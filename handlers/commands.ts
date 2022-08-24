@@ -5,17 +5,8 @@ import {
   ApplicationCommandOptionType,
 } from "discord.js";
 
-function setCommands(client: Client, guildId: string = "") {
-  let commands:
-    | GuildApplicationCommandManager
-    | ApplicationCommandManager
-    | undefined;
-  if (guildId.length > 0) {
-    const guild = client.guilds.cache.get(guildId);
-    commands = guild?.commands;
-  } else {
-    commands = client.application?.commands;
-  }
+function setCommands(client: Client) {
+  let commands = client.application?.commands;
 
   commands?.create({
     name: "lookingforteam",
