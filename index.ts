@@ -1,7 +1,7 @@
 import { Client, GatewayIntentBits, IntentsBitField } from "discord.js";
-import setCommands from "./commands/commands";
-import handleInteractions from "./commands/interactions";
-import handleMessage from "./commands/messages";
+import setCommands from "./handlers/commands";
+import handleInteractions from "./handlers/interactions";
+import handleMessage from "./handlers/messages";
 
 const client = new Client({
   intents: [
