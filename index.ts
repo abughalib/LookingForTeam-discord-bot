@@ -13,8 +13,7 @@ const client = new Client({
 
 client.on("ready", () => {
   console.log("The bot is ready!");
-  const guildId = "923701565158744155";
-  setCommands(client, guildId);
+  setCommands(client);
 });
 
 client.on("interactionCreate", async (interaction) => {
