@@ -4,7 +4,7 @@
   "description": "A discord bot for multiplayer gaming community",
   "main": "index.ts",
   "scripts": {
-    "start": "ts-node index.ts",
+    "start": "nodemon index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
