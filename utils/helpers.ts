@@ -1,7 +1,11 @@
 function formatTime(duration: number): string {
+
+  // Added for cameld00d
   if (duration < 0) {
     return "For few hours maybe";
   }
+
+  // Duration less then 1 i.e minutes
   if (duration < 1) {
     duration = 60 * duration;
     if (duration < 1) {

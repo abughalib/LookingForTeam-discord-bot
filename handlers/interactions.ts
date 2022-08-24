@@ -21,17 +21,17 @@ async function handleInteractions(interaction: Interaction) {
     let spots = options.get('spots')?.value || 3;
     let duration: number = (options.get("duration")?.value as number) || 0.5;
 
-    // Maximum spot in wing is 3
-    if (spots > 3){
-      spots = 3;
+    // Maximum spot in wing is MAXIMUM_TEAM_SPOT which is 3 as of now
+    if (spots > AppSettings.MAXIMUM_TEAM_SPOT){
+      spots = AppSettings.MAXIMUM_TEAM_SPOT;
     }
-    // If Duration is more then 10 hours convert it into Minutes
-    if (duration > 10) {
+    // If Duration is more then MAXIMUM_HOURS_TEAM hours convert it into Minutes
+    if (duration > AppSettings.MAXIMUM_HOURS_TEAM) {
       duration = duration/60;
     }
 
     // If Duration is more then 18 hours dismiss it.
-    if (duration > 1080) {
+    if (duration > AppSettings.MAXIMUM_HOURS_TEAM*60) {
       return;
     }
 

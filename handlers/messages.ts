@@ -1,4 +1,5 @@
 import { Client, Message } from "discord.js";
+import { AppSettings } from "../utils/settings";
 import embedMessage from "./embeded_message";
 
 async function handleMessage(prefix: string, message: Message, client: Client) {
@@ -39,7 +40,7 @@ async function handleMessage(prefix: string, message: Message, client: Client) {
         );
 
         embeded_message.setFooter({
-          text: "Auto delete in 60 seconds",
+          text: `Auto delete in ${AppSettings.HELP_MESSAGE_DISMISS_DURATION/1000} seconds`,
         });
 
         let sent_message = await message.channel.send({
@@ -49,7 +50,7 @@ async function handleMessage(prefix: string, message: Message, client: Client) {
         setTimeout(async () => {
           await sent_message.delete();
           await message.delete();
-        }, 5 * 1000);
+        }, AppSettings.HELP_MESSAGE_DISMISS_DURATION);
     }
   }
 }
