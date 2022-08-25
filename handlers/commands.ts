@@ -1,21 +1,23 @@
 import { Client, ApplicationCommandOptionType } from "discord.js";
 
 function setCommands(client: Client) {
-
   if (client.application == null) {
-    console.error('ClientApplication null, client: ', client);
+    console.error("ClientApplication null, client: ", client);
     return;
   }
 
   let commands = client.application.commands;
 
   if (commands == null) {
-    console.error('Application Commands null, application: ', client.application);
+    console.error(
+      "Application Commands null, application: ",
+      client.application
+    );
     return;
   }
 
   commands.create({
-    name: "lookingforteam",
+    name: "wing",
     description: "Looking For Team Commands",
     options: [
       {
@@ -44,12 +46,20 @@ function setCommands(client: Client) {
       },
       {
         name: "duration",
-        description:
-          "How long are you planning to wing up (Hours) numbers only?",
+        description: "How long would you play (hours or minutes) numbers only?",
         required: false,
         type: ApplicationCommandOptionType.Number,
       },
     ],
+  });
+  commands.create({
+    name: "winghelp",
+    description: "Need help to use this BOT",
+  });
+
+  commands.create({
+    name: "ping",
+    description: "Check if the Bot is up and Running",
   });
 }
 

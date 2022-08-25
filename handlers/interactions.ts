@@ -34,7 +34,14 @@ async function interactionCommandHandler(interaction: CommandInteraction) {
   );
   const nickName = userInterected?.nickname || interaction.user.username;
 
-  if (commandName === "lookingforteam") {
+  const options_list = [
+    "Game Version",
+    "What kind of mission/gameplay?",
+    "Star System/Location",
+    "Number of Space in Wing/Team Available",
+  ];
+
+  if (commandName === "wing") {
     const version =
       options.get("version")?.value || AppSettings.DEFAULT_GAME_VERSION;
     const activity =
@@ -60,19 +67,13 @@ async function interactionCommandHandler(interaction: CommandInteraction) {
       return;
     }
 
-    const list_headers = [
-      "Game Version",
-      "What kind of mission/gameplay?",
-      "Star System/Location",
-      "Number of Space in Wing/Team Available",
-    ];
-    const list_headers_values = [version, activity, location, spots];
+    const options_values = [version, activity, location, spots];
     const title: string = "PC Team + Wing Request";
 
     let embeded_message = embedMessage(
       title,
-      list_headers,
-      list_headers_values,
+      options_list,
+      options_values,
       nickName
     );
 
@@ -124,6 +125,50 @@ async function interactionCommandHandler(interaction: CommandInteraction) {
         }
       });
     }, AppSettings.HOURS_TO_MILISEC * duration);
+  } else if (commandName === "winghelp") {
+    const title: string = "How to use, Check example.";
+    const list_options = [
+      "Command",
+      "Game Version",
+      "What kind of mission/gameplay?",
+      "Star System/Location",
+      "Number of Space in Wing/Team Available",
+      "Duration/TimeFrame",
+    ];
+    const list_options_values = [
+      "Use `/wing`",
+      "Odyssey, Horizon 4.0, Horizon 3.8, ED Beyond",
+      "Mining, Bounty Hunting, etc...",
+      "SOL",
+      "2 Spots",
+      "1.5 (1 hours and 30 minutes)",
+    ];
+
+    let embeded_message = embedMessage(
+      title,
+      list_options,
+      list_options_values,
+      interaction.user.username || "Unknown"
+    );
+
+    embeded_message.setFooter({
+      text: `Auto delete in ${
+        AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT / 1000
+      } seconds`,
+    });
+
+    await interaction.deferReply({
+      ephemeral: true,
+    });
+
+    await interaction.editReply({
+      embeds: [embeded_message],
+    });
+  } else if (commandName === "ping") {
+    await interaction.reply({
+      content: "Bots never sleeps",
+      ephemeral: true,
+    });
   }
 }
 
