@@ -8,17 +8,17 @@ function formatTime(duration: number): string {
   if (duration < 1) {
     duration = 60 * duration;
     if (duration < 1) {
-      return `${duration * 60} seconds`;
+      return `${Math.floor(duration * 60)} seconds`;
     }
-    return `About ${duration.toFixed(2)} Minutes`;
+    return `About ${Math.floor(duration)} Minutes`;
   }
   let str_duration = duration.toString();
 
   if (str_duration.includes(".")) {
     const duration_split = str_duration.split(".");
     const hours = duration_split[0];
-    const minutes = (parseInt(duration_split[1]) * 60) / 10;
-    return `About ${hours} hours and ${minutes.toFixed(2)} Minutes`;
+    const minutes = Math.floor((parseInt(duration_split[1]) * 60) / 10);
+    return `About ${hours} hours and ${minutes} Minutes`;
   }
 
   return `About ${duration} Hours`;
