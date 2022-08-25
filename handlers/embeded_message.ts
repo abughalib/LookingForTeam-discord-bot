@@ -1,9 +1,4 @@
-import {
-  APIEmbedField,
-  EmbedBuilder,
-  Interaction,
-  RestOrArray,
-} from "discord.js";
+import { APIEmbedField, EmbedBuilder, RestOrArray } from "discord.js";
 import { AppSettings } from "../utils/settings";
 
 function getFields(
