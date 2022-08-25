@@ -18,4 +18,4 @@ client.on("interactionCreate", async (interaction) => {
   await handleInteractions(interaction);
 });
 
-client.login(process.env.TEST_BOT_TOKEN);
+client.login(process.env.LOOKING_BOT_TEAM_TOKEN);
