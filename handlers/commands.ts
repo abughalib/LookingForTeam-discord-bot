@@ -1,14 +1,20 @@
-import {
-  Client,
-  ApplicationCommandManager,
-  GuildApplicationCommandManager,
-  ApplicationCommandOptionType,
-} from "discord.js";
+import { Client, ApplicationCommandOptionType } from "discord.js";
 
 function setCommands(client: Client) {
-  let commands = client.application?.commands;
 
-  commands?.create({
+  if (client.application == null) {
+    console.error('ClientApplication null, client: ', client);
+    return;
+  }
+
+  let commands = client.application.commands;
+
+  if (commands == null) {
+    console.error('Application Commands null, application: ', client.application);
+    return;
+  }
+
+  commands.create({
     name: "lookingforteam",
     description: "Looking For Wing Command",
     options: [
