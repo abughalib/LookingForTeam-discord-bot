@@ -14,10 +14,20 @@ async function handleMessage(prefix: string, message: Message, client: Client) {
         await message.channel.send({
           content: "Bots never sleeps",
         });
+        setTimeout(async () => {
+          await message.delete().catch((error) => {
+            if (error.code !== 10008) {
+              console.error(`Failed to to delete the message: ${error}`);
+            } else {
+              console.info("Message Already Deleted");
+            }
+          });
+        }, AppSettings.HELP_MESSAGE_DISMISS_DURATION);
         break;
       case "help":
         const title: string = "How to use, Check example.";
         const list_headers = [
+          "Command",
           "Game Version",
           "What kind of mission/gameplay?",
           "Star System/Location",
@@ -25,6 +35,7 @@ async function handleMessage(prefix: string, message: Message, client: Client) {
           "Duration/TimeFrame",
         ];
         const list_headers_values = [
+          "Use `/lookingforteam `",
           "Odyssey, Horizon 4.0, Horizon 3.8, ED Beyond",
           "Mining, Bounty Hunting, etc...",
           "SOL",
@@ -40,7 +51,9 @@ async function handleMessage(prefix: string, message: Message, client: Client) {
         );
 
         embeded_message.setFooter({
-          text: `Auto delete in ${AppSettings.HELP_MESSAGE_DISMISS_DURATION/1000} seconds`,
+          text: `Auto delete in ${
+            AppSettings.HELP_MESSAGE_DISMISS_DURATION / 1000
+          } seconds`,
         });
 
         let sent_message = await message.channel.send({
@@ -48,8 +61,20 @@ async function handleMessage(prefix: string, message: Message, client: Client) {
         });
 
         setTimeout(async () => {
-          await sent_message.delete();
-          await message.delete();
+          await sent_message.delete().catch((error) => {
+            if (error.code !== 10008) {
+              console.error(`Failed to to delete the message: ${error}`);
+            } else {
+              console.info("Message Already Deleted");
+            }
+          });
+          await message.delete().catch((error) => {
+            if (error.code !== 10008) {
+              console.error(`Failed to to delete the message: ${error}`);
+            } else {
+              console.info("Message Already Deleted");
+            }
+          });
         }, AppSettings.HELP_MESSAGE_DISMISS_DURATION);
     }
   }
