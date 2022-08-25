@@ -16,7 +16,7 @@ function setCommands(client: Client) {
 
   commands.create({
     name: "lookingforteam",
-    description: "Looking For Wing Command",
+    description: "Looking For Team Commands",
     options: [
       {
         name: "version",
