@@ -6,6 +6,7 @@ const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
     IntentsBitField.Flags.GuildMessages,
+    GatewayIntentBits.MessageContent,
   ],
 });
 
@@ -18,4 +19,5 @@ client.on("interactionCreate", async (interaction) => {
   await handleInteractions(interaction);
 });
 
-client.login(process.env.LOOKING_BOT_TEAM_TOKEN);
+client.login(process.env.LOOKING_FOR_TEAM_BOT_TOKEN);
+// client.login(process.env.TEST_BOT_TOKEN);
