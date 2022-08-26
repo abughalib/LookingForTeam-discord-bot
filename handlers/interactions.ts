@@ -177,8 +177,7 @@ async function interactionCommandHandler(
           console.info("Message Already Deleted");
         } else if (error.code === 50027) {
           // Discord API Error, Invalid Webhook Token
-          // Retry
-          retryDeletingMessage(interaction);
+          console.error('Failed to delete the message: ', error);
         } else {
           // Message Deletion failed and its unknown Error.
           console.error(`Failed to to delete the message: ${error}`);
@@ -265,8 +264,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
           console.info("Message Already Deleted");
         } else if (error.code === 50027) {
           // Discord API Error, Invalid Webhook Token
-          // Retry
-          retryDeletingMessage(interaction);
+          console.error('Failed to delete the message: ', error);
         } else {
           // Message Deletion failed and its unknown Error.
           console.error(`Failed to to delete the message: ${error}`);
@@ -307,39 +305,6 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       ephemeral: true,
     });
   }
-}
-
-/// Function to handle Discord API Error [50027]
-/// Its discord's error, this function would be removed when Discord fixes it.
-async function retryDeletingMessage(
-  interaction: CommandInteraction | ButtonInteraction
-) {
-  let tries: number = 0;
-  const MAX_TRIES = 10;
-  const RETRY_MESSAGE_DELETION = 1000 * 15 * 60; // 15 Minutes
-
-  setInterval(async () => {
-    await interaction.deleteReply().catch((error) => {
-      if (error.code === 10008) {
-        return;
-      } else if (error.code === 50027) {
-        console.error(
-          `Trying to Delete got APIError[50027], retrying: ${tries} `
-        );
-      } else {
-        // Some Other error.
-        console.error(`Failed to to delete the message: ${error}`);
-        return;
-      }
-    });
-    tries += 1;
-    if (tries > MAX_TRIES) {
-      console.error(
-        `Failed to Delete the message after ${MAX_TRIES}, DiscordAPIError[50027]`
-      );
-      return;
-    }
-  }, RETRY_MESSAGE_DELETION);
 }
 
 async function interactionMenuHandler(
