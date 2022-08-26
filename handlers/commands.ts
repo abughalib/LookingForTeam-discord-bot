@@ -21,12 +21,6 @@ function setCommands(client: Client) {
     description: "Looking For Team Commands",
     options: [
       {
-        name: "version",
-        description: "What version of game you're using",
-        required: false,
-        type: ApplicationCommandOptionType.String,
-      },
-      {
         name: "activity",
         description: "What are you planning to do in Game?",
         required: false,
