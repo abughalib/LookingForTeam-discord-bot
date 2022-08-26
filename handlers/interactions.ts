@@ -5,23 +5,72 @@ import {
   ButtonStyle,
   CommandInteraction,
   Interaction,
+  SelectMenuBuilder,
+  SelectMenuInteraction,
+  EmbedBuilder,
+  Embed,
 } from "discord.js";
 import { AppSettings } from "../utils/settings";
 import formatTime from "../utils/helpers";
 import embedMessage from "./embeded_message";
 
 async function handleInteractions(interaction: Interaction) {
+  const menus = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
+    new SelectMenuBuilder()
+      .setCustomId("select_game_version")
+      .setPlaceholder("Game Version")
+      .addOptions(
+        {
+          label: "Odyssey",
+          description: "Elite Dangerous Odyssey 4.0",
+          value: "odyssey",
+        },
+        {
+          label: "Horizon 4.0",
+          description: "Elite Dangerous Horizon 4.0",
+          value: "horizon_four_zero",
+        },
+        {
+          label: "Horizon 3.8",
+          description: "Elite Dangerous Horizon 3.8",
+          value: "horizon_three_eight",
+        },
+        {
+          label: "Beyond",
+          description: "Elite Dangerous Beyond",
+          value: "beyond",
+        }
+      )
+  );
+
+  const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId("command_join")
+      .setLabel("Request Team Invite")
+      .setStyle(ButtonStyle.Primary),
+    new ButtonBuilder()
+      .setCustomId("command_dismiss")
+      .setLabel("Delete")
+      .setStyle(ButtonStyle.Danger)
+  );
+
   if (interaction.isCommand()) {
-    interactionCommandHandler(interaction);
+    interactionCommandHandler(interaction, menus, buttons);
   } else if (interaction.isButton()) {
     interactionButtonHandler(interaction);
+  } else if (interaction.isSelectMenu()) {
+    interactionMenuHandler(interaction, buttons);
   } else {
     // To be Implemented in Future if needed
     return;
   }
 }
 
-async function interactionCommandHandler(interaction: CommandInteraction) {
+async function interactionCommandHandler(
+  interaction: CommandInteraction,
+  menus: ActionRowBuilder<SelectMenuBuilder>,
+  buttons: ActionRowBuilder<ButtonBuilder>
+) {
   const { commandName, options } = interaction;
 
   if (interaction.guild == null) {
@@ -35,15 +84,12 @@ async function interactionCommandHandler(interaction: CommandInteraction) {
   const nickName = userInterected?.nickname || interaction.user.username;
 
   const options_list = [
-    "Game Version",
     "What kind of mission/gameplay?",
     "Star System/Location",
     "Number of Space in Wing/Team Available",
   ];
 
   if (commandName === "wing") {
-    const version =
-      options.get("version")?.value || AppSettings.DEFAULT_GAME_VERSION;
     const activity =
       options.get("activity")?.value || AppSettings.DEFAULT_TEAM_ACTIVITY;
     const location =
@@ -67,8 +113,17 @@ async function interactionCommandHandler(interaction: CommandInteraction) {
       return;
     }
 
-    const options_values = [version, activity, location, spots];
-    const title: string = "PC Team + Wing Request";
+    const options_values = [activity, location, spots];
+
+    let title: string = AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
+
+    if (interaction.channelId === AppSettings.XBOX_CHANNEL_ID) {
+      title = AppSettings.XBOX_WING_REQUEST_INTERACTION_TITLE;
+    } else if (interaction.channelId === AppSettings.PS_CHANNEL_ID) {
+      title = AppSettings.PS_WING_REQUEST_INTERACTION_TITLE;
+    } else {
+      title = AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
+    }
 
     let embeded_message = embedMessage(
       title,
@@ -92,27 +147,27 @@ async function interactionCommandHandler(interaction: CommandInteraction) {
       text: `Auto delete in ${duration * 60} minutes`,
     });
 
-    //Adding Button
-    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("command_join")
-        .setLabel("Request Team Invite")
-        .setStyle(ButtonStyle.Primary),
-      new ButtonBuilder()
-        .setCustomId("command_dismiss")
-        .setLabel("Delete")
-        .setStyle(ButtonStyle.Danger)
-    );
+    if (interaction.channelId === AppSettings.PC_CHANNEL_ID) {
+      await interaction.deferReply({
+        ephemeral: false,
+      });
 
-    await interaction.deferReply({
-      ephemeral: false,
-    });
+      // Pretty Looking reply
+      await interaction.editReply({
+        embeds: [embeded_message],
+        components: [buttons, menus],
+      });
+    } else {
+      await interaction.deferReply({
+        ephemeral: false,
+      });
 
-    // Pretty Looking reply
-    await interaction.editReply({
-      embeds: [embeded_message],
-      components: [buttons],
-    });
+      // Pretty Looking reply
+      await interaction.editReply({
+        embeds: [embeded_message],
+        components: [buttons],
+      });
+    }
 
     // Auto Delete message after certain time.
     setTimeout(async () => {
@@ -248,7 +303,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     }
 
     interaction.reply({
-      content: "You can't use this button to dismiss",
+      content: "Cannot perform this action",
       ephemeral: true,
     });
   }
@@ -261,14 +316,16 @@ async function retryDeletingMessage(
 ) {
   let tries: number = 0;
   const MAX_TRIES = 10;
-  const RETRY_MESSAGE_DELETION = 1000*15*60; // 15 Minutes
+  const RETRY_MESSAGE_DELETION = 1000 * 15 * 60; // 15 Minutes
 
   setInterval(async () => {
     await interaction.deleteReply().catch((error) => {
       if (error.code === 10008) {
         return;
       } else if (error.code === 50027) {
-        console.error(`Message Deleted after: ${tries}`);
+        console.error(
+          `Trying to Delete got APIError[50027], retrying: ${tries} `
+        );
       } else {
         // Some Other error.
         console.error(`Failed to to delete the message: ${error}`);
@@ -277,10 +334,74 @@ async function retryDeletingMessage(
     });
     tries += 1;
     if (tries > MAX_TRIES) {
-      console.error(`Failed to Delete the message after ${MAX_TRIES}, DiscordAPIError[50027]`);
+      console.error(
+        `Failed to Delete the message after ${MAX_TRIES}, DiscordAPIError[50027]`
+      );
       return;
     }
   }, RETRY_MESSAGE_DELETION);
+}
+
+async function interactionMenuHandler(
+  interaction: SelectMenuInteraction,
+  buttons: ActionRowBuilder<ButtonBuilder>
+) {
+  if (interaction.user !== interaction.message.interaction?.user) {
+    interaction.reply({
+      content: "You cannot perform this action",
+      ephemeral: true,
+    });
+    return;
+  }
+
+  let original_message: Embed = interaction.message.embeds[0];
+  let title = original_message.data.title;
+  let fields = original_message.data.fields;
+
+  let new_embeded_message = new EmbedBuilder();
+  new_embeded_message.setTitle(title || "");
+  new_embeded_message.addFields(fields || [{ name: "", value: "" }]);
+
+  if (interaction.customId === "select_game_version") {
+    await interaction.deferUpdate();
+    if (interaction.values[0] === "odyssey") {
+      new_embeded_message.addFields({
+        name: "Elite Dangerous Version",
+        value: "Elite Dangerous Odyssey",
+      });
+      await interaction.editReply({
+        components: [buttons],
+        embeds: [new_embeded_message],
+      });
+    } else if (interaction.values[0] === "horizon_four_zero") {
+      new_embeded_message.addFields({
+        name: "Elite Dangerous Version",
+        value: "Elite Dangerous Horizon 4.0",
+      });
+      await interaction.editReply({
+        components: [buttons],
+        embeds: [new_embeded_message],
+      });
+    } else if (interaction.values[0] === "horizon_three_eight") {
+      new_embeded_message.addFields({
+        name: "Elite Dangerous Version",
+        value: "Elite Dangerous Horizon 3.8",
+      });
+      await interaction.editReply({
+        components: [buttons],
+        embeds: [new_embeded_message],
+      });
+    } else if (interaction.values[0] === "beyond") {
+      new_embeded_message.addFields({
+        name: "Elite Dangerous Version",
+        value: "Elite Dangerous Beyond",
+      });
+      await interaction.editReply({
+        components: [buttons],
+        embeds: [new_embeded_message],
+      });
+    }
+  }
 }
 
 export default handleInteractions;
