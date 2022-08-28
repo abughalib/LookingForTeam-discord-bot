@@ -9,6 +9,7 @@ import {
   SelectMenuInteraction,
   EmbedBuilder,
   Embed,
+  Message,
 } from "discord.js";
 import { AppSettings } from "../utils/settings";
 import formatTime from "../utils/helpers";
@@ -169,6 +170,8 @@ async function interactionCommandHandler(
       });
     }
 
+    let sent_message = await interaction.fetchReply();
+
     // Auto Delete message after certain time.
     setTimeout(async () => {
       await interaction.deleteReply().catch((error) => {
@@ -177,7 +180,8 @@ async function interactionCommandHandler(
           console.info("Message Already Deleted");
         } else if (error.code === 50027) {
           // Discord API Error, Invalid Webhook Token
-          console.error('Failed to delete the message: ', error);
+          deleteMessage(sent_message);
+          // console.error(`Failed to delete the message: ${error}`);
         } else {
           // Message Deletion failed and its unknown Error.
           console.error(`Failed to to delete the message: ${error}`);
@@ -257,6 +261,8 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       content: `Hey ${originalUserInteraction}, ${currentUserInteraction} is looking for Team Invite`,
     });
 
+    let message = await interaction.fetchReply();
+
     setTimeout(async () => {
       await interaction.deleteReply().catch((error) => {
         // Message Already Deleted
@@ -264,7 +270,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
           console.info("Message Already Deleted");
         } else if (error.code === 50027) {
           // Discord API Error, Invalid Webhook Token
-          console.error('Failed to delete the message: ', error);
+          deleteMessage(message);
         } else {
           // Message Deletion failed and its unknown Error.
           console.error(`Failed to to delete the message: ${error}`);
@@ -366,7 +372,18 @@ async function interactionMenuHandler(
         embeds: [new_embeded_message],
       });
     }
+    let sent_message = await interaction.fetchReply();
+    deleteMessage(sent_message);
   }
+}
+
+async function deleteMessage(message: Message | null | undefined) {
+  if (message === null || message === undefined) {
+    return;
+  }
+  await message.delete().catch((error)=> {
+    console.error(`${error}`)
+  });
 }
 
 export default handleInteractions;
