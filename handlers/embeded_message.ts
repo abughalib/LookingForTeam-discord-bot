@@ -24,7 +24,7 @@ function embedMessage(
   let embeded_message = new EmbedBuilder()
     .setColor(AppSettings.EMBEDED_MESSAGE_COLOR)
     .setTitle(title)
-    .setAuthor({ name: `${nickName}` })
+    .setAuthor({ name: `Created by: ${nickName}` })
     .addFields(...getFields(options, values))
     .setTimestamp();
 
