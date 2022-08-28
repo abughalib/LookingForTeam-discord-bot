@@ -372,8 +372,6 @@ async function interactionMenuHandler(
         embeds: [new_embeded_message],
       });
     }
-    let sent_message = await interaction.fetchReply();
-    deleteMessage(sent_message);
   }
 }
 
@@ -382,7 +380,15 @@ async function deleteMessage(message: Message | null | undefined) {
     return;
   }
   await message.delete().catch((error)=> {
-    console.error(`${error}`)
+    if (error.code === 10008) {
+      console.info("Message Already Deleted");
+    } else if (error.code === 50027) {
+      // This is a known error
+      console.error("Failed to delete message 50027 error");
+    }
+    else {
+      console.log("Unknown Error: ", error);
+    }
   });
 }
 
