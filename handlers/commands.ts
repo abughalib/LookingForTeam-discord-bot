@@ -1,4 +1,5 @@
 import { Client, ApplicationCommandOptionType } from "discord.js";
+import { AppSettings } from "../utils/settings";
 
 function setCommands(client: Client) {
   if (client.application == null) {
@@ -17,7 +18,7 @@ function setCommands(client: Client) {
   }
 
   commands.create({
-    name: "wing",
+    name: AppSettings.BOT_WING_COMMAND_NAME,
     description: "Looking For Team Commands",
     options: [
       {
@@ -43,16 +44,16 @@ function setCommands(client: Client) {
         description: "How much space you have in your Team",
         required: false,
         type: ApplicationCommandOptionType.Number,
-      }
+      },
     ],
   });
   commands.create({
-    name: "winghelp",
+    name: AppSettings.BOT_HELP_COMMAND_NAME,
     description: "Need help to use this BOT",
   });
 
   commands.create({
-    name: "ping",
+    name: AppSettings.BOT_PING_COMMAND_NAME,
     description: "Check if the Bot is up and Running",
   });
 }
