@@ -20,28 +20,7 @@ async function handleInteractions(interaction: Interaction) {
     new SelectMenuBuilder()
       .setCustomId("select_game_version")
       .setPlaceholder("Game Version")
-      .addOptions(
-        {
-          label: "Odyssey",
-          description: "Elite Dangerous Odyssey 4.0",
-          value: "odyssey",
-        },
-        {
-          label: "Horizon 4.0",
-          description: "Elite Dangerous Horizon 4.0",
-          value: "horizon_four_zero",
-        },
-        {
-          label: "Horizon 3.8",
-          description: "Elite Dangerous Horizon 3.8",
-          value: "horizon_three_eight",
-        },
-        {
-          label: "Beyond",
-          description: "Elite Dangerous Beyond",
-          value: "beyond",
-        }
-      )
+      .addOptions(AppSettings.AVAILABLE_GAME_VERSIONS)
   );
 
   const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -90,7 +69,7 @@ async function interactionCommandHandler(
     "Number of Space in Wing/Team Available",
   ];
 
-  if (commandName === "wing") {
+  if (commandName === AppSettings.BOT_WING_COMMAND_NAME) {
     const activity =
       options.get("activity")?.value || AppSettings.DEFAULT_TEAM_ACTIVITY;
     const location =
@@ -109,7 +88,7 @@ async function interactionCommandHandler(
       duration = duration / 60;
     }
 
-    // If Duration is more then 18 hours dismiss it.
+    // If Duration is more then 10 hours dismiss it.
     if (duration > AppSettings.MAXIMUM_HOURS_TEAM * 60) {
       return;
     }
@@ -145,7 +124,7 @@ async function interactionCommandHandler(
     }
 
     embeded_message.setFooter({
-      text: `Auto delete in ${duration * 60} minutes`,
+      text: `Auto delete in ${Math.ceil(duration * 60)} minutes`,
     });
 
     if (interaction.channelId === AppSettings.PC_CHANNEL_ID) {
@@ -181,14 +160,13 @@ async function interactionCommandHandler(
         } else if (error.code === 50027) {
           // Discord API Error, Invalid Webhook Token
           deleteMessage(sent_message);
-          // console.error(`Failed to delete the message: ${error}`);
         } else {
           // Message Deletion failed and its unknown Error.
           console.error(`Failed to to delete the message: ${error}`);
         }
       });
     }, AppSettings.HOURS_TO_MILISEC * duration);
-  } else if (commandName === "winghelp") {
+  } else if (commandName === AppSettings.BOT_HELP_COMMAND_NAME) {
     const title: string = "How to use, Check example.";
     const list_options = [
       "Command",
@@ -227,7 +205,7 @@ async function interactionCommandHandler(
     await interaction.editReply({
       embeds: [embeded_message],
     });
-  } else if (commandName === "ping") {
+  } else if (commandName === AppSettings.BOT_PING_COMMAND_NAME) {
     await interaction.reply({
       content: "Bots never sleeps",
       ephemeral: true,
@@ -317,7 +295,10 @@ async function interactionMenuHandler(
   interaction: SelectMenuInteraction,
   buttons: ActionRowBuilder<ButtonBuilder>
 ) {
-  if (interaction.user !== interaction.message.interaction?.user) {
+  if (interaction.message.interaction === null) {
+    return;
+  }
+  if (interaction.user !== interaction.message.interaction.user) {
     interaction.reply({
       content: "You cannot perform this action",
       ephemeral: true,
@@ -327,11 +308,16 @@ async function interactionMenuHandler(
 
   let original_message: Embed = interaction.message.embeds[0];
   let title = original_message.data.title;
+  let author = original_message.data.author?.name || "";
   let fields = original_message.data.fields;
+  let footer = original_message.data.footer?.text || "";
 
   let new_embeded_message = new EmbedBuilder();
   new_embeded_message.setTitle(title || "");
+  new_embeded_message.setAuthor({ name: author });
   new_embeded_message.addFields(fields || [{ name: "", value: "" }]);
+  new_embeded_message.setFooter({ text: footer });
+  new_embeded_message.setTimestamp();
 
   if (interaction.customId === "select_game_version") {
     await interaction.deferUpdate();
@@ -379,14 +365,13 @@ async function deleteMessage(message: Message | null | undefined) {
   if (message === null || message === undefined) {
     return;
   }
-  await message.delete().catch((error)=> {
+  await message.delete().catch((error) => {
     if (error.code === 10008) {
       console.info("Message Already Deleted");
     } else if (error.code === 50027) {
       // This is a known error
       console.error("Failed to delete message 50027 error");
-    }
-    else {
+    } else {
       console.log("Unknown Error: ", error);
     }
   });
