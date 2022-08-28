@@ -21,6 +21,12 @@ function setCommands(client: Client) {
     description: "Looking For Team Commands",
     options: [
       {
+        name: "duration",
+        description: "How long would you play (hours or minutes) numbers only?",
+        required: true,
+        type: ApplicationCommandOptionType.Number,
+      },
+      {
         name: "activity",
         description: "What are you planning to do in Game?",
         required: false,
@@ -37,13 +43,7 @@ function setCommands(client: Client) {
         description: "How much space you have in your Team",
         required: false,
         type: ApplicationCommandOptionType.Number,
-      },
-      {
-        name: "duration",
-        description: "How long would you play (hours or minutes) numbers only?",
-        required: true,
-        type: ApplicationCommandOptionType.Number,
-      },
+      }
     ],
   });
   commands.create({
