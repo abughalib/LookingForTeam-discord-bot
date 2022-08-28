@@ -41,7 +41,7 @@ function setCommands(client: Client) {
       {
         name: "duration",
         description: "How long would you play (hours or minutes) numbers only?",
-        required: false,
+        required: true,
         type: ApplicationCommandOptionType.Number,
       },
     ],
