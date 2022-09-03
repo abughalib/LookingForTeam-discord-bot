@@ -357,6 +357,15 @@ async function interactionMenuHandler(
         components: [buttons],
         embeds: [new_embeded_message],
       });
+    } else if (interaction.values[0] === "any") {
+      new_embeded_message.addFields({
+        name: "Elite Dangerous Version",
+        value: "Any",
+      });
+      await interaction.editReply({
+        components: [buttons],
+        embeds: [new_embeded_message],
+      });
     }
   }
 }

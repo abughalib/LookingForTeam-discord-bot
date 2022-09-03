@@ -43,7 +43,7 @@ export class AppSettings {
     {
       label: "Any",
       description: "Any Version of Elite Dangerous",
-      value: "Any"
+      value: "any"
     },
   ];
 }
