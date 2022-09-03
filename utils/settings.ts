@@ -40,5 +40,10 @@ export class AppSettings {
       description: "Elite Dangerous Beyond",
       value: "beyond",
     },
+    {
+      label: "Any",
+      description: "Any Version of Elite Dangerous",
+      value: "Any"
+    },
   ];
 }
