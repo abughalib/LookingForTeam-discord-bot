@@ -394,7 +394,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
 
         await interaction.reply({
           ephemeral: false,
-          content: `${interaction.message.author}, Your request is accepted`,
+          content: `${interaction.message.mentions.users.last()}, Your request is accepted`,
         });
         deleteInteractionButton(
           interaction,
