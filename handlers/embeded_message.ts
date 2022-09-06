@@ -26,7 +26,7 @@ function embedMessage(
     .setTitle(title)
     .setAuthor({ name: `Created by: ${nickName}` })
     .addFields(...getFields(options, values))
-    .setTimestamp();
+    .setTimestamp(Date.now());
 
   return embeded_message;
 }
