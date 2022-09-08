@@ -136,6 +136,7 @@ async function interactionCommandHandler(
     if (!systemInfo || !systemInfo.id) {
       await interaction.editReply({
         content: "No System found with Name: " + systemName,
+        components: [dismissButton]
       });
     } else if (
       !systemInfo.controllingFaction ||
