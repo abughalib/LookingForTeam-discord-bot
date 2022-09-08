@@ -1,6 +1,6 @@
 {
   "name": "lookingforteam",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "A discord bot for multiplayer gaming community",
   "main": "index.ts",
   "scripts": {
@@ -25,5 +25,9 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.19"
+  },
+  "engines": {
+    "npm": ">=8.18.0",
+    "node": ">=18.8.0"
   }
 }
