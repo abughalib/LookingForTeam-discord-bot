@@ -1,6 +1,6 @@
 import { APIEmbedField, EmbedBuilder, RestOrArray } from "discord.js";
 import { AppSettings } from "../utils/settings";
-import SystemInfo from "../utils/systemInfoMode";
+import SystemInfo from "../utils/systemInfoModel";
 
 function getFields(
   options: string[],

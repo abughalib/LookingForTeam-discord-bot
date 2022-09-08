@@ -9,7 +9,7 @@ import {
 import getSystemInfo from "../../utils/edsm";
 import formatTime from "../../utils/helpers";
 import { AppSettings } from "../../utils/settings";
-import SystemInfo from "../../utils/systemInfoMode";
+import SystemInfo from "../../utils/systemInfoModel";
 import embedMessage from "../embeded_message";
 import systemEmbedMessage from "../systemInfoEmbed";
 import deleteInteraction from "./deleteInteractions";

@@ -1,5 +1,5 @@
 import { AppSettings } from "./settings";
-import SystemInfo from "./systemInfoMode";
+import SystemInfo from "./systemInfoModel";
 
 async function fetchSystemInfo(systemName: string) {
   let resp = await fetch(AppSettings.BOT_SYSTEM_INFO_FETCH_URL, {
