@@ -3,11 +3,16 @@ import {
   ActionRowBuilder,
   SelectMenuBuilder,
   ButtonBuilder,
+  EmbedBuilder,
+  ButtonStyle,
 } from "discord.js";
+import getSystemInfo from "../../utils/edsm";
 import formatTime from "../../utils/helpers";
 import { AppSettings } from "../../utils/settings";
+import SystemInfo from "../../utils/systemInfoMode";
 import embedMessage from "../embeded_message";
-import deleteMessage from "./deleteMessage";
+import systemEmbedMessage from "../systemInfoEmbed";
+import deleteInteraction from "./deleteInteractions";
 
 async function interactionCommandHandler(
   interaction: CommandInteraction,
@@ -111,24 +116,48 @@ async function interactionCommandHandler(
         components: [buttons],
       });
     }
-
-    let sent_message = await interaction.fetchReply();
-
     // Auto Delete message after certain time.
-    setTimeout(async () => {
-      await interaction.deleteReply().catch((error) => {
-        // Message Already Deleted
-        if (error.code === 10008) {
-          console.info("Message Already Deleted");
-        } else if (error.code === 50027) {
-          // Discord API Error, Invalid Webhook Token
-          deleteMessage(sent_message);
-        } else {
-          // Message Deletion failed and its unknown Error.
-          console.error(`Failed to to delete the message: ${error}`);
-        }
+    deleteInteraction(interaction, AppSettings.HOURS_TO_MILISEC * duration);
+  } else if (commandName == AppSettings.BOT_SYSTEM_INFO_COMMAND_NAME) {
+    const systemName: string =
+      options.get("system_name")?.value?.toString() ||
+      AppSettings.DEFAULT_SYSTEM_NAME;
+    await interaction.deferReply();
+
+    let systemInfo: SystemInfo | null = await getSystemInfo(systemName);
+
+    let dismissButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId("command_dismiss")
+        .setLabel("Delete")
+        .setStyle(ButtonStyle.Danger)
+    );
+
+    if (!systemInfo || !systemInfo.id) {
+      await interaction.editReply({
+        content: "No System found with Name: " + systemName,
       });
-    }, AppSettings.HOURS_TO_MILISEC * duration);
+    } else if (
+      !systemInfo.controllingFaction ||
+      systemInfo.factions.length === 0
+    ) {
+      await interaction.editReply({
+        embeds: [
+          new EmbedBuilder()
+            .setTitle(`Inhabitated System: ${systemInfo.name}`)
+            .setURL(systemInfo.url),
+        ],
+        components: [dismissButton],
+      });
+    } else {
+      let embeded_message = systemEmbedMessage(systemInfo);
+      await interaction.editReply({
+        embeds: [embeded_message],
+        components: [dismissButton],
+      });
+    }
+
+    deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
   } else if (commandName === AppSettings.BOT_HELP_COMMAND_NAME) {
     const title: string = "How to use, Check example.";
     const list_options = [
