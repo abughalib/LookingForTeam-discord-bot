@@ -47,6 +47,20 @@ function setCommands(client: Client) {
       },
     ],
   });
+
+  commands.create({
+    name: AppSettings.BOT_SYSTEM_INFO_COMMAND_NAME,
+    description: "Get Systems Factions Info",
+    options: [
+      {
+        name: "system_name",
+        description: "Elite Dangerous system name",
+        required: true,
+        type: ApplicationCommandOptionType.String,
+      },
+    ],
+  });
+
   commands.create({
     name: AppSettings.BOT_HELP_COMMAND_NAME,
     description: "Need help to use this BOT",
