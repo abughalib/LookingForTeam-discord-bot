@@ -1,4 +1,5 @@
 import { Client, ApplicationCommandOptionType } from "discord.js";
+import CommandLocalizations from "../utils/localization";
 import { AppSettings } from "../utils/settings";
 
 function setCommands(client: Client) {
@@ -20,28 +21,38 @@ function setCommands(client: Client) {
   commands.create({
     name: AppSettings.BOT_WING_COMMAND_NAME,
     description: "Looking For Team Commands",
+    description_localizations:
+      CommandLocalizations.LOOKING_FOR_TEAM_DESCRIPTION,
     options: [
       {
         name: "duration",
         description: "How long would you play (hours or minutes) numbers only?",
+        description_localizations:
+          CommandLocalizations.LOOKING_FOR_TEAM_DURATION_DESCRIPTION,
         required: true,
         type: ApplicationCommandOptionType.Number,
       },
       {
         name: "activity",
         description: "What are you planning to do in Game?",
+        description_localizations:
+          CommandLocalizations.LOOKING_FOR_TEAM_ACTIVITY_DESCRIPTION,
         required: false,
         type: ApplicationCommandOptionType.String,
       },
       {
         name: "location",
         description: "Where are you (System Name)?",
+        description_localizations:
+          CommandLocalizations.LOOKING_FOR_TEAM_LOCATION_DESCRIPTION,
         required: false,
         type: ApplicationCommandOptionType.String,
       },
       {
         name: "spots",
-        description: "How much space you have in your Team",
+        description: "How much space you have in your Team?",
+        description_localizations:
+          CommandLocalizations.LOOKING_FOR_TEAM_SPOTS_DESCRIPTION,
         required: false,
         type: ApplicationCommandOptionType.Number,
       },
@@ -49,12 +60,16 @@ function setCommands(client: Client) {
   });
   commands.create({
     name: AppSettings.BOT_HELP_COMMAND_NAME,
-    description: "Need help to use this BOT",
+    description: "Need help to use this BOT?",
+    description_localizations:
+      CommandLocalizations.LOOKING_FOR_TEAM_HELP_DESCRIPTION,
   });
 
   commands.create({
     name: AppSettings.BOT_PING_COMMAND_NAME,
     description: "Check if the Bot is up and Running",
+    description_localizations:
+      CommandLocalizations.LOOKING_FOR_TEAM_PING_DESCRIPTION,
   });
 }
 
