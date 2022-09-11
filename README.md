@@ -34,7 +34,6 @@
   * In scope
     * Select `bot`.
   * In Bot Permission
-    * `Manage Nicknames`
     * `Read Messages`
     * `Send Messages`
     * `Manage Messages`
