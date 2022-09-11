@@ -6,8 +6,8 @@ import {
   SelectMenuBuilder,
 } from "discord.js";
 import { AppSettings } from "../utils/settings";
-import interactionMenuHandler from "./interactions/MenuInteractions";
-import interactionButtonHandler from "./interactions/ButtonInteractions";
+import interactionMenuHandler from "./interactions/menuInteractions";
+import interactionButtonHandler from "./interactions/buttonInteractions";
 import interactionCommandHandler from "./interactions/commandInteraction";
 
 async function handleInteractions(interaction: Interaction) {
