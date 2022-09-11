@@ -19,7 +19,7 @@ export class AppSettings {
   static readonly BOT_WING_COMMAND_NAME = "wing";
   static readonly BOT_HELP_COMMAND_NAME = "winghelp";
   static readonly BOT_PING_COMMAND_NAME = "ping";
-  static readonly GAME_NAME = "Elite Dangerous"
+  static readonly GAME_NAME = "Elite Dangerous";
   static readonly AVAILABLE_GAME_VERSIONS = [
     {
       label: "Odyssey",
@@ -44,7 +44,7 @@ export class AppSettings {
     {
       label: "Any",
       description: "Any Version of Elite Dangerous",
-      value: "any"
+      value: "any",
     },
   ];
 }
