@@ -1,8 +1,8 @@
-import { ButtonInteraction, CacheType } from "discord.js";
+import { ButtonInteraction, CacheType, CommandInteraction } from "discord.js";
 import deleteMessage from "./deleteMessage";
 
-async function deleteInteractionButton(
-  interaction: ButtonInteraction<CacheType>,
+async function deleteInteraction(
+  interaction: ButtonInteraction<CacheType> | CommandInteraction<CacheType>,
   timeout: number
 ) {
   let message = await interaction.fetchReply();
@@ -22,4 +22,5 @@ async function deleteInteractionButton(
   }, timeout);
 }
 
-export default deleteInteractionButton;
+// export {deleteInteractionCommand, deleteInteractionButton};
+export default deleteInteraction;
