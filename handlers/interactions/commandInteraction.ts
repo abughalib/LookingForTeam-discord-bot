@@ -10,6 +10,7 @@ import getSystemInfo from "../../utils/edsm";
 import formatTime from "../../utils/helpers";
 import { AppSettings } from "../../utils/settings";
 import SystemInfo from "../../utils/systemInfoModel";
+import getEpochTimeAfterHours from "../../utils/timestamp";
 import embedMessage from "../embeded_message";
 import systemEmbedMessage from "../systemInfoEmbed";
 import deleteInteraction from "./deleteInteractions";
@@ -23,6 +24,9 @@ async function interactionCommandHandler(
 
   if (interaction.guild == null) {
     console.error("interaction guild null: ");
+    interaction.reply({
+      content: "Some internal error occured. Please try again later.",
+    });
     return;
   }
 
@@ -35,6 +39,7 @@ async function interactionCommandHandler(
     "What kind of mission/gameplay?",
     "Star System/Location",
     "Number of Space in Wing/Team Available",
+    "When to join?",
   ];
 
   if (commandName === AppSettings.BOT_WING_COMMAND_NAME) {
@@ -46,6 +51,27 @@ async function interactionCommandHandler(
     let duration: number =
       (options.get("duration")?.value as number) ||
       AppSettings.DEFAULT_TEAM_DURATION;
+    let when: number = (options.get("when")?.value as number) || 0;
+
+    if (when < 0) {
+      interaction.reply({
+        content: "Please enter a valid hour",
+        ephemeral: true,
+      });
+      return;
+    }
+
+    if (when > AppSettings.MAXIMUM_HOURS_TEAM) {
+      when = when / 60;
+    }
+
+    if (when > AppSettings.MAXIMUM_HOURS_TEAM * 60) {
+      interaction.reply({
+        ephemeral: true,
+        content: "You cannot set a time more than 10 hours",
+      });
+      return;
+    }
 
     // Maximum spot in wing is MAXIMUM_TEAM_SPOT which is 3 as of now
     if (spots > AppSettings.MAXIMUM_TEAM_SPOT) {
@@ -58,10 +84,19 @@ async function interactionCommandHandler(
 
     // If Duration is more then 10 hours dismiss it.
     if (duration > AppSettings.MAXIMUM_HOURS_TEAM * 60) {
+      interaction.reply({
+        ephemeral: true,
+        content: "You cannnot request for more then 10 hours",
+      });
       return;
     }
 
-    const options_values = [activity, location, parseInt(spots.toString())];
+    const options_values = [
+      activity,
+      location,
+      parseInt(spots.toString()),
+      when === 0 ? "Now" : `<t:${getEpochTimeAfterHours(when)}:T>`,
+    ];
 
     let title: string = AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
 
@@ -82,7 +117,7 @@ async function interactionCommandHandler(
 
     // Adding time
     embeded_message.addFields({
-      name: "Duration/TimeFrame",
+      name: "Duration",
       value: `${formatTime(duration)}`,
     });
 
@@ -92,7 +127,9 @@ async function interactionCommandHandler(
     }
 
     embeded_message.setFooter({
-      text: `Auto delete in ${Math.ceil(duration * 60)} minutes`,
+      text: `Auto delete in ${
+        Math.ceil(duration * 60) + Math.ceil(when * 60)
+      } minutes`,
     });
 
     if (interaction.channelId === AppSettings.PC_CHANNEL_ID) {
@@ -117,7 +154,11 @@ async function interactionCommandHandler(
       });
     }
     // Auto Delete message after certain time.
-    deleteInteraction(interaction, AppSettings.HOURS_TO_MILISEC * duration);
+    deleteInteraction(
+      interaction,
+      AppSettings.HOURS_TO_MILISEC * duration +
+        AppSettings.HOURS_TO_MILISEC * when
+    );
   } else if (commandName == AppSettings.BOT_SYSTEM_INFO_COMMAND_NAME) {
     const systemName: string =
       options.get("system_name")?.value?.toString() ||
@@ -136,7 +177,7 @@ async function interactionCommandHandler(
     if (!systemInfo || !systemInfo.id) {
       await interaction.editReply({
         content: "No System found with Name: " + systemName,
-        components: [dismissButton]
+        components: [dismissButton],
       });
     } else if (
       !systemInfo.controllingFaction ||
@@ -167,7 +208,8 @@ async function interactionCommandHandler(
       "What kind of mission/gameplay?",
       "Star System/Location",
       "Number of Space in Wing/Team Available",
-      "Duration/TimeFrame",
+      "When to join?",
+      "Duration",
     ];
     const list_options_values = [
       "Use `/wing`",
@@ -175,6 +217,7 @@ async function interactionCommandHandler(
       "Mining, Bounty Hunting, etc...",
       "SOL",
       "2 Spots",
+      "25 (25 minutes from now)",
       "1.5 (1 hours and 30 minutes)",
     ];
 
@@ -186,9 +229,7 @@ async function interactionCommandHandler(
     );
 
     embeded_message.setFooter({
-      text: `Auto delete in ${
-        AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT / 1000
-      } seconds`,
+      text: `Note: Messages may get delete by dyno`,
     });
 
     await interaction.deferReply({

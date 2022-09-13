@@ -56,6 +56,15 @@ function setCommands(client: Client) {
         required: false,
         type: ApplicationCommandOptionType.Number,
       },
+      {
+        name: "when",
+        description:
+          "In how many hours from you want to play leave blank or 0 for now?",
+        description_localizations:
+          CommandLocalizations.LOOKING_FOR_TEAM_WHEN_DESCRIPTION,
+        required: false,
+        type: ApplicationCommandOptionType.String,
+      },
     ],
   });
 
