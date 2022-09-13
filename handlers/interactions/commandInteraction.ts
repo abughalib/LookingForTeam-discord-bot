@@ -48,10 +48,15 @@ async function interactionCommandHandler(
     const location =
       options.get("location")?.value || AppSettings.DEFAULT_TEAM_LOCATION;
     let spots = options.get("spots")?.value || AppSettings.MAXIMUM_TEAM_SPOT;
-    let duration: number =
-      (options.get("duration")?.value as number) ||
-      AppSettings.DEFAULT_TEAM_DURATION;
-    let when: number = (options.get("when")?.value as number) || 0;
+    let duration: number = Number(
+      (
+        (options.get("duration")?.value as number) ||
+        AppSettings.DEFAULT_TEAM_DURATION
+      ).toFixed(2)
+    );
+    let when: number = Number(
+      ((options.get("when")?.value as number) || 0).toFixed(2)
+    );
 
     if (when < 0) {
       interaction.reply({
@@ -127,9 +132,7 @@ async function interactionCommandHandler(
     }
 
     embeded_message.setFooter({
-      text: `Auto delete in ${
-        Math.ceil(duration * 60) + Math.ceil(when * 60)
-      } minutes`,
+      text: `Expires in ${formatTime(duration + when)}`,
     });
 
     if (interaction.channelId === AppSettings.PC_CHANNEL_ID) {
@@ -156,8 +159,7 @@ async function interactionCommandHandler(
     // Auto Delete message after certain time.
     deleteInteraction(
       interaction,
-      AppSettings.HOURS_TO_MILISEC * duration +
-        AppSettings.HOURS_TO_MILISEC * when
+      AppSettings.HOURS_TO_MILISEC * (duration + when)
     );
   } else if (commandName == AppSettings.BOT_SYSTEM_INFO_COMMAND_NAME) {
     const systemName: string =
