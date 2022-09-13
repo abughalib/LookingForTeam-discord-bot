@@ -63,7 +63,7 @@ function setCommands(client: Client) {
         description_localizations:
           CommandLocalizations.LOOKING_FOR_TEAM_WHEN_DESCRIPTION,
         required: false,
-        type: ApplicationCommandOptionType.String,
+        type: ApplicationCommandOptionType.Number,
       },
     ],
   });
