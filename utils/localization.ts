@@ -223,4 +223,38 @@ export default class CommandLocalizations {
     tr: "Bot'un açık ve çalışıyor olup olmadığını kontrol edin",
     uk: "Перевірте, чи увімкнено Bot і чи він працює",
   };
+
+  static readonly LOOKING_FOR_TEAM_WHEN_DESCRIPTION = {
+    "en-US": "How long from now you need to play, leave clear or 0 for now?",
+    "en-GB": "How long from now you need to play, leave clear or 0 for now?",
+    bg: "Колко време от сега трябва да играете, оставете ясно или 0 за сега?",
+    "zh-CN": "从现在开始你需要多长时间来玩，清除或0？",
+    "zh-TW": "從現在開始你需要多長時間來玩，清除或0？",
+    hr: "Koliko dugo od sada trebate igrati, ostavite jasno ili 0 za sada?",
+    cs: "Kolik času od nyní potřebujete hrát, nechte jasné nebo 0 pro nyní?",
+    da: "Hvor lang tid fra nu skal du spille, forlade klart eller 0 nu?",
+    nl: "Hoe lang vanaf nu moet je spelen, duidelijk achterlaten of 0 voor nu?",
+    fi: "Kuinka kauan sinun on nyt pelaamista, jätä selkeästi tai 0 nyt?",
+    fr: "Quand joueriez-vous à partir de maintenant (heures)",
+    de: "Wie lange brauchen Sie ab jetzt, um zu spielen, klar zu lassen oder 0 für jetzt?",
+    el: "Πόσο χρόνο από τώρα χρειάζεστε να παίξετε, αφήστε καθαρά ή 0 τώρα;",
+    hi: "अब तक कितना समय खेलने की आपको आवश्यकता है, अब तक स्पष्ट छोड़ दें या 0?",
+    hu: "Hány időtől most kell játszani, hagyja tiszta vagy 0 most?",
+    it: "Quanto tempo da ora hai bisogno di giocare, lasciare chiaro o 0 per ora?",
+    ja: "今からどれくらいの時間を遊ぶ必要がありますか、今は明確に残してください、または0ですか？",
+    ko: "지금부터 얼마나 오래 플레이해야하는지 지금은 명확하게 또는 0으로 둘러싸십시오?",
+    lt: "Kiek laiko nuo dabar jums reikia žaisti, palikti aiškiai arba 0 dabar?",
+    no: "Hvor lenge fra nå må du spille, forlate klart eller 0 nå?",
+    pl: "Ile czasu od teraz potrzebujesz grać, zostaw jasno lub 0 teraz?",
+    "pt-BR":
+      "Quanto tempo a partir de agora você precisa jogar, deixe claro ou 0 para agora?",
+    ro: "Cât timp de la acum aveți nevoie să jucați, lăsați clar sau 0 acum?",
+    ru: "Сколько времени сейчас вам нужно играть, оставить ясно или 0 сейчас?",
+    "es-ES":
+      "¿Cuánto tiempo desde ahora necesitas jugar, dejar claro o 0 para ahora?",
+    "sv-SE": "Hur länge från nu måste du spela, lämna klart eller 0 nu?",
+    th: "เวลาที่จะเล่นต้องใช้เวลาเท่าไหร่จากตอนนี้ ปล่อยให้ชัดเจนหรือ 0 ตอนนี้",
+    tr: "Şimdi ne kadar süre oynamanız gerekiyor, şimdi açık bırakın veya 0?",
+    uk: "Скільки часу з цього часу вам потрібно грати, залишити ясно або 0 зараз?",
+  };
 }
