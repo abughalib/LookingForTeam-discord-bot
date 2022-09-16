@@ -210,17 +210,19 @@ async function interactionCommandHandler(
     const nickName = userInterected?.nickname || interaction.user.username;
 
     const title: string = "System Death Info";
+    interaction.deferReply({
+      ephemeral: true
+    })
+    const systemDeath = await edsm.getSystemDeath(systemName);
 
-    const systemDeath = (await edsm.getSystemDeath(systemName)) || {
-      id: 0,
-      id64: 0,
-      name: "",
-      deaths: {
-        day: "",
-        week: "",
-        total: "",
-      },
-    };
+    if (systemDeath === null || systemDeath.deaths === undefined) {
+      interaction.editReply({
+        content: "Cannot find system Death Info!",
+      });
+      return;
+    }
+
+    console.log(systemDeath);
 
     const options_list = ["System Name", "Day", "Week", "Total"];
 
@@ -233,9 +235,8 @@ async function interactionCommandHandler(
 
     const embeded_message = embedMessage(title, options_list, values, nickName);
 
-    interaction.reply({
+    interaction.editReply({
       embeds: [embeded_message],
-      ephemeral: true,
     });
   } else if (commandName === AppSettings.BOT_HELP_COMMAND_NAME) {
     const title: string = "How to use, Check example.";
