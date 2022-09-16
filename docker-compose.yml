@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  discord_bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      LOOKING_FOR_TEAM_BOT_TOKEN: "Discord bot token"
