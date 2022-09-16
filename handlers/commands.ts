@@ -84,12 +84,14 @@ function setCommands(client: Client) {
   commands.create({
     name: AppSettings.BOT_SYSTEM_TRAFFIC_COMMAND_NAME,
     description: "Get System Traffic Info",
-    options: [{
-      name: "system_traffic",
-      description: "Elite Dangerous System Name",
-      required: true,
-      type: ApplicationCommandOptionType.String,
-    }]
+    options: [
+      {
+        name: "system_traffic",
+        description: "Elite Dangerous System Name",
+        required: true,
+        type: ApplicationCommandOptionType.String,
+      },
+    ],
   });
 
   commands.create({
@@ -97,13 +99,13 @@ function setCommands(client: Client) {
     description: "Get System Death Info",
     options: [
       {
-        name: 'system_name',
+        name: "system_name",
         description: "Elite Dangerous System Name",
         required: true,
-        type: ApplicationCommandOptionType.String
-      }
-    ]
-  })
+        type: ApplicationCommandOptionType.String,
+      },
+    ],
+  });
 
   commands.create({
     name: AppSettings.BOT_HELP_COMMAND_NAME,

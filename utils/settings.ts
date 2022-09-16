@@ -35,7 +35,7 @@ export class AppSettings {
   static readonly BOT_HEADER = {
     "Content-Type": "application/json",
     "User-Agent": "Looking-For-Team-Bot/1.8 (Linux)",
-  }
+  };
   static readonly AVAILABLE_GAME_VERSIONS = [
     {
       label: "Odyssey",

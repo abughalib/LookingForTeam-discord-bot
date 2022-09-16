@@ -17,7 +17,7 @@ function formatTime(duration: number): string {
   if (str_duration.includes(".")) {
     const duration_split = str_duration.split(".");
     const hours = duration_split[0];
-    const minutes = Math.ceil((parseFloat("."+duration_split[1]) * 60));
+    const minutes = Math.ceil(parseFloat("." + duration_split[1]) * 60);
     return `About ${hours} hours and ${minutes} Minutes`;
   }
 
