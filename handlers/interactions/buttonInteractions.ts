@@ -191,7 +191,8 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
 
         await interaction.reply({
           ephemeral: false,
-          content: `${interaction.message.mentions.users.last()}, Your request is accepted`,
+          content: `${interaction.message.mentions.users.last()}, Your request is accepted`+
+          `\nMake sure you have ${interaction.message.mentions.users.first()} as your in-game friend`,
         });
         deleteInteractionButton(
           interaction,
