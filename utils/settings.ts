@@ -19,6 +19,8 @@ export class AppSettings {
   static readonly PS_CHANNEL_ID = "790162689887961089";
   static readonly BOT_WING_COMMAND_NAME = "wing";
   static readonly BOT_SYSTEM_INFO_COMMAND_NAME = "systeminfo";
+  static readonly BOT_SYSTEM_TRAFFIC_COMMAND_NAME = "systemtraffic";
+  static readonly BOT_SYSTEM_DEATH_COMMAND_NAME = "systemdeath";
   static readonly BOT_SYSTEM_INFO_FETCH_URL =
     "https://www.edsm.net/api-system-v1/factions";
   static readonly BOT_SYSTEM_DEATHS_INFO_FETCH_URL =

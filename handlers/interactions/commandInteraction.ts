@@ -6,7 +6,7 @@ import {
   EmbedBuilder,
   ButtonStyle,
 } from "discord.js";
-import getSystemInfo from "../../utils/edsm";
+import EDSM from "../../utils/edsm";
 import formatTime from "../../utils/helpers";
 import { AppSettings } from "../../utils/settings";
 import SystemInfo from "../../utils/systemInfoModel";
@@ -41,6 +41,8 @@ async function interactionCommandHandler(
     "Number of Space in Wing/Team Available",
     "When to join?",
   ];
+
+  const edsm = new EDSM();
 
   if (commandName === AppSettings.BOT_WING_COMMAND_NAME) {
     const activity =
@@ -167,7 +169,7 @@ async function interactionCommandHandler(
       AppSettings.DEFAULT_SYSTEM_NAME;
     await interaction.deferReply();
 
-    let systemInfo: SystemInfo | null = await getSystemInfo(systemName);
+    let systemInfo: SystemInfo | null = await edsm.getSystemInfo(systemName);
 
     let dismissButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
@@ -202,6 +204,40 @@ async function interactionCommandHandler(
     }
 
     deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
+  } else if (commandName === AppSettings.BOT_SYSTEM_DEATH_COMMAND_NAME) {
+    const systemName: string =
+      options.get("system_name")?.value?.toString() || "SOL";
+    const nickName = userInterected?.nickname || interaction.user.username;
+
+    const title: string = "System Death Info";
+    interaction.deferReply({
+      ephemeral: true
+    })
+    const systemDeath = await edsm.getSystemDeath(systemName);
+
+    if (systemDeath === null || systemDeath.deaths === undefined) {
+      interaction.editReply({
+        content: "Cannot find system Death Info!",
+      });
+      return;
+    }
+
+    console.log(systemDeath);
+
+    const options_list = ["System Name", "Day", "Week", "Total"];
+
+    const values = [
+      systemDeath.name,
+      systemDeath.deaths.day,
+      systemDeath.deaths.week,
+      systemDeath.deaths.total,
+    ];
+
+    const embeded_message = embedMessage(title, options_list, values, nickName);
+
+    interaction.editReply({
+      embeds: [embeded_message],
+    });
   } else if (commandName === AppSettings.BOT_HELP_COMMAND_NAME) {
     const title: string = "How to use, Check example.";
     const list_options = [
