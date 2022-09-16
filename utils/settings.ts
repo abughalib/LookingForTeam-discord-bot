@@ -19,10 +19,21 @@ export class AppSettings {
   static readonly PS_CHANNEL_ID = "790162689887961089";
   static readonly BOT_WING_COMMAND_NAME = "wing";
   static readonly BOT_SYSTEM_INFO_COMMAND_NAME = "systeminfo";
-  static readonly BOT_SYSTEM_INFO_FETCH_URL = "https://www.edsm.net/api-system-v1/factions";
+  static readonly BOT_SYSTEM_INFO_FETCH_URL =
+    "https://www.edsm.net/api-system-v1/factions";
+  static readonly BOT_SYSTEM_DEATHS_INFO_FETCH_URL =
+    "https://www.edsm.net/api-system-v1/deaths";
+  static readonly BOT_SYSTEM_TRAFFIC_FETCH_URL =
+    "https://www.edsm.net/api-system-v1/traffic";
+  static readonly BOT_ELITE_SERVER_FETCH_URL =
+    "https://www.edsm.net/api-status-v1/elite-server";
   static readonly BOT_HELP_COMMAND_NAME = "winghelp";
   static readonly BOT_PING_COMMAND_NAME = "ping";
   static readonly GAME_NAME = "Elite Dangerous";
+  static readonly BOT_HEADER = {
+    "Content-Type": "application/json",
+    "User-Agent": "Looking-For-Team-Bot/1.8 (Linux)",
+  }
   static readonly AVAILABLE_GAME_VERSIONS = [
     {
       label: "Odyssey",

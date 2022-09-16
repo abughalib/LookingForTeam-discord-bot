@@ -1,5 +1,6 @@
 import { AppSettings } from "./settings";
 import SystemInfo from "./systemInfoModel";
+import { ServerStatusModel, SystemDeath, SystemTrafficInfo } from "./models";
 
 async function fetchSystemInfo(systemName: string) {
   let resp = await fetch(AppSettings.BOT_SYSTEM_INFO_FETCH_URL, {
@@ -7,13 +8,54 @@ async function fetchSystemInfo(systemName: string) {
     body: JSON.stringify({
       systemName: systemName,
     }),
-    headers: {
-      "Content-Type": "application/json",
-      "User-Agent": "Looking-For-Team-Bot/1.8 (Linux)",
-    },
+    headers: AppSettings.BOT_HEADER,
   });
 
   return resp.json();
+}
+
+async function eliteServerStatus(): Promise<ServerStatusModel | null> {
+  let resp = await fetch(AppSettings.BOT_ELITE_SERVER_FETCH_URL);
+
+  let resp_json = await resp.json();
+
+  let serverStatus: ServerStatusModel = resp_json;
+
+  return serverStatus;
+}
+
+async function getSystemTrafficInfo(
+  systemName: string
+): Promise<SystemTrafficInfo | null> {
+  let resp = await fetch(AppSettings.BOT_SYSTEM_TRAFFIC_FETCH_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      systemName: systemName,
+    }),
+    headers: AppSettings.BOT_HEADER,
+  });
+
+  let resp_json = await resp.json();
+
+  let systemTrafficInfo: SystemTrafficInfo = resp_json;
+
+  return systemTrafficInfo;
+}
+
+async function getSystemDeath(systemName: string): Promise<SystemDeath | null> {
+  let resp = await fetch(AppSettings.BOT_SYSTEM_DEATHS_INFO_FETCH_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      systemName: systemName
+    }),
+    headers: AppSettings.BOT_HEADER
+  });
+
+  let resp_json = await resp.json();
+
+  let systemDeath: SystemDeath = resp_json;
+
+  return systemDeath;
 }
 
 async function getSystemInfo(systemName: string): Promise<SystemInfo | null> {
@@ -24,7 +66,7 @@ async function getSystemInfo(systemName: string): Promise<SystemInfo | null> {
     return null;
   }
 
-  let systemInfo: SystemInfo = {
+  return {
     id: json_data.id,
     id64: json_data.id64,
     name: json_data.name,
@@ -32,8 +74,6 @@ async function getSystemInfo(systemName: string): Promise<SystemInfo | null> {
     controllingFaction: json_data.controllingFaction,
     factions: json_data.factions,
   };
-
-  return systemInfo;
 }
 
 export default getSystemInfo;
