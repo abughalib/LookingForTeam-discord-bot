@@ -97,7 +97,7 @@ function setCommands(client: Client) {
     description: "Get System Death Info",
     options: [
       {
-        name: 'system_death',
+        name: 'system_name',
         description: "Elite Dangerous System Name",
         required: true,
         type: ApplicationCommandOptionType.String
