@@ -93,6 +93,19 @@ function setCommands(client: Client) {
   });
 
   commands.create({
+    name: AppSettings.BOT_SYSTEM_DEATH_COMMAND_NAME,
+    description: "Get System Death Info",
+    options: [
+      {
+        name: 'system_death',
+        description: "Elite Dangerous System Name",
+        required: true,
+        type: ApplicationCommandOptionType.String
+      }
+    ]
+  })
+
+  commands.create({
     name: AppSettings.BOT_HELP_COMMAND_NAME,
     description: "Need help to use this BOT?",
     description_localizations:
