@@ -4,7 +4,7 @@
 
 ## Configure
 
-- Make Sure you have [Node Installed](https://nodejs.org/en/download/)
+- Make Sure you have [Node 18+ Installed](https://nodejs.org/en/download/)
 - [Create a Discord bot](https://discord.com/developers/applications)
 - Goto Bot in Discord Developer Portal->settings
 
@@ -42,20 +42,34 @@
     - `Manage Messages`
     - `Use Slash Commands`
 - Copy Generated Url and open it on a web browser and select Server.
-
-## Run
-
-- Install dependencies
-
-  ```
+## Build
+- Using NPM
+  ```bash
   npm install
   ```
-
-- Start using NPM
+  ```bash
+  npm run build
   ```
+- Docker
+  ```bash
+    docker build .
+  ```
+## Run dev mode
+
+- Start using NPM 
+  ```bash
   npm start
   ```
 - Manually
-  ```
+  ```bash
   ts-node index.ts
+  ```
+## Run production mode
+- using Node
+  ```bash
+  node dist/index.js
+  ```
+- using Docker
+  ```bash
+  docker-compose up
   ```
