@@ -10,6 +10,7 @@ import EDSM from "../../utils/edsm";
 import formatTime from "../../utils/helpers";
 import { AppSettings } from "../../utils/settings";
 import SystemInfo from "../../utils/systemInfoModel";
+import { SystemTrafficInfo } from "../../utils/models";
 import getEpochTimeAfterHours from "../../utils/timestamp";
 import embedMessage from "../embeded_message";
 import systemEmbedMessage from "../systemInfoEmbed";
@@ -204,6 +205,64 @@ async function interactionCommandHandler(
     }
 
     deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
+  } else if (commandName === AppSettings.BOT_SYSTEM_TRAFFIC_COMMAND_NAME) {
+    const title: string = "System Traffic Info";
+    const systemName: string =
+      options.get("system_name")?.value?.toString() || "SOL";
+    const nickName = userInterected?.nickname || interaction.user.username;
+
+    interaction.deferReply({
+      ephemeral: true,
+    });
+
+    const systemTrafficInfo = await edsm.getSystemTrafficInfo(systemName);
+
+    if (systemTrafficInfo === null) {
+      interaction.editReply({
+        content: "Cannot find Traffic Info",
+      });
+      return;
+    }
+
+    if (
+      systemTrafficInfo.breakdown === null ||
+      systemTrafficInfo.breakdown === undefined ||
+      systemTrafficInfo.traffic == null
+    ) {
+      interaction.editReply({
+        content: "No ship info is in EDSM for this system",
+      });
+      return;
+    }
+
+    const shipsAndCount = getShipAndCount(systemTrafficInfo);
+
+    let options_list: string[] = [
+      "System Name",
+      "Today",
+      "This Week",
+      "All Time",
+      ...shipsAndCount.shipNames,
+    ];
+    let values: string[] = [
+      systemTrafficInfo.name,
+      systemTrafficInfo.traffic.day.toString(),
+      systemTrafficInfo.traffic.week.toString(),
+      systemTrafficInfo.traffic.total.toString(),
+      ...shipsAndCount.shipCount,
+    ];
+
+    let embeded_message = embedMessage(
+      title,
+      options_list,
+      values,
+      nickName,
+      true
+    );
+
+    interaction.editReply({
+      embeds: [embeded_message],
+    });
   } else if (commandName === AppSettings.BOT_SYSTEM_DEATH_COMMAND_NAME) {
     const systemName: string =
       options.get("system_name")?.value?.toString() || "SOL";
@@ -211,8 +270,8 @@ async function interactionCommandHandler(
 
     const title: string = "System Death Info";
     interaction.deferReply({
-      ephemeral: true
-    })
+      ephemeral: true,
+    });
     const systemDeath = await edsm.getSystemDeath(systemName);
 
     if (systemDeath === null || systemDeath.deaths === undefined) {
@@ -222,9 +281,7 @@ async function interactionCommandHandler(
       return;
     }
 
-    console.log(systemDeath);
-
-    const options_list = ["System Name", "Day", "Week", "Total"];
+    const options_list = ["System Name", "Today", "This Week", "All Time"];
 
     const values = [
       systemDeath.name,
@@ -283,6 +340,183 @@ async function interactionCommandHandler(
       ephemeral: true,
     });
   }
+}
+
+interface ShipsInfo {
+  shipNames: Array<string>;
+  shipCount: Array<string>;
+}
+
+function getShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
+  let shipNames: string[] = [];
+  let shipCount: string[] = [];
+
+  if (systemTrafficInfo.breakdown !== null) {
+    if (
+      systemTrafficInfo.breakdown.Addar !== null &&
+      systemTrafficInfo.breakdown.Addar > 0
+    ) {
+      shipNames.push("Addar");
+      shipCount.push(systemTrafficInfo.breakdown.Addar.toString());
+    }
+    if (
+      systemTrafficInfo.breakdown.Anaconda !== null &&
+      systemTrafficInfo.breakdown.Anaconda > 0
+    ) {
+      shipNames.push("Anaconda");
+      shipCount.push(systemTrafficInfo.breakdown.Anaconda.toString());
+    }
+    if (
+      systemTrafficInfo.breakdown["Asp Explorer"] !== null &&
+      systemTrafficInfo.breakdown["Asp Explorer"] > 0
+    ) {
+      shipNames.push("Asp Explorer");
+      shipCount.push(systemTrafficInfo.breakdown["Asp Explorer"].toString());
+    }
+
+    if (
+      systemTrafficInfo.breakdown["Beluga Liner"] !== null &&
+      systemTrafficInfo.breakdown["Beluga Liner"] > 0
+    ) {
+      shipNames.push("Beluga Liner");
+      shipCount.push(systemTrafficInfo.breakdown["Beluga Liner"].toString());
+    }
+
+    if (
+      systemTrafficInfo.breakdown["Cobra MkIII"] !== null &&
+      systemTrafficInfo.breakdown["Cobra MkIII"] > 0
+    ) {
+      shipNames.push("Cobra MkIII");
+      shipCount.push(systemTrafficInfo.breakdown["Cobra MkIII"].toString());
+    }
+    if (
+      systemTrafficInfo.breakdown["Diamondback Explorer"] !== null &&
+      systemTrafficInfo.breakdown["Diamondback Explorer"] > 0
+    ) {
+      shipNames.push("Diamondback Explorer");
+      shipCount.push(
+        systemTrafficInfo.breakdown["Diamondback Explorer"].toString()
+      );
+    }
+    if (
+      systemTrafficInfo.breakdown.Dolphin !== null &&
+      systemTrafficInfo.breakdown.Dolphin > 0
+    ) {
+      shipNames.push("Dolphin");
+      shipCount.push(systemTrafficInfo.breakdown.Dolphin.toString());
+    }
+    if (
+      systemTrafficInfo.breakdown["Federal Assault Ship"] !== null &&
+      systemTrafficInfo.breakdown["Federal Assault Ship"] > 0
+    ) {
+      shipNames.push("Federal Assault Ship");
+      shipCount.push(
+        systemTrafficInfo.breakdown["Federal Assault Ship"].toString()
+      );
+    }
+    if (
+      systemTrafficInfo.breakdown["Federal Corvette"] !== null &&
+      systemTrafficInfo.breakdown["Federal Corvette"] > 0
+    ) {
+      shipNames.push("Federal Corvette");
+      shipCount.push(
+        systemTrafficInfo.breakdown["Federal Corvette"].toString()
+      );
+    }
+    if (
+      systemTrafficInfo.breakdown["Federal Gunship"] !== null &&
+      systemTrafficInfo.breakdown["Federal Gunship"] > 0
+    ) {
+      shipNames.push("Federal Gunship");
+      shipCount.push(systemTrafficInfo.breakdown["Federal Gunship"].toString());
+    }
+    if (
+      systemTrafficInfo.breakdown["Fer-de-Lance"] !== null &&
+      systemTrafficInfo.breakdown["Fer-de-Lance"] > 0
+    ) {
+      shipNames.push("Fer-de-Lance");
+      shipCount.push(systemTrafficInfo.breakdown["Fer-de-Lance"].toString());
+    }
+    if (
+      systemTrafficInfo.breakdown.Hauler !== null &&
+      systemTrafficInfo.breakdown.Hauler > 0
+    ) {
+      shipNames.push("Hauler");
+      shipCount.push(systemTrafficInfo.breakdown.Hauler.toString());
+    }
+    if (
+      systemTrafficInfo.breakdown["Imperial Clipper"] !== null &&
+      systemTrafficInfo.breakdown["Imperial Clipper"] > 0
+    ) {
+      shipNames.push("Imperial Clipper");
+      shipCount.push(
+        systemTrafficInfo.breakdown["Imperial Clipper"].toString()
+      );
+    }
+    if (
+      systemTrafficInfo.breakdown["Imperial Courier"] !== null &&
+      systemTrafficInfo.breakdown["Imperial Courier"] > 0
+    ) {
+      shipNames.push("Imperial Courier");
+      shipCount.push(
+        systemTrafficInfo.breakdown["Imperial Courier"].toString()
+      );
+    }
+    if (
+      systemTrafficInfo.breakdown["Imperial Cutter"] !== null &&
+      systemTrafficInfo.breakdown["Imperial Cutter"] > 0
+    ) {
+      shipNames.push("Imperial Cutter");
+      shipCount.push(systemTrafficInfo.breakdown["Imperial Cutter"].toString());
+    }
+    if (
+      systemTrafficInfo.breakdown.Orca !== null &&
+      systemTrafficInfo.breakdown.Orca > 0
+    ) {
+      shipNames.push("Orca");
+      shipCount.push(systemTrafficInfo.breakdown.Orca.toString());
+    }
+    if (
+      systemTrafficInfo.breakdown.Python !== null &&
+      systemTrafficInfo.breakdown.Python > 0
+    ) {
+      shipNames.push("Python");
+      shipCount.push(systemTrafficInfo.breakdown.Python.toString());
+    }
+    if (
+      systemTrafficInfo.breakdown["Type-9 Heavy"] !== null &&
+      systemTrafficInfo.breakdown["Type-9 Heavy"] > 0
+    ) {
+      shipNames.push("Type-9 Heavy");
+      shipCount.push(systemTrafficInfo.breakdown["Type-9 Heavy"].toString());
+    }
+    if (
+      systemTrafficInfo.breakdown["Viper MkIII"] !== null &&
+      systemTrafficInfo.breakdown["Viper MkIII"] > 0
+    ) {
+      shipNames.push("Viper MkIII");
+      shipCount.push(systemTrafficInfo.breakdown["Viper MkIII"].toString());
+    }
+    if (
+      systemTrafficInfo.breakdown["Viper MkIV"] !== null &&
+      systemTrafficInfo.breakdown["Viper MkIV"] > 0
+    ) {
+      shipNames.push("Viper MkIV");
+      shipCount.push(systemTrafficInfo.breakdown["Viper MkIV"].toString());
+    }
+    if (
+      systemTrafficInfo.breakdown["Vulture"] !== null &&
+      systemTrafficInfo.breakdown["Vulture"] > 0
+    ) {
+      shipNames.push("Vulture");
+      shipCount.push(systemTrafficInfo.breakdown["Vulture"].toString());
+    }
+  }
+
+  return {
+    shipNames,
+    shipCount,
+  };
 }
 
 export default interactionCommandHandler;
