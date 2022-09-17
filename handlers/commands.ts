@@ -86,7 +86,7 @@ function setCommands(client: Client) {
     description: "Get System Traffic Info",
     options: [
       {
-        name: "system_traffic",
+        name: "system_name",
         description: "Elite Dangerous System Name",
         required: true,
         type: ApplicationCommandOptionType.String,
