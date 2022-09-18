@@ -41,6 +41,7 @@ async function interactionCommandHandler(
     "Star System/Location",
     "Number of Space in Wing/Team Available",
     "When to join?",
+    "Players Joined",
   ];
 
   const edsm = new EDSM();
@@ -104,6 +105,7 @@ async function interactionCommandHandler(
       location,
       parseInt(spots.toString()),
       when === 0 ? "Now" : `<t:${getEpochTimeAfterHours(when)}:T>`,
+      `${interaction.user}`,
     ];
 
     let title: string = AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;

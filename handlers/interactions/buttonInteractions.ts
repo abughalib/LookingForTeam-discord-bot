@@ -32,11 +32,17 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     }
 
     if (interaction.message.embeds[0].data.fields === undefined) {
+      interaction.reply({
+        content: "Undefined Team Invite",
+        ephemeral: true,
+      });
       return;
     }
 
     let originalUserInteraction = interaction.message.interaction.user;
     let currentUserInteraction = interaction.user;
+
+    let joined_user = "";
 
     let originalFields: APIEmbedField[] =
       interaction.message.embeds[0].data.fields;
@@ -46,8 +52,18 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     originalFields.forEach((field) => {
       if (field.name === "Number of Space in Wing/Team Available") {
         spots = parseInt(field.value);
+      } else if (field.name === "Players Joined") {
+        joined_user = field.value;
       }
     });
+
+    if (joined_user.includes(interaction.user.toString())) {
+      interaction.reply({
+        content: "You're already in the Team",
+        ephemeral: true,
+      });
+      return;
+    }
 
     if (spots <= 0) {
       interaction.reply({
@@ -166,6 +182,13 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
             new_fields.push({
               name: "Number of Space in Wing/Team Available",
               value: (parseInt(field.value) - 1).toString(),
+            });
+          } else if (field.name === "Players Joined") {
+            new_fields.push({
+              name: field.name,
+              value: `${
+                field.value
+              }\n${interaction.message.mentions.users.last()}`,
             });
           } else {
             new_fields.push(field);
