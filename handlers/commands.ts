@@ -69,6 +69,32 @@ function setCommands(client: Client) {
   });
 
   commands.create({
+    name: AppSettings.BOT_REGISTER_CHANNEL_COMMAND_NAME,
+    description: "Register Channel as per Platform",
+    options: [
+      {
+        name: "channel_platform",
+        description: "Specify Channel as PC, XBOX or PS",
+        required: true,
+        type: ApplicationCommandOptionType.String,
+      },
+    ],
+  });
+
+  commands.create({
+    name: AppSettings.BOT_DEREGISTER_CHANNEL_COMMAND_NAME,
+    description: "Deregister Channel as per Platform",
+    options: [
+      {
+        name: "channel_platform",
+        description: "Specify Channel as PC, XBOX or PS",
+        required: true,
+        type: ApplicationCommandOptionType.String,
+      },
+    ],
+  });
+
+  commands.create({
     name: AppSettings.BOT_SYSTEM_INFO_COMMAND_NAME,
     description: "Get Systems Factions Info",
     options: [
