@@ -26,7 +26,11 @@ async function handleInteractions(interaction: Interaction) {
     new ButtonBuilder()
       .setCustomId("command_dismiss")
       .setLabel("Delete")
-      .setStyle(ButtonStyle.Danger)
+      .setStyle(ButtonStyle.Danger),
+    new ButtonBuilder()
+      .setCustomId("command_leave_team")
+      .setLabel("Leave Team")
+      .setStyle(ButtonStyle.Secondary)
   );
 
   if (interaction.isCommand()) {
