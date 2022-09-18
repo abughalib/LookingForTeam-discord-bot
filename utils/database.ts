@@ -1,4 +1,5 @@
-import { Database } from "sqlite3";
+import sqlite3 from "sqlite3";
+import { open } from "sqlite";
 
 enum ChannelType {
   PC,
@@ -8,56 +9,63 @@ enum ChannelType {
 }
 
 class DatabaseOperation {
-  private database: Database = new Database(":memory:");
+  async getDatabase() {
+    const db = await open({
+      filename: "../database.db",
+      driver: sqlite3.Database,
+    });
+    return db;
+  }
 
-  constructor() {
-    this.database = new Database("../database.db");
+  async getFromPlatformChannel(channelName: string, channelID: string) {
+    const db = await this.getDatabase();
+
+    const rows = await db.all(
+      `SELECT id FROM ${channelName} WHERE channel_id='${channelID}'`
+    );
+
+    if (rows.length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  async setChannelPlatformType(channelType: ChannelType, channelID: string) {
+    const db = await this.getDatabase();
+
+    switch (channelType) {
+      case ChannelType.PC:
+        await db.run(`INSERT INTO PC_CHANNEL_IDs VALUES('${channelID}')`);
+        break;
+      case ChannelType.XBOX:
+        await db.run(`INSERT INTO XBOX_CHANNEL_IDs VALUES('${channelID}')`);
+        break;
+      case ChannelType.PS:
+        await db.run(`INSERT INTO PS_CHANNEL_IDs VALUES('${channelID}')`);
+        break;
+      default:
+        break;
+    }
   }
 
   async getChannelType(channelID: string): Promise<ChannelType> {
-
     let channelType: ChannelType = ChannelType.OTHER;
 
-    this.database.each(
-      `SELECT id FROM PC_CHANNEL_IDs WHERE channel_id='${channelID}'`,
-      (error, row) => {
-        if (error) {
-          console.error(`Dtabase Error: ${error}`);
-        }
-        console.log(`From PC: ${row.id}`);
-        channelType = ChannelType.PC;
-      }
-    );
+    if (await this.getFromPlatformChannel("PC_CHANNEL_IDs", channelID)) {
+      return ChannelType.PC;
+    }
 
-    this.database.each(
-      `SELECT channel_id FROM XBOX_CHANNEL_IDs WHERE channel_id='${channelID}'`,
-      (error, row) => {
-        if (error) {
-          console.error(`Dtabase Error: ${error}`);
-        }
-        channelType = ChannelType.XBOX;
-        console.log(`From XBOX: ${row} Type: ${channelType}`);
-      }
-    );
+    if (await this.getFromPlatformChannel("XBOX_CHANNEL_IDs", channelID)) {
+      return ChannelType.XBOX;
+    }
 
-    this.database.each(
-      `SELECT channel_id FROM PS_CHANNEL_IDs WHERE channel_id='${channelID}'`,
-      (error, row) => {
-        if (error) {
-          console.error(`Dtabase Error: ${error}`);
-        }
-        console.log(`From PS: ${row.id}`);
-        channelType = ChannelType.PS;
-      }
-    );
-    console.log(`Type: ${channelType}`);
+    if (await this.getFromPlatformChannel("PS_CHANNEL_IDs", channelID)) {
+      return ChannelType.PS;
+    }
+
     return channelType;
   }
 }
 
-
-let dbp: DatabaseOperation = new DatabaseOperation();
-
-dbp.getChannelType('test_xbox').then((type)=> {
-  console.log(type);
-});
+export { DatabaseOperation, ChannelType };
