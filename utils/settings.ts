@@ -18,6 +18,8 @@ export class AppSettings {
     "Play Station Wing Request";
   static readonly PS_CHANNEL_ID = "790162689887961089";
   static readonly BOT_WING_COMMAND_NAME = "wing";
+  static readonly BOT_REGISTER_CHANNEL_COMMAND_NAME = "addchannel";
+  static readonly BOT_DEREGISTER_CHANNEL_COMMAND_NAME = "removechannel";
   static readonly BOT_SYSTEM_INFO_COMMAND_NAME = "systeminfo";
   static readonly BOT_SYSTEM_TRAFFIC_COMMAND_NAME = "systemtraffic";
   static readonly BOT_SYSTEM_DEATH_COMMAND_NAME = "systemdeath";
