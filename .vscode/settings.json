@@ -1,0 +1,12 @@
+{
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "driver": "SQLite",
+      "name": "DiscordBotDB",
+      "group": "Sqlite",
+      "database": "${workspaceFolder:LookingForTeam-discord-bot}/database.db"
+    }
+  ],
+  "sqltools.useNodeRuntime": true
+}
