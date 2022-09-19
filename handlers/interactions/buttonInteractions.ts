@@ -205,9 +205,11 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
             mentionedUser = interaction.message.mentions.users;
             new_fields.push({
               name: field.name,
-              value: `${
-                field.value
-              }\n${mentionedUser.first() === interaction.user ? mentionedUser.last() : mentionedUser.first()}`,
+              value: `${field.value}\n${
+                mentionedUser.first() === interaction.user
+                  ? mentionedUser.last()
+                  : mentionedUser.first()
+              }`,
             });
           } else {
             new_fields.push(field);
@@ -400,16 +402,13 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
   }
 }
 
-function removeIndex(arri: Array<string>, elem: string) {
+function removeIndex(arri: Array<string>, leavingUser: string) {
   let array: Array<string> = [];
 
   for (let i = 0; i < arri.length; i += 1) {
-  if(arri[i] !== elem){
-  array.push(arri[i];
-    if (arri[i] === elem) {
-      continue;
+    if (arri[i] !== leavingUser) {
+      array.push(arri[i]);
     }
-    array.push(arri[i]);
   }
 
   return array;
