@@ -25,9 +25,13 @@ async function interactionCommandHandler(
 
   if (interaction.guild == null) {
     console.error("interaction guild null: ");
-    interaction.reply({
-      content: "Some internal error occured. Please try again later.",
-    });
+    interaction
+      .reply({
+        content: "Some internal error occured. Please try again later.",
+      })
+      .catch((err) => {
+        console.error(err);
+      });
     return;
   }
 
@@ -63,10 +67,14 @@ async function interactionCommandHandler(
     );
 
     if (when < 0) {
-      interaction.reply({
-        content: "Please enter a valid hour",
-        ephemeral: true,
-      });
+      interaction
+        .reply({
+          content: "Please enter a valid hour",
+          ephemeral: true,
+        })
+        .catch((err) => {
+          console.error(err);
+        });
       return;
     }
 
@@ -75,10 +83,14 @@ async function interactionCommandHandler(
     }
 
     if (when > AppSettings.MAXIMUM_HOURS_TEAM * 60) {
-      interaction.reply({
-        ephemeral: true,
-        content: "You cannot set a time more than 10 hours",
-      });
+      interaction
+        .reply({
+          ephemeral: true,
+          content: "You cannot set a time more than 10 hours",
+        })
+        .catch((err) => {
+          console.error(`Error set a time more than 10 hours: ${err}`);
+        });
       return;
     }
 
@@ -93,10 +105,16 @@ async function interactionCommandHandler(
 
     // If Duration is more then 10 hours dismiss it.
     if (duration > AppSettings.MAXIMUM_HOURS_TEAM * 60) {
-      interaction.reply({
-        ephemeral: true,
-        content: "You cannnot request for more then 10 hours",
-      });
+      interaction
+        .reply({
+          ephemeral: true,
+          content: "You cannnot request for more then 10 hours",
+        })
+        .catch((err) => {
+          console.error(
+            `Error If Duration is more then 10 hours dismiss it: ${err}`
+          );
+        });
       return;
     }
 
@@ -141,25 +159,41 @@ async function interactionCommandHandler(
     });
 
     if (interaction.channelId === AppSettings.PC_CHANNEL_ID) {
-      await interaction.deferReply({
-        ephemeral: false,
-      });
+      await interaction
+        .deferReply({
+          ephemeral: false,
+        })
+        .catch((err) => {
+          console.error(`Error in deferReply: ${err}`);
+        });
 
       // Pretty Looking reply
-      await interaction.editReply({
-        embeds: [embeded_message],
-        components: [buttons, menus],
-      });
+      await interaction
+        .editReply({
+          embeds: [embeded_message],
+          components: [buttons, menus],
+        })
+        .catch((err) => {
+          console.error(`Error in editReply: ${err}`);
+        });
     } else {
-      await interaction.deferReply({
-        ephemeral: false,
-      });
+      await interaction
+        .deferReply({
+          ephemeral: false,
+        })
+        .catch((err) => {
+          console.error(`Error in deferReply: ${err}`);
+        });
 
       // Pretty Looking reply
-      await interaction.editReply({
-        embeds: [embeded_message],
-        components: [buttons],
-      });
+      await interaction
+        .editReply({
+          embeds: [embeded_message],
+          components: [buttons],
+        })
+        .catch((err) => {
+          console.error(`Error in deferReply: ${err}`);
+        });
     }
     // Auto Delete message after certain time.
     deleteInteraction(
@@ -170,7 +204,9 @@ async function interactionCommandHandler(
     const systemName: string =
       options.get("system_name")?.value?.toString() ||
       AppSettings.DEFAULT_SYSTEM_NAME;
-    await interaction.deferReply();
+    await interaction.deferReply().catch((err) => {
+      console.error(`Error in deferReply: ${err}`);
+    });
 
     let systemInfo: SystemInfo | null = await edsm.getSystemInfo(systemName);
 
@@ -182,28 +218,40 @@ async function interactionCommandHandler(
     );
 
     if (!systemInfo || !systemInfo.id) {
-      await interaction.editReply({
-        content: "No System found with Name: " + systemName,
-        components: [dismissButton],
-      });
+      await interaction
+        .editReply({
+          content: "No System found with Name: " + systemName,
+          components: [dismissButton],
+        })
+        .catch((err) => {
+          console.error(`Error in editReply: ${err}`);
+        });
     } else if (
       !systemInfo.controllingFaction ||
       systemInfo.factions.length === 0
     ) {
-      await interaction.editReply({
-        embeds: [
-          new EmbedBuilder()
-            .setTitle(`Inhabitated System: ${systemInfo.name}`)
-            .setURL(systemInfo.url),
-        ],
-        components: [dismissButton],
-      });
+      await interaction
+        .editReply({
+          embeds: [
+            new EmbedBuilder()
+              .setTitle(`Inhabitated System: ${systemInfo.name}`)
+              .setURL(systemInfo.url),
+          ],
+          components: [dismissButton],
+        })
+        .catch((err) => {
+          console.error(`Error in editReply: ${err}`);
+        });
     } else {
       let embeded_message = systemEmbedMessage(systemInfo);
-      await interaction.editReply({
-        embeds: [embeded_message],
-        components: [dismissButton],
-      });
+      await interaction
+        .editReply({
+          embeds: [embeded_message],
+          components: [dismissButton],
+        })
+        .catch((err) => {
+          console.error(`Error in editReply: ${err}`);
+        });
     }
 
     deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
@@ -213,16 +261,26 @@ async function interactionCommandHandler(
       options.get("system_name")?.value?.toString() || "SOL";
     const nickName = userInterected?.nickname || interaction.user.username;
 
-    interaction.deferReply({
-      ephemeral: true,
-    });
+    interaction
+      .deferReply({
+        ephemeral: true,
+      })
+      .catch((err) => {
+        console.error(`Error in System Traffic Info: ${err}`);
+      });
 
     const systemTrafficInfo = await edsm.getSystemTrafficInfo(systemName);
 
     if (systemTrafficInfo === null) {
-      interaction.editReply({
-        content: "Cannot find Traffic Info",
-      });
+      interaction
+        .editReply({
+          content: "Cannot find Traffic Info",
+        })
+        .catch((err) => {
+          console.error(
+            `Error in System Traffic Info__ Cannot find Traffic Info: ${err}`
+          );
+        });
       return;
     }
 
@@ -231,9 +289,15 @@ async function interactionCommandHandler(
       systemTrafficInfo.breakdown === undefined ||
       systemTrafficInfo.traffic == null
     ) {
-      interaction.editReply({
-        content: "No ship info is in EDSM for this system",
-      });
+      interaction
+        .editReply({
+          content: "No ship info is in EDSM for this system",
+        })
+        .catch((err) => {
+          console.error(
+            `Error in System Traffic Info__ No ship info is in EDSM for this system: ${err}`
+          );
+        });
       return;
     }
 
@@ -271,15 +335,23 @@ async function interactionCommandHandler(
     const nickName = userInterected?.nickname || interaction.user.username;
 
     const title: string = "System Death Info";
-    interaction.deferReply({
-      ephemeral: true,
-    });
+    interaction
+      .deferReply({
+        ephemeral: true,
+      })
+      .catch((err) => {
+        console.error(`Error in System Death Info: ${err}`);
+      });
     const systemDeath = await edsm.getSystemDeath(systemName);
 
     if (systemDeath === null || systemDeath.deaths === undefined) {
-      interaction.editReply({
-        content: "Cannot find system Death Info!",
-      });
+      interaction
+        .editReply({
+          content: "Cannot find system Death Info!",
+        })
+        .catch((err) => {
+          console.error(`Error in System Death Info: ${err}`);
+        });
       return;
     }
 
@@ -294,9 +366,13 @@ async function interactionCommandHandler(
 
     const embeded_message = embedMessage(title, options_list, values, nickName);
 
-    interaction.editReply({
-      embeds: [embeded_message],
-    });
+    interaction
+      .editReply({
+        embeds: [embeded_message],
+      })
+      .catch((err) => {
+        console.error(`Error in System Death Info: ${err}`);
+      });
   } else if (commandName === AppSettings.BOT_HELP_COMMAND_NAME) {
     const title: string = "How to use, Check example.";
     const list_options = [
@@ -329,18 +405,30 @@ async function interactionCommandHandler(
       text: `Note: Messages may get delete by dyno`,
     });
 
-    await interaction.deferReply({
-      ephemeral: true,
-    });
+    await interaction
+      .deferReply({
+        ephemeral: true,
+      })
+      .catch((err) => {
+        console.error(`Error in Help: ${err}`);
+      });
 
-    await interaction.editReply({
-      embeds: [embeded_message],
-    });
+    await interaction
+      .editReply({
+        embeds: [embeded_message],
+      })
+      .catch((err) => {
+        console.error(`Error in Help: ${err}`);
+      });
   } else if (commandName === AppSettings.BOT_PING_COMMAND_NAME) {
-    await interaction.reply({
-      content: "Bots never sleeps",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "Bots never sleeps",
+        ephemeral: true,
+      })
+      .catch((err) => {
+        console.error(`Error in Ping: ${err}`);
+      });
   }
 }
 
