@@ -42,7 +42,9 @@
     - `Manage Messages`
     - `Use Slash Commands`
 - Copy Generated Url and open it on a web browser and select Server.
+
 ## Build
+
 - Using NPM
   ```bash
   npm install
@@ -54,9 +56,10 @@
   ```bash
     docker build .
   ```
+
 ## Run dev mode
 
-- Start using NPM 
+- Start using NPM
   ```bash
   npm start
   ```
@@ -64,7 +67,9 @@
   ```bash
   ts-node index.ts
   ```
+
 ## Run production mode
+
 - using Node
   ```bash
   node dist/index.js
