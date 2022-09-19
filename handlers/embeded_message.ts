@@ -9,7 +9,7 @@ function getFields(
   let fields: RestOrArray<APIEmbedField> = Array.from(
     Array(Math.max(options.length, values.length)),
     (_, i): APIEmbedField => {
-      return { name: options[i], value: `${values[i]}`, inline: inline};
+      return { name: options[i], value: `${values[i]}`, inline: inline };
     }
   );
 

@@ -15,10 +15,12 @@ async function interactionMenuHandler(
     return;
   }
   if (interaction.user !== interaction.message.interaction.user) {
-    interaction.reply({
-      content: "You cannot perform this action",
-      ephemeral: true,
-    });
+    interaction
+      .reply({
+        content: "You cannot perform this action",
+        ephemeral: true,
+      })
+      .catch(console.error);
     return;
   }
 
@@ -50,10 +52,12 @@ async function interactionMenuHandler(
           name: AppSettings.GAME_NAME + " Version",
           value: version.description,
         });
-        await interaction.editReply({
-          components: [buttons],
-          embeds: [new_embeded_message],
-        });
+        await interaction
+          .editReply({
+            components: [buttons],
+            embeds: [new_embeded_message],
+          })
+          .catch(console.error);
       }
     });
   }
