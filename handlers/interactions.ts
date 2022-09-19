@@ -13,23 +13,23 @@ import interactionCommandHandler from "./interactions/commandInteraction";
 async function handleInteractions(interaction: Interaction) {
   const menus = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
     new SelectMenuBuilder()
-      .setCustomId("select_game_version")
-      .setPlaceholder("Game Version")
+      .setCustomId(AppSettings.SELECT_GAME_VERSION)
+      .setPlaceholder(AppSettings.SELECT_GAME_VERSION_PLACEHOLDER)
       .addOptions(AppSettings.AVAILABLE_GAME_VERSIONS)
   );
 
   const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
-      .setCustomId("command_join")
-      .setLabel("Request Team Invite")
+      .setCustomId(AppSettings.BUTTON_JOIN_ID)
+      .setLabel(AppSettings.BUTTON_JOIN_LABEL)
       .setStyle(ButtonStyle.Primary),
     new ButtonBuilder()
-      .setCustomId("command_dismiss")
-      .setLabel("Delete")
+      .setCustomId(AppSettings.BUTTON_DISMISS_ID)
+      .setLabel(AppSettings.BUTTON_DISMISS_LABEL)
       .setStyle(ButtonStyle.Danger),
     new ButtonBuilder()
-      .setCustomId("command_leave_team")
-      .setLabel("Leave Team")
+      .setCustomId(AppSettings.BUTTON_LEAVE_TEAM_ID)
+      .setLabel(AppSettings.BUTTON_LEAVE_TEAM_LABEL)
       .setStyle(ButtonStyle.Secondary)
   );
 
