@@ -16,7 +16,7 @@ import deleteInteractionButton from "./deleteInteractions";
 import deleteMessage from "./deleteMessage";
 
 async function interactionButtonHandler(interaction: ButtonInteraction) {
-  if (interaction.customId === "command_join") {
+  if (interaction.customId === AppSettings.BUTTON_JOIN_ID) {
     // If Interaction message is null or delete by admin.
     if (interaction.message.interaction == null) {
       await interaction.reply({
@@ -78,12 +78,12 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
 
     let buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId("accept_request")
-        .setLabel("Accept Request")
+        .setCustomId(AppSettings.BUTTON_ACCEPT_REQUEST_ID)
+        .setLabel(AppSettings.BUTTON_ACCEPT_REQUEST_LABEL)
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
-        .setCustomId("reject_request")
-        .setLabel("Decline/Cancel Request")
+        .setCustomId(AppSettings.BUTTON_REJECT_REQUEST_ID)
+        .setLabel(AppSettings.BUTTON_REQUEST_REQUEST_LABEL)
         .setStyle(ButtonStyle.Danger)
     );
 
@@ -95,7 +95,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       interaction,
       AppSettings.DEFAULT_REQUEST_TEAM_TIMEOUT
     );
-  } else if (interaction.customId === "command_dismiss") {
+  } else if (interaction.customId === AppSettings.BUTTON_DISMISS_ID) {
     // If Interaction message is null or delete by admin.
     if (interaction.message.interaction === null) {
       await interaction.reply({
@@ -127,8 +127,8 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       });
     }
   } else if (
-    interaction.customId === "accept_request" ||
-    interaction.customId === "reject_request"
+    interaction.customId === AppSettings.BUTTON_ACCEPT_REQUEST_ID ||
+    interaction.customId === AppSettings.BUTTON_REJECT_REQUEST_ID
   ) {
     if (interaction.message.reference === null) {
       console.error("Interaction is null: " + interaction.message);
@@ -173,7 +173,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       return;
     }
 
-    if (interaction.customId === "accept_request") {
+    if (interaction.customId === AppSettings.BUTTON_ACCEPT_REQUEST_ID) {
       if (interaction.user === message.interaction.user) {
         // Edit the interection
         // and delete the reply
@@ -251,7 +251,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
           content: `You Cannot Perform this action`,
         });
       }
-    } else if (interaction.customId === "reject_request") {
+    } else if (interaction.customId === AppSettings.BUTTON_REJECT_REQUEST_ID) {
       // Reject request
       // It should be done by either original author or the one requested.
       if (interaction.message.mentions.users.has(interaction.user.id)) {

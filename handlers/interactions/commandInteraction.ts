@@ -7,10 +7,14 @@ import {
   ButtonStyle,
 } from "discord.js";
 import EDSM from "../../utils/edsm";
-import {formatTime, getShipAndCount} from "../../utils/helpers";
+import {
+  checkDurationValidation,
+  DurationValidation,
+  formatTime,
+  getShipAndCount,
+} from "../../utils/helpers";
 import { AppSettings } from "../../utils/settings";
 import SystemInfo from "../../utils/systemInfoModel";
-import { SystemTrafficInfo } from "../../utils/models";
 import getEpochTimeAfterHours from "../../utils/timestamp";
 import embedMessage from "../embeded_message";
 import systemEmbedMessage from "../systemInfoEmbed";
@@ -25,8 +29,9 @@ async function interactionCommandHandler(
 
   if (interaction.guild == null) {
     console.error("interaction guild null: ");
-    interaction
+    await interaction
       .reply({
+        ephemeral: true,
         content: "Some internal error occured. Please try again later.",
       })
       .catch((err) => {
@@ -40,81 +45,58 @@ async function interactionCommandHandler(
   );
   const nickName = userInterected?.nickname || interaction.user.username;
 
-  const options_list = [
-    "What kind of mission/gameplay?",
-    "Star System/Location",
-    "Number of Space in Wing/Team Available",
-    "When to join?",
-    "Players Joined",
-  ];
+  const options_list = AppSettings.BOT_WING_FIELDS;
 
   const edsm = new EDSM();
 
   if (commandName === AppSettings.BOT_WING_COMMAND_NAME) {
     const activity =
-      options.get("activity")?.value || AppSettings.DEFAULT_TEAM_ACTIVITY;
+      options.get(AppSettings.INTERACTION_ACTIVITY_ID)?.value ||
+      AppSettings.DEFAULT_TEAM_ACTIVITY;
     const location =
-      options.get("location")?.value || AppSettings.DEFAULT_TEAM_LOCATION;
-    let spots = options.get("spots")?.value || AppSettings.MAXIMUM_TEAM_SPOT;
+      options.get(AppSettings.INTERACTION_LOCATION_ID)?.value ||
+      AppSettings.DEFAULT_TEAM_LOCATION;
+    let spots =
+      options.get(AppSettings.INTERACTION_SPOTS_ID)?.value ||
+      AppSettings.MAXIMUM_TEAM_SPOT;
     let duration: number = Number(
       (
-        (options.get("duration")?.value as number) ||
+        (options.get(AppSettings.INTERACTION_DURATION_ID)?.value as number) ||
         AppSettings.DEFAULT_TEAM_DURATION
       ).toFixed(2)
     );
     let when: number = Number(
-      ((options.get("when")?.value as number) || 0).toFixed(2)
+      (
+        (options.get(AppSettings.INTERACTION_WHEN_ID)?.value as number) || 0
+      ).toFixed(2)
     );
 
-    if (when < 0) {
-      interaction
-        .reply({
-          content: "Please enter a valid hour",
-          ephemeral: true,
-        })
-        .catch((err) => {
-          console.error(err);
-        });
+    if (
+      !(await isValidDuration(interaction, duration)) ||
+      !(await isValidDuration(interaction, when))
+    ) {
       return;
     }
 
+    await interaction.deferReply();
+
+    // If timer is more then MAXIMUM_HOURS_TEAM hours convert it into Minutes
     if (when > AppSettings.MAXIMUM_HOURS_TEAM) {
       when = when / 60;
     }
 
-    if (when > AppSettings.MAXIMUM_HOURS_TEAM * 60) {
-      interaction
-        .reply({
-          ephemeral: true,
-          content: "You cannot set a time more than 10 hours",
-        })
-        .catch((err) => {
-          console.error(`Error set a time more than 10 hours: ${err}`);
-        });
-      return;
+    // If Duration is more then MAXIMUM_HOURS_TEAM hours convert it into Minutes
+    if (duration > AppSettings.MAXIMUM_HOURS_TEAM) {
+      duration = duration / 60;
     }
 
     // Maximum spot in wing is MAXIMUM_TEAM_SPOT which is 3 as of now
     if (spots > AppSettings.MAXIMUM_TEAM_SPOT) {
       spots = AppSettings.MAXIMUM_TEAM_SPOT;
     }
-    // If Duration is more then MAXIMUM_HOURS_TEAM hours convert it into Minutes
-    if (duration > AppSettings.MAXIMUM_HOURS_TEAM) {
-      duration = duration / 60;
-    }
 
     // If Duration is more then 10 hours dismiss it.
     if (duration > AppSettings.MAXIMUM_HOURS_TEAM * 60) {
-      interaction
-        .reply({
-          ephemeral: true,
-          content: "You cannnot request for more then 10 hours",
-        })
-        .catch((err) => {
-          console.error(
-            `Error If Duration is more then 10 hours dismiss it: ${err}`
-          );
-        });
       return;
     }
 
@@ -122,7 +104,9 @@ async function interactionCommandHandler(
       activity,
       location,
       parseInt(spots.toString()),
-      when === 0 ? "Now" : `<t:${getEpochTimeAfterHours(when)}:T>`,
+      when === 0
+        ? AppSettings.DEFAULT_WHEN_VALUE
+        : `<t:${getEpochTimeAfterHours(when)}:T>`,
       `${interaction.user}`,
     ];
 
@@ -145,7 +129,7 @@ async function interactionCommandHandler(
 
     // Adding time
     embeded_message.addFields({
-      name: "Duration",
+      name: AppSettings.BOT_WING_DURATION_FIELD_NAME,
       value: `${formatTime(duration)}`,
     });
 
@@ -202,7 +186,7 @@ async function interactionCommandHandler(
     );
   } else if (commandName == AppSettings.BOT_SYSTEM_INFO_COMMAND_NAME) {
     const systemName: string =
-      options.get("system_name")?.value?.toString() ||
+      options.get(AppSettings.INTERACTION_SYSTEM_NAME_ID)?.value?.toString() ||
       AppSettings.DEFAULT_SYSTEM_NAME;
     await interaction.deferReply().catch((err) => {
       console.error(`Error in deferReply: ${err}`);
@@ -210,12 +194,7 @@ async function interactionCommandHandler(
 
     let systemInfo: SystemInfo | null = await edsm.getSystemInfo(systemName);
 
-    let dismissButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("command_dismiss")
-        .setLabel("Delete")
-        .setStyle(ButtonStyle.Danger)
-    );
+    let dismissButton = createDismissButton();
 
     if (!systemInfo || !systemInfo.id) {
       await interaction
@@ -258,7 +237,8 @@ async function interactionCommandHandler(
   } else if (commandName === AppSettings.BOT_SYSTEM_TRAFFIC_COMMAND_NAME) {
     const title: string = "System Traffic Info";
     const systemName: string =
-      options.get("system_name")?.value?.toString() || "SOL";
+      options.get(AppSettings.INTERACTION_SYSTEM_NAME_ID)?.value?.toString() ||
+      "SOL";
     const nickName = userInterected?.nickname || interaction.user.username;
 
     interaction
@@ -305,9 +285,7 @@ async function interactionCommandHandler(
 
     let options_list: string[] = [
       "System Name",
-      "Today",
-      "This Week",
-      "All Time",
+      ...AppSettings.SYSTEM_TIMELINE,
       ...shipsAndCount.shipNames,
     ];
     let values: string[] = [
@@ -331,7 +309,8 @@ async function interactionCommandHandler(
     });
   } else if (commandName === AppSettings.BOT_SYSTEM_DEATH_COMMAND_NAME) {
     const systemName: string =
-      options.get("system_name")?.value?.toString() || "SOL";
+      options.get(AppSettings.INTERACTION_SYSTEM_NAME_ID)?.value?.toString() ||
+      AppSettings.DEFAULT_STAR_SYSTEM_NAME;
     const nickName = userInterected?.nickname || interaction.user.username;
 
     const title: string = "System Death Info";
@@ -355,16 +334,21 @@ async function interactionCommandHandler(
       return;
     }
 
-    const options_list = ["System Name", "Today", "This Week", "All Time"];
+    const listFieldheading = ["System Name", ...AppSettings.SYSTEM_TIMELINE];
 
-    const values = [
+    const listFieldValues = [
       systemDeath.name,
       systemDeath.deaths.day,
       systemDeath.deaths.week,
       systemDeath.deaths.total,
     ];
 
-    const embeded_message = embedMessage(title, options_list, values, nickName);
+    const embeded_message = embedMessage(
+      title,
+      listFieldheading,
+      listFieldValues,
+      nickName
+    );
 
     interaction
       .editReply({
@@ -374,35 +358,23 @@ async function interactionCommandHandler(
         console.error(`Error in System Death Info: ${err}`);
       });
   } else if (commandName === AppSettings.BOT_HELP_COMMAND_NAME) {
-    const title: string = "How to use, Check example.";
-    const list_options = [
-      "Command",
-      "Game Version",
-      "What kind of mission/gameplay?",
-      "Star System/Location",
-      "Number of Space in Wing/Team Available",
-      "When to join?",
-      "Duration",
+    const title: string = AppSettings.BOT_HELP_REPLY_TITLE;
+    const listFieldheading = [
+      ...AppSettings.BOT_HELP_FIELD_TITLE,
+      ...AppSettings.BOT_WING_FIELDS,
+      ...AppSettings.BOT_HELP_EXTRA_FIELDS,
     ];
-    const list_options_values = [
-      "Use `/wing`",
-      "Odyssey, Horizon 4.0, Horizon 3.8, ED Beyond",
-      "Mining, Bounty Hunting, etc...",
-      "SOL",
-      "2 Spots",
-      "25 (25 minutes from now)",
-      "1.5 (1 hours and 30 minutes)",
-    ];
+    const listFieldValue = AppSettings.BOT_HELP_COMMAND_REPLY_FIELD_VALUES;
 
     let embeded_message = embedMessage(
       title,
-      list_options,
-      list_options_values,
-      interaction.user.username || "Unknown"
+      listFieldheading,
+      listFieldValue,
+      interaction.user.username
     );
 
     embeded_message.setFooter({
-      text: `Note: Messages may get delete by dyno`,
+      text: AppSettings.BOT_HELP_REPLY_FOOTER_NOTE,
     });
 
     await interaction
@@ -423,13 +395,57 @@ async function interactionCommandHandler(
   } else if (commandName === AppSettings.BOT_PING_COMMAND_NAME) {
     await interaction
       .reply({
-        content: "Bots never sleeps",
+        content: AppSettings.BOT_PING_REPLY,
         ephemeral: true,
       })
       .catch((err) => {
         console.error(`Error in Ping: ${err}`);
       });
   }
+}
+
+function createDismissButton(): ActionRowBuilder<ButtonBuilder> {
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(AppSettings.BUTTON_DISMISS_ID)
+      .setLabel(AppSettings.BUTTON_DISMISS_LABEL)
+      .setStyle(ButtonStyle.Danger)
+  );
+}
+
+async function isValidDuration(
+  interaction: CommandInteraction,
+  timer: number
+): Promise<boolean> {
+  switch (checkDurationValidation(timer)) {
+    case DurationValidation.INVALID:
+      await interaction
+        .reply({
+          content: "Please enter a valid hour",
+          ephemeral: true,
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+      return false;
+    case DurationValidation.LIMIT_EXCEEDED:
+      interaction
+        .reply({
+          ephemeral: true,
+          content: "You cannnot request for more then 10 hours",
+        })
+        .catch((err) => {
+          console.error(
+            `Error If Duration/Timer is more then 10 hours dismiss it: ${err}`
+          );
+        });
+      return false;
+    case DurationValidation.VALID:
+      break;
+    default:
+      break;
+  }
+  return true;
 }
 
 export default interactionCommandHandler;
