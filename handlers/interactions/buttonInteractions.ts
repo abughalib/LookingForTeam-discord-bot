@@ -7,6 +7,8 @@ import {
   Message,
   Embed,
   EmbedBuilder,
+  User,
+  Collection,
 } from "discord.js";
 import { AppSettings } from "../../utils/settings";
 import deleteInteractionButton from "./deleteInteractions";
@@ -190,8 +192,8 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
           return;
         }
 
-        let spots_count: number = 0;
         let new_fields: APIEmbedField[] = [];
+        let mentionedUser: Collection<string, User>;
 
         fields.forEach((field) => {
           if (field.name === "Number of Space in Wing/Team Available") {
@@ -200,11 +202,12 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
               value: (parseInt(field.value) - 1).toString(),
             });
           } else if (field.name === "Players Joined") {
+            mentionedUser = interaction.message.mentions.users;
             new_fields.push({
               name: field.name,
               value: `${
                 field.value
-              }\n${interaction.message.mentions.users.last()}`,
+              }\n${mentionedUser.first() === interaction.user ? mentionedUser.last() : mentionedUser.first()}`,
             });
           } else {
             new_fields.push(field);
@@ -400,7 +403,10 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
 function removeIndex(arri: Array<string>, elem: string) {
   let array: Array<string> = [];
 
-  for (let i = 0; i < arri.length && arri[i] != elem; i += 1) {
+  for (let i = 0; i < arri.length; i += 1) {
+    if (arri[i] === elem) {
+      continue;
+    }
     array.push(arri[i]);
   }
 
