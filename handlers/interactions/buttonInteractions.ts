@@ -10,6 +10,7 @@ import {
   User,
   Collection,
 } from "discord.js";
+import { removeEntry } from "../../utils/helpers";
 import { AppSettings } from "../../utils/settings";
 import deleteInteractionButton from "./deleteInteractions";
 import deleteMessage from "./deleteMessage";
@@ -368,7 +369,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       return;
     }
 
-    team_players = removeIndex(team_players, interaction.user.toString());
+    team_players = removeEntry(team_players, interaction.user.toString());
 
     new_fields.forEach((field) => {
       if (field.name === "Players Joined") {
@@ -400,18 +401,6 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     // If More features are required
     // Would be Implemented later...
   }
-}
-
-function removeIndex(arri: Array<string>, leavingUser: string) {
-  let array: Array<string> = [];
-
-  for (let i = 0; i < arri.length; i += 1) {
-    if (arri[i] !== leavingUser) {
-      array.push(arri[i]);
-    }
-  }
-
-  return array;
 }
 
 export default interactionButtonHandler;
