@@ -1,4 +1,5 @@
 import { SystemTrafficInfo } from "./models";
+import { AppSettings } from "./settings";
 
 function formatTime(duration: number): string {
   // Added for cameld00d
@@ -25,7 +26,6 @@ function formatTime(duration: number): string {
 
   return `About ${duration} Hours`;
 }
-
 
 interface ShipsInfo {
   shipNames: Array<string>;
@@ -204,6 +204,23 @@ function getShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
   };
 }
 
+enum DurationValidation {
+  VALID,
+  INVALID,
+  LIMIT_EXCEEDED,
+}
+
+function checkDurationValidation(duration: number): DurationValidation {
+  if (duration <= 0) {
+    return DurationValidation.INVALID;
+  }
+  if (duration > AppSettings.MAXIMUM_HOURS_TEAM) {
+    return DurationValidation.LIMIT_EXCEEDED;
+  }
+
+  return DurationValidation.VALID;
+}
+
 function removeEntry(arri: Array<string>, leavingUser: string) {
   let array: Array<string> = [];
 
@@ -216,4 +233,10 @@ function removeEntry(arri: Array<string>, leavingUser: string) {
   return array;
 }
 
-export {formatTime, getShipAndCount, removeEntry};
+export {
+  formatTime,
+  getShipAndCount,
+  removeEntry,
+  checkDurationValidation,
+  DurationValidation,
+};
