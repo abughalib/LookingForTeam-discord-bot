@@ -404,6 +404,8 @@ function removeIndex(arri: Array<string>, elem: string) {
   let array: Array<string> = [];
 
   for (let i = 0; i < arri.length; i += 1) {
+  if(arri[i] !== elem){
+  array.push(arri[i];
     if (arri[i] === elem) {
       continue;
     }
