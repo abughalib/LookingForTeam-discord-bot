@@ -6,7 +6,7 @@ const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
  IntentsBitField.Flags.GuildMessages,
-    
+
     GatewayIntentBits.MessageContent,
   ],
 });
@@ -17,7 +17,7 @@ client.on("ready", () => {
 });
 
 client.on("interactionCreate", async (interaction) => {
-      
+
   await handleInteractions(interaction);
 });
 
