@@ -95,11 +95,6 @@ async function interactionCommandHandler(
       spots = AppSettings.MAXIMUM_TEAM_SPOT;
     }
 
-    // If Duration is more then 10 hours dismiss it.
-    if (duration > AppSettings.MAXIMUM_HOURS_TEAM * 60) {
-      return;
-    }
-
     const options_values = [
       activity,
       location,
@@ -283,12 +278,12 @@ async function interactionCommandHandler(
 
     const shipsAndCount = getShipAndCount(systemTrafficInfo);
 
-    let options_list: string[] = [
+    const options_list: string[] = [
       "System Name",
       ...AppSettings.SYSTEM_TIMELINE,
       ...shipsAndCount.shipNames,
     ];
-    let values: string[] = [
+    const values: string[] = [
       systemTrafficInfo.name,
       systemTrafficInfo.traffic.day.toString(),
       systemTrafficInfo.traffic.week.toString(),
@@ -296,7 +291,7 @@ async function interactionCommandHandler(
       ...shipsAndCount.shipCount,
     ];
 
-    let embeded_message = embedMessage(
+    const embeded_message = embedMessage(
       title,
       options_list,
       values,
@@ -366,7 +361,7 @@ async function interactionCommandHandler(
     ];
     const listFieldValue = AppSettings.BOT_HELP_COMMAND_REPLY_FIELD_VALUES;
 
-    let embeded_message = embedMessage(
+    const embeded_message = embedMessage(
       title,
       listFieldheading,
       listFieldValue,
