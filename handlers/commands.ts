@@ -8,7 +8,7 @@ function setCommands(client: Client) {
     return;
   }
 
-  let commands = client.application.commands;
+  const commands = client.application.commands;
 
   if (commands == null) {
     console.error(

@@ -211,7 +211,7 @@ enum DurationValidation {
 }
 
 function checkDurationValidation(duration: number): DurationValidation {
-  if (duration <= 0) {
+  if (duration < 0) {
     return DurationValidation.INVALID;
   }
   if (duration > AppSettings.MAXIMUM_HOURS_TEAM) {

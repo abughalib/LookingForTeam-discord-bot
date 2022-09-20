@@ -5,7 +5,7 @@ async function deleteInteraction(
   interaction: ButtonInteraction<CacheType> | CommandInteraction<CacheType>,
   timeout: number
 ) {
-  let message = await interaction.fetchReply();
+  const message = await interaction.fetchReply();
   setTimeout(async () => {
     await interaction.deleteReply().catch((error) => {
       // Message Already Deleted

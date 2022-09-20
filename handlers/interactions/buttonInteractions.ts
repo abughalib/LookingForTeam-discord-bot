@@ -49,13 +49,13 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
 
     let spots: number = 0;
 
-    interaction.message.embeds[0].data.fields.forEach((field) => {
+    for (const field of interaction.message.embeds[0].data.fields) {
       if (field.name === "Number of Space in Wing/Team Available") {
         spots = parseInt(field.value);
       } else if (field.name === "Players Joined") {
         joined_user = field.value;
       }
-    });
+    }
 
     if (joined_user.includes(interaction.user.toString())) {
       await interaction.reply({
@@ -73,7 +73,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       return;
     }
 
-    let buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId(AppSettings.BUTTON_ACCEPT_REQUEST_ID)
         .setLabel(AppSettings.BUTTON_ACCEPT_REQUEST_LABEL)
@@ -172,7 +172,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
         let new_fields: APIEmbedField[] = [];
         let mentionedUser: Collection<string, User>;
 
-        fields.forEach((field) => {
+        for (const field of fields) {
           if (field.name === "Number of Space in Wing/Team Available") {
             new_fields.push({
               name: "Number of Space in Wing/Team Available",
@@ -191,7 +191,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
           } else {
             new_fields.push(field);
           }
-        });
+        }
 
         const footer = original_message.data.footer?.text || "";
 
@@ -280,11 +280,11 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     // Edit the interection
     // and delete the reply
 
-    let original_message: Embed = message.embeds[0];
-    let title = original_message.data.title;
-    let author = original_message.data.author?.name || "";
-    let fields = original_message.data.fields;
-    let timestamp = original_message.timestamp;
+    const original_message: Embed = message.embeds[0];
+    const title = original_message.data.title;
+    const author = original_message.data.author?.name || "";
+    const fields = original_message.data.fields;
+    const timestamp = original_message.timestamp;
 
     if (!title || !author || !fields || !timestamp) {
       console.error("Cannot find original interaction embed fields");
@@ -305,7 +305,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     let team_players: string[] = [];
     let players: string = "";
 
-    fields.forEach((field) => {
+    for (const field of fields) {
       if (field.name === "Number of Space in Wing/Team Available") {
         new_fields.push({
           name: "Number of Space in Wing/Team Available",
@@ -317,7 +317,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       } else {
         new_fields.push(field);
       }
-    });
+    }
 
     team_players = players.split("\n");
 
@@ -338,13 +338,13 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
 
     team_players = removeEntry(team_players, interaction.user.toString());
 
-    new_fields.forEach((field) => {
+    for (const field of new_fields) {
       if (field.name === "Players Joined") {
         field.value = team_players.join("\n") || "";
       }
-    });
+    }
 
-    let footer = original_message.data.footer?.text || "";
+    const footer = original_message.data.footer?.text || "";
 
     let new_embeded_message = new EmbedBuilder();
     new_embeded_message.setTitle(title || "");

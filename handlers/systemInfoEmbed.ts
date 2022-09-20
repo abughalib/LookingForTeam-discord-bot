@@ -34,7 +34,7 @@ function systemEmbedMessage(systemInfo: SystemInfo): EmbedBuilder {
     lastUpdated = Math.max(lastUpdated, faction.lastUpdate);
   });
 
-  let embeded_message = new EmbedBuilder()
+  const embeded_message = new EmbedBuilder()
     .setColor(AppSettings.EMBEDED_MESSAGE_COLOR)
     .setTitle(systemInfo.name)
     .setAuthor({ name: `System Info` })

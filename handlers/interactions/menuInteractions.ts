@@ -24,12 +24,12 @@ async function interactionMenuHandler(
     return;
   }
 
-  let original_message: Embed = interaction.message.embeds[0];
-  let title = original_message.data.title;
-  let author = original_message.data.author?.name || "";
-  let fields = original_message.data.fields;
-  let footer = original_message.data.footer?.text || "";
-  let timestamp = original_message.data.timestamp;
+  const original_message: Embed = interaction.message.embeds[0];
+  const title = original_message.data.title;
+  const author = original_message.data.author?.name || "";
+  const fields = original_message.data.fields;
+  const footer = original_message.data.footer?.text || "";
+  const timestamp = original_message.data.timestamp;
 
   if (!title || !author || !fields || !footer || !timestamp) {
     console.error("Cannot find original interaction message");
