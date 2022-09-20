@@ -184,7 +184,7 @@ async function interactionCommandHandler(
       interaction,
       AppSettings.HOURS_TO_MILISEC * (duration + when)
     );
-  } else if (commandName == AppSettings.BOT_SYSTEM_INFO_COMMAND_NAME) {
+  } else if (commandName == AppSettings.BOT_SYSTEM_FACTION_INFO_COMMAND_NAME) {
     const systemName: string =
       options.get(AppSettings.INTERACTION_SYSTEM_NAME_ID)?.value?.toString() ||
       AppSettings.DEFAULT_SYSTEM_NAME;
