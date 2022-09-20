@@ -32,7 +32,7 @@ export class AppSettings {
 
   // Interaction commands for the bot.
   static readonly BOT_WING_COMMAND_NAME = "wing";
-  static readonly BOT_SYSTEM_INFO_COMMAND_NAME = "systeminfo";
+  static readonly BOT_SYSTEM_FACTION_INFO_COMMAND_NAME = "systemfaction";
   static readonly BOT_SYSTEM_TRAFFIC_COMMAND_NAME = "systemtraffic";
   static readonly BOT_SYSTEM_DEATH_COMMAND_NAME = "systemdeath";
   static readonly BOT_HELP_COMMAND_NAME = "winghelp";
@@ -46,6 +46,11 @@ export class AppSettings {
   static readonly INTERACTION_WHEN_ID = "when";
   static readonly INTERACTION_SYSTEM_NAME_ID = "system_name";
   static readonly INTERACTION_DISMISS_ID = "command_dismiss";
+
+  // Interaction field description
+  static readonly INTERACTION_SYSTEM_NAME_DESC = "Elite Dangerous System Name";
+  static readonly INTERACTION_HELP_DESC = "Need help to use this BOT?";
+  static readonly INTERACTION_PING_DESC = "Check if the Bot is up and Running";
 
   // Buttons customIDs
   static readonly BUTTON_JOIN_ID = "button_join";
