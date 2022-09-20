@@ -42,17 +42,14 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       return;
     }
 
-    let originalUserInteraction = interaction.message.interaction.user;
-    let currentUserInteraction = interaction.user;
+    const originalUserInteraction = interaction.message.interaction.user;
+    const currentUserInteraction = interaction.user;
 
     let joined_user = "";
 
-    let originalFields: APIEmbedField[] =
-      interaction.message.embeds[0].data.fields;
-
     let spots: number = 0;
 
-    originalFields.forEach((field) => {
+    interaction.message.embeds[0].data.fields.forEach((field) => {
       if (field.name === "Number of Space in Wing/Team Available") {
         spots = parseInt(field.value);
       } else if (field.name === "Players Joined") {
@@ -107,14 +104,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
 
     // If the Original Author of interaction clicks on dismiss
     if (interaction.message.interaction.user === interaction.user) {
-      await interaction.message.delete().catch((error) => {
-        if (error.code !== 10008) {
-          console.error(`Failed to to delete the message: ${error}`);
-        } else {
-          console.info("Message Already Deleted");
-        }
-        return;
-      });
+      await deleteMessage(interaction.message);
       await interaction.reply({
         content: "Your message is deleted",
         ephemeral: true,
@@ -149,22 +139,12 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       });
       return;
     }
-    if (interaction.channel === null) {
-      console.error("Interaction Channel is null: " + interaction);
-      await interaction.reply({
-        content: "Original Channel not Found",
-        ephemeral: true,
-      });
-      return;
-    }
 
-    let messageId: string = interaction.message.reference.messageId;
-    let message: Message | null = await interaction.channel.messages
-      .fetch(messageId)
-      .catch((error) => {
-        console.log("Cannot find message: " + error);
-        return null;
-      });
+    const messageId: string = interaction.message.reference.messageId;
+    const message: Message | null = await getMessageByID(
+      interaction,
+      messageId
+    );
     if (message === null || message.interaction == null) {
       await interaction.reply({
         content: "Original Message not Found",
@@ -178,18 +158,14 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
         // Edit the interection
         // and delete the reply
 
-        let original_message: Embed = message.embeds[0];
-        let title = original_message.data.title;
-        let author = original_message.data.author?.name || "";
-        let fields = original_message.data.fields;
-        let timestamp = original_message.timestamp;
+        const original_message: Embed = message.embeds[0];
+        const title = original_message.data.title;
+        const author = original_message.data.author?.name || "";
+        const fields = original_message.data.fields;
+        const timestamp = original_message.timestamp;
 
         if (!title || !author || !fields || !timestamp) {
           console.error("Cannot find original interaction embed fields");
-          return;
-        }
-
-        if (fields === undefined) {
           return;
         }
 
@@ -217,7 +193,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
           }
         });
 
-        let footer = original_message.data.footer?.text || "";
+        const footer = original_message.data.footer?.text || "";
 
         let new_embeded_message = new EmbedBuilder();
         new_embeded_message.setTitle(title || "");
@@ -225,10 +201,6 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
         new_embeded_message.addFields(new_fields || [{ name: "", value: "" }]);
         new_embeded_message.setFooter({ text: footer });
         new_embeded_message.setTimestamp(Date.parse(timestamp));
-
-        if (fields === undefined) {
-          return;
-        }
 
         await message.edit({
           embeds: [new_embeded_message],
@@ -267,7 +239,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
         });
       }
     }
-  } else if (interaction.customId === "command_leave_team") {
+  } else if (interaction.customId === AppSettings.BUTTON_LEAVE_TEAM_ID) {
     await interaction.deferReply({
       ephemeral: true,
     });
@@ -297,12 +269,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     }
 
     let messageId: string = interaction.message.id;
-    let message: Message | null = await interaction.channel.messages
-      .fetch(messageId)
-      .catch((error) => {
-        console.log("Cannot find message: " + error);
-        return null;
-      });
+    let message: Message | null = await getMessageByID(interaction, messageId);
     if (message === null || message.interaction == null) {
       await interaction.editReply({
         content: "Original Message null",
@@ -401,6 +368,34 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     // If More features are required
     // Would be Implemented later...
   }
+}
+
+/*
+  Args:
+    ButtonInteraction
+  Returns:
+    Message if found or null
+*/
+async function getMessageByID(
+  interaction: ButtonInteraction,
+  messageId: string
+): Promise<Message | null> {
+  if (interaction.channel === null) {
+    console.error("Interaction Channel is null: " + interaction);
+    await interaction.reply({
+      content: "Original Channel not Found",
+      ephemeral: true,
+    });
+    return null;
+  }
+
+  const message = await interaction.channel.messages
+    .fetch(messageId)
+    .catch((error) => {
+      console.log("Cannot find message: " + error);
+      return null;
+    });
+  return message;
 }
 
 export default interactionButtonHandler;
