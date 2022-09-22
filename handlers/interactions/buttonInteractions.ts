@@ -334,7 +334,6 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
         );
       }
     } else if (interaction.customId === AppSettings.BUTTON_REJECT_REQUEST_ID) {
-
       // Defer interaction reply.
       await interaction.deferReply();
       // If the Reject Team invite is clicked.
@@ -360,7 +359,6 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       }
     }
   } else if (interaction.customId === AppSettings.BUTTON_LEAVE_TEAM_ID) {
-
     // If the Leave Team button is clicked.
     // Defer interaction reply.
 
@@ -410,7 +408,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
 
     // Get messageID of the message created at the first place by the user who created the Team.
     let messageId: string = interaction.message.id;
-    
+
     // Fetch the original message by message ID.
 
     let message: Message | null = await getMessageByID(interaction, messageId);
@@ -430,7 +428,7 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     // and delete the reply
 
     // Get the original message embed fields.
-    // These fields are the fields of the message 
+    // These fields are the fields of the message
     // sent by the user who created the Team.
     const original_message: Embed = message.embeds[0];
     const title = original_message.data.title;
@@ -461,22 +459,34 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     // The player already joined in the Team.
     let team_players: string[] = [];
 
+    // Loop through the fields of the original message.
     for (let i = 0; i < fields.length; i += 1) {
+      // TODO - Change this to a constant.
       if (fields[i].name === "Number of Space in Wing/Team Available") {
+        // push the field to the new fields array.
+        // with increment value of the spots by one.
         new_fields.push({
           name: "Number of Space in Wing/Team Available",
           value: (parseInt(fields[i].value) + 1).toString(),
         });
       } else if (fields[i].name === "Players Joined") {
-        team_players = fields[i].value.split('\n');
+        // If the field name is 'Players Joined' field from embed message sent.
+        // Adding the users to users to the mentionedUser collection.
+        team_players = fields[i].value.split("\n");
         new_fields.push(fields[i]);
       } else {
+        // push the field to the new fields array.
         new_fields.push(fields[i]);
       }
     }
 
-    
+    // Check if the interaction user is the the one who created the Team.
+    // The first user in team_players should be the one who created the Team.
     if (team_players.indexOf(interaction.user.toString()) === 0) {
+      // If the interaction user is the one who created the Team.
+      // Send ephemeral message to the interaction user.
+      // Notify the user that they cannot leave the Team.
+      // They have to delete it.
       await interaction.editReply({
         content:
           "You're the one created it, To leave please use `Delete` button",
@@ -484,21 +494,31 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
       return;
     }
 
+    // Check if the interaction user is in the team_players.
     if (!team_players.includes(interaction.user.toString())) {
+      // If the interaction user is not in the team_players.
+      // Send ephemeral message to the interaction user.
+      // Notify the user that they are not in the Team.
       await interaction.editReply({
         content: "You're not in the Team",
       });
       return;
     }
 
+    // Remove the interaction user from the team_players.
     team_players = removeEntry(team_players, interaction.user.toString());
 
+    // Loop through the team_players.
+    // Replace the previous "Players" joined value to to the new one.
+    // Join the team_players with new line.
     for (let i = 0; i < new_fields.length; i += 1) {
       if (fields[i].name === "Players Joined") {
         fields[i].value = team_players.join("\n") || "";
       }
     }
 
+    // get original message embed footer, if any.
+    // For now it contains the message delete time.
     const footer = original_message.data.footer?.text || "";
 
     let new_embeded_message = new EmbedBuilder();
@@ -508,14 +528,12 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     new_embeded_message.setFooter({ text: footer });
     new_embeded_message.setTimestamp(Date.parse(timestamp));
 
-    if (fields === undefined) {
-      return;
-    }
-
+    // Edit the original message with the new embeded message.
     await message.edit({
       embeds: [new_embeded_message],
     });
 
+    // Notify the user that they have left the Team.
     await interaction.editReply({
       content: `You left the Team`,
     });
@@ -529,13 +547,19 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
   Args:
     ButtonInteraction
   Returns:
-    Message if found or null
+    Message if the message is found.
+    null if the message is not found.
 */
 async function getMessageByID(
   interaction: ButtonInteraction,
   messageId: string
 ): Promise<Message | null> {
+  // Get the channel of the interaction.
+  // If the channel is null.
   if (interaction.channel === null) {
+    // Log the error and interaction.
+    // Notify the user that the channel is not found.
+    // return null.
     console.error("Interaction Channel is null: " + interaction);
     await interaction.reply({
       content: "Original Channel not Found",
@@ -544,6 +568,8 @@ async function getMessageByID(
     return null;
   }
 
+  // Get the message by message ID.
+  // If the message is null.
   const message = await interaction.channel.messages
     .fetch(messageId)
     .catch((error) => {
