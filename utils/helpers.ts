@@ -32,7 +32,7 @@ interface ShipsInfo {
   shipCount: Array<string>;
 }
 
-function getShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
+function getEliteShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
   let shipNames: string[] = [];
   let shipCount: string[] = [];
 
@@ -235,7 +235,7 @@ function removeEntry(arri: Array<string>, leavingUser: string) {
 
 export {
   formatTime,
-  getShipAndCount,
+  getEliteShipAndCount,
   removeEntry,
   checkDurationValidation,
   DurationValidation,

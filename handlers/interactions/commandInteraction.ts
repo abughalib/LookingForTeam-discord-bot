@@ -11,7 +11,7 @@ import {
   checkDurationValidation,
   DurationValidation,
   formatTime,
-  getShipAndCount,
+  getEliteShipAndCount,
 } from "../../utils/helpers";
 import { AppSettings } from "../../utils/settings";
 import SystemInfo from "../../utils/systemInfoModel";
@@ -276,7 +276,7 @@ async function interactionCommandHandler(
       return;
     }
 
-    const shipsAndCount = getShipAndCount(systemTrafficInfo);
+    const shipsAndCount = getEliteShipAndCount(systemTrafficInfo);
 
     const options_list: string[] = [
       "System Name",
