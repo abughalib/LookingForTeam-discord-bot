@@ -43,17 +43,18 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     }
 
     const originalUserInteraction = interaction.message.interaction.user;
+    const fields = interaction.message.embeds[0].data.fields;
     const currentUserInteraction = interaction.user;
 
     let joined_user = "";
 
     let spots: number = 0;
 
-    for (const field of interaction.message.embeds[0].data.fields) {
-      if (field.name === "Number of Space in Wing/Team Available") {
-        spots = parseInt(field.value);
-      } else if (field.name === "Players Joined") {
-        joined_user = field.value;
+    for (let i = 0; i < fields.length; i += 1) {
+      if (fields[i].name === "Number of Space in Wing/Team Available") {
+        spots = parseInt(fields[i].value);
+      } else if (fields[i].name === "Players Joined") {
+        joined_user = fields[i].value;
       }
     }
 
@@ -172,24 +173,24 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
         let new_fields: APIEmbedField[] = [];
         let mentionedUser: Collection<string, User>;
 
-        for (const field of fields) {
-          if (field.name === "Number of Space in Wing/Team Available") {
+        for (let i = 0; i < fields.length; i += 1) {
+          if (fields[i].name === "Number of Space in Wing/Team Available") {
             new_fields.push({
               name: "Number of Space in Wing/Team Available",
-              value: (parseInt(field.value) - 1).toString(),
+              value: (parseInt(fields[i].value) - 1).toString(),
             });
-          } else if (field.name === "Players Joined") {
+          } else if (fields[i].name === "Players Joined") {
             mentionedUser = interaction.message.mentions.users;
             new_fields.push({
-              name: field.name,
-              value: `${field.value}\n${
+              name: fields[i].name,
+              value: `${fields[i].value}\n${
                 mentionedUser.first() === interaction.user
                   ? mentionedUser.last()
                   : mentionedUser.first()
               }`,
             });
           } else {
-            new_fields.push(field);
+            new_fields.push(fields[i]);
           }
         }
 
@@ -305,17 +306,17 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     let team_players: string[] = [];
     let players: string = "";
 
-    for (const field of fields) {
-      if (field.name === "Number of Space in Wing/Team Available") {
+    for (let i = 0; i < fields.length; i += 1) {
+      if (fields[i].name === "Number of Space in Wing/Team Available") {
         new_fields.push({
           name: "Number of Space in Wing/Team Available",
-          value: (parseInt(field.value) + 1).toString(),
+          value: (parseInt(fields[i].value) + 1).toString(),
         });
-      } else if (field.name === "Players Joined") {
-        players = field.value;
-        new_fields.push(field);
+      } else if (fields[i].name === "Players Joined") {
+        players = fields[i].value;
+        new_fields.push(fields[i]);
       } else {
-        new_fields.push(field);
+        new_fields.push(fields[i]);
       }
     }
 
@@ -338,9 +339,9 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
 
     team_players = removeEntry(team_players, interaction.user.toString());
 
-    for (const field of new_fields) {
-      if (field.name === "Players Joined") {
-        field.value = team_players.join("\n") || "";
+    for (let i = 0; i < new_fields.length; i += 1) {
+      if (fields[i].name === "Players Joined") {
+        fields[i].value = team_players.join("\n") || "";
       }
     }
 
