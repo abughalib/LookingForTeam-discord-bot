@@ -20,15 +20,28 @@ import embedMessage from "../embeded_message";
 import systemEmbedMessage from "../systemInfoEmbed";
 import deleteInteraction from "./deleteInteractions";
 
+/*
+  Args:
+    interaction: CommandInteraction.
+    Menu: Menu Available for selection.
+    buttons: Buttons to be added to the message.
+  Returns:
+    void
+*/
 async function interactionCommandHandler(
   interaction: CommandInteraction,
   menus: ActionRowBuilder<SelectMenuBuilder>,
   buttons: ActionRowBuilder<ButtonBuilder>
 ) {
+  // CommandName and options
   const { commandName, options } = interaction;
 
+  // Check if the interaction.guild is null
   if (interaction.guild == null) {
-    console.error("interaction guild null: ");
+    // Log Error interaction
+    console.error("interaction guild null: " + interaction);
+    // Reply to the interaction
+    // Show internal error message
     await interaction
       .reply({
         ephemeral: true,
@@ -40,16 +53,26 @@ async function interactionCommandHandler(
     return;
   }
 
+  // fetch interacted user from the interaction.guild members
+  // To get the nick name of the user
   const userInterected = await interaction.guild.members.fetch(
     interaction.user.id
   );
+
+  // Get the name of the user which is used in the channel
+  // User can have different name in different channels
   const nickName = userInterected?.nickname || interaction.user.username;
 
-  const options_list = AppSettings.BOT_WING_FIELDS;
+  // Heading for the embed message
+  const listFieldheading = AppSettings.BOT_WING_FIELDS;
 
+  // For EDSM API
   const edsm = new EDSM();
 
+  // BOT command Names
+  // Defined in [BOT_COMMANDS]
   if (commandName === AppSettings.BOT_WING_COMMAND_NAME) {
+    // Get specific option from the command
     const activity =
       options.get(AppSettings.INTERACTION_ACTIVITY_ID)?.value ||
       AppSettings.DEFAULT_TEAM_ACTIVITY;
@@ -59,18 +82,22 @@ async function interactionCommandHandler(
     let spots =
       options.get(AppSettings.INTERACTION_SPOTS_ID)?.value ||
       AppSettings.MAXIMUM_TEAM_SPOT;
+
+    // How long the team will be active
     let duration: number = Number(
       (
         (options.get(AppSettings.INTERACTION_DURATION_ID)?.value as number) ||
         AppSettings.DEFAULT_TEAM_DURATION
       ).toFixed(2)
     );
+    // When the Team creator is looking for Team
     let when: number = Number(
       (
         (options.get(AppSettings.INTERACTION_WHEN_ID)?.value as number) || 0
       ).toFixed(2)
     );
 
+    // Check if the duration and when is valid
     if (
       !(await isValidDuration(interaction, duration)) ||
       !(await isValidDuration(interaction, when))
@@ -78,24 +105,29 @@ async function interactionCommandHandler(
       return;
     }
 
+    // Defer the reply
     await interaction.deferReply();
 
-    // If timer is more then MAXIMUM_HOURS_TEAM hours convert it into Minutes
+    // If timer is more then [MAXIMUM_HOURS_TEAM] hours convert it into Minutes
     if (when > AppSettings.MAXIMUM_HOURS_TEAM) {
       when = when / 60;
     }
 
-    // If Duration is more then MAXIMUM_HOURS_TEAM hours convert it into Minutes
+    // If Duration is more then [MAXIMUM_HOURS_TEAM] hours convert it into Minutes
     if (duration > AppSettings.MAXIMUM_HOURS_TEAM) {
       duration = duration / 60;
     }
 
-    // Maximum spot in wing is MAXIMUM_TEAM_SPOT which is 3 as of now
+    // Maximum spot in wing is [MAXIMUM_TEAM_SPOT] which is 3 as of now
     if (spots > AppSettings.MAXIMUM_TEAM_SPOT) {
       spots = AppSettings.MAXIMUM_TEAM_SPOT;
     }
 
-    const options_values = [
+    /*
+      If when is 0 then it means the user is looking for team now
+      else it will be the time when the user is looking for team
+    */
+    const listFieldValue = [
       activity,
       location,
       parseInt(spots.toString()),
@@ -105,8 +137,10 @@ async function interactionCommandHandler(
       `${interaction.user}`,
     ];
 
+    // Title for the embed message
     let title: string = AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
 
+    // Channel name for the embed message
     if (interaction.channelId === AppSettings.XBOX_CHANNEL_ID) {
       title = AppSettings.XBOX_WING_REQUEST_INTERACTION_TITLE;
     } else if (interaction.channelId === AppSettings.PS_CHANNEL_ID) {
@@ -115,10 +149,11 @@ async function interactionCommandHandler(
       title = AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
     }
 
+    // Create the embed message
     let embeded_message = embedMessage(
       title,
-      options_list,
-      options_values,
+      listFieldheading,
+      listFieldValue,
       nickName
     );
 
@@ -128,25 +163,25 @@ async function interactionCommandHandler(
       value: `${formatTime(duration)}`,
     });
 
-    // Time can't be negative;
-    if (duration < 0) {
-      duration = AppSettings.DEFAULT_TEAM_DURATION;
-    }
-
+    // Set footer for the embed message
     embeded_message.setFooter({
       text: `Expires in ${formatTime(duration + when)}`,
     });
 
-    if (interaction.channelId === AppSettings.PC_CHANNEL_ID) {
-      await interaction
-        .deferReply({
-          ephemeral: false,
-        })
-        .catch((err) => {
-          console.error(`Error in deferReply: ${err}`);
-        });
+    // Defer message reply
+    await interaction
+      .deferReply({
+        ephemeral: false,
+      })
+      .catch((err) => {
+        console.error(`Error in deferReply: ${err}`);
+      });
 
+    // Send the embed message specific for the channel [PC, XBOX, PS]
+    if (interaction.channelId === AppSettings.PC_CHANNEL_ID) {
       // Pretty Looking reply
+      // Send the embed message
+      // Add the buttons and menu to the message
       await interaction
         .editReply({
           embeds: [embeded_message],
@@ -156,14 +191,6 @@ async function interactionCommandHandler(
           console.error(`Error in editReply: ${err}`);
         });
     } else {
-      await interaction
-        .deferReply({
-          ephemeral: false,
-        })
-        .catch((err) => {
-          console.error(`Error in deferReply: ${err}`);
-        });
-
       // Pretty Looking reply
       await interaction
         .editReply({
@@ -180,17 +207,29 @@ async function interactionCommandHandler(
       AppSettings.HOURS_TO_MILISEC * (duration + when)
     );
   } else if (commandName == AppSettings.BOT_SYSTEM_FACTION_INFO_COMMAND_NAME) {
+    /*
+      System faction info command [BOT_SYSTEM_FACTION_INFO_COMMAND_NAME]
+    */
+
+    // Get the system name from the command
     const systemName: string =
       options.get(AppSettings.INTERACTION_SYSTEM_NAME_ID)?.value?.toString() ||
       AppSettings.DEFAULT_SYSTEM_NAME;
+
+    // Defer message reply
+    // as API call may take more than 3 seconds
     await interaction.deferReply().catch((err) => {
       console.error(`Error in deferReply: ${err}`);
     });
 
+    // Get the system info from EDSM API
     let systemInfo: SystemInfo | null = await edsm.getSystemInfo(systemName);
 
+    // Create a dismiss button for the replies
     let dismissButton = createDismissButton();
 
+    // If API call returns null
+    // That means the system is not found
     if (!systemInfo || !systemInfo.id) {
       await interaction
         .editReply({
@@ -204,6 +243,12 @@ async function interactionCommandHandler(
       !systemInfo.controllingFaction ||
       systemInfo.factions.length === 0
     ) {
+      /*
+        If the system is found but there is no controlling faction
+        Send a message saying that Inhabitated system.
+        Create a embed message
+        With System URL
+      */
       await interaction
         .editReply({
           embeds: [
@@ -217,6 +262,9 @@ async function interactionCommandHandler(
           console.error(`Error in editReply: ${err}`);
         });
     } else {
+      // Create embed message for the system faction info
+      // Reply embed message
+      // With dismiss button
       let embeded_message = systemEmbedMessage(systemInfo);
       await interaction
         .editReply({
@@ -228,15 +276,23 @@ async function interactionCommandHandler(
         });
     }
 
+    // Delete the message after [HELP_MESSAGE_DISMISS_TIMEOUT]
     deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
   } else if (commandName === AppSettings.BOT_SYSTEM_TRAFFIC_COMMAND_NAME) {
+    // Title for the embed message
     const title: string = "System Traffic Info";
+
+    // Get system name from the command
     const systemName: string =
       options.get(AppSettings.INTERACTION_SYSTEM_NAME_ID)?.value?.toString() ||
       "SOL";
+
+    // Get NickName for that specific server
     const nickName = userInterected?.nickname || interaction.user.username;
 
-    interaction
+    // Defer message reply
+    // Ephermal true so that only the user can see the message
+    await interaction
       .deferReply({
         ephemeral: true,
       })
@@ -244,10 +300,13 @@ async function interactionCommandHandler(
         console.error(`Error in System Traffic Info: ${err}`);
       });
 
+    // Get the system Traffic info from EDSM API
     const systemTrafficInfo = await edsm.getSystemTrafficInfo(systemName);
 
+    // If API call returns null
+    // That means the system is not found
     if (systemTrafficInfo === null) {
-      interaction
+      await interaction
         .editReply({
           content: "Cannot find Traffic Info",
         })
@@ -259,12 +318,10 @@ async function interactionCommandHandler(
       return;
     }
 
-    if (
-      systemTrafficInfo.breakdown === null ||
-      systemTrafficInfo.breakdown === undefined ||
-      systemTrafficInfo.traffic == null
-    ) {
-      interaction
+    // If the breakdown is null or underfined
+    // That means there is no traffic info for that system
+    if (!systemTrafficInfo.breakdown || !systemTrafficInfo.traffic) {
+      await interaction
         .editReply({
           content: "No ship info is in EDSM for this system",
         })
@@ -276,14 +333,19 @@ async function interactionCommandHandler(
       return;
     }
 
+    // Breakdown of the traffic info
+    // Ship name and count
     const shipsAndCount = getEliteShipAndCount(systemTrafficInfo);
 
-    const options_list: string[] = [
+    // Embed message heading
+    const listFieldheading: string[] = [
       "System Name",
       ...AppSettings.SYSTEM_TIMELINE,
       ...shipsAndCount.shipNames,
     ];
-    const values: string[] = [
+
+    // Embed message Values
+    const listFieldValue: string[] = [
       systemTrafficInfo.name,
       systemTrafficInfo.traffic.day.toString(),
       systemTrafficInfo.traffic.week.toString(),
@@ -291,35 +353,49 @@ async function interactionCommandHandler(
       ...shipsAndCount.shipCount,
     ];
 
+    // Create the embed message
     const embeded_message = embedMessage(
       title,
-      options_list,
-      values,
+      listFieldheading,
+      listFieldValue,
       nickName,
       true
     );
 
+    // Reply embed message
     interaction.editReply({
       embeds: [embeded_message],
     });
   } else if (commandName === AppSettings.BOT_SYSTEM_DEATH_COMMAND_NAME) {
+    // Get system name from the command
     const systemName: string =
       options.get(AppSettings.INTERACTION_SYSTEM_NAME_ID)?.value?.toString() ||
       AppSettings.DEFAULT_STAR_SYSTEM_NAME;
+
+    // Get NickName for that specific server of that user
     const nickName = userInterected?.nickname || interaction.user.username;
 
+    // The title for the embed message
     const title: string = "System Death Info";
-    interaction
+
+    // Defer message reply
+    await interaction
       .deferReply({
         ephemeral: true,
       })
       .catch((err) => {
         console.error(`Error in System Death Info: ${err}`);
       });
+
+    // Get the system Death from EDSM API
     const systemDeath = await edsm.getSystemDeath(systemName);
 
+    // System Death info is not found
+    // or System Death death is undefined
     if (systemDeath === null || systemDeath.deaths === undefined) {
-      interaction
+      // Reply with a message
+      // Saying that there is no death info for that system
+      await interaction
         .editReply({
           content: "Cannot find system Death Info!",
         })
@@ -329,8 +405,11 @@ async function interactionCommandHandler(
       return;
     }
 
+    // Breakdown of the death info
     const listFieldheading = ["System Name", ...AppSettings.SYSTEM_TIMELINE];
 
+    // Breakdown of the death info
+    // By Time
     const listFieldValues = [
       systemDeath.name,
       systemDeath.deaths.day,
@@ -338,6 +417,7 @@ async function interactionCommandHandler(
       systemDeath.deaths.total,
     ];
 
+    // Create the embed message
     const embeded_message = embedMessage(
       title,
       listFieldheading,
@@ -345,7 +425,8 @@ async function interactionCommandHandler(
       nickName
     );
 
-    interaction
+    // Reply embed message
+    await interaction
       .editReply({
         embeds: [embeded_message],
       })
@@ -353,14 +434,20 @@ async function interactionCommandHandler(
         console.error(`Error in System Death Info: ${err}`);
       });
   } else if (commandName === AppSettings.BOT_HELP_COMMAND_NAME) {
+    // Title for the embed message
     const title: string = AppSettings.BOT_HELP_REPLY_TITLE;
+
+    // List of the fields for the embed message
     const listFieldheading = [
       ...AppSettings.BOT_HELP_FIELD_TITLE,
       ...AppSettings.BOT_WING_FIELDS,
       ...AppSettings.BOT_HELP_EXTRA_FIELDS,
     ];
+
+    // List of the values for the embed message
     const listFieldValue = AppSettings.BOT_HELP_COMMAND_REPLY_FIELD_VALUES;
 
+    // Create the embed message
     const embeded_message = embedMessage(
       title,
       listFieldheading,
@@ -368,10 +455,12 @@ async function interactionCommandHandler(
       interaction.user.username
     );
 
+    // set Message footer
     embeded_message.setFooter({
       text: AppSettings.BOT_HELP_REPLY_FOOTER_NOTE,
     });
 
+    // Defer message reply
     await interaction
       .deferReply({
         ephemeral: true,
@@ -380,6 +469,7 @@ async function interactionCommandHandler(
         console.error(`Error in Help: ${err}`);
       });
 
+    // Edit Reply of interaction with embed message
     await interaction
       .editReply({
         embeds: [embeded_message],
@@ -388,6 +478,7 @@ async function interactionCommandHandler(
         console.error(`Error in Help: ${err}`);
       });
   } else if (commandName === AppSettings.BOT_PING_COMMAND_NAME) {
+    // Reply with a message
     await interaction
       .reply({
         content: AppSettings.BOT_PING_REPLY,
@@ -399,6 +490,14 @@ async function interactionCommandHandler(
   }
 }
 
+/*
+  Args:
+    None
+  Returns:
+    Buttons
+*/
+
+// To be removed in the future.
 function createDismissButton(): ActionRowBuilder<ButtonBuilder> {
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
@@ -408,10 +507,22 @@ function createDismissButton(): ActionRowBuilder<ButtonBuilder> {
   );
 }
 
+/*
+  Args:
+    interaction: CommandInteraction
+  Returns:
+    boolean
+
+  Description:
+    Check if the duration is Valid.
+    If the duration is valid, then return true.
+    else send a ephemeral message to the user and return false.
+*/
 async function isValidDuration(
   interaction: CommandInteraction,
   timer: number
 ): Promise<boolean> {
+  // Check if the timer is valid
   switch (checkDurationValidation(timer)) {
     case DurationValidation.INVALID:
       await interaction
@@ -423,6 +534,7 @@ async function isValidDuration(
           console.error(err);
         });
       return false;
+    // In case if the Duration is more then allowd time [MAXIMUM_HOURS_TEAM]
     case DurationValidation.LIMIT_EXCEEDED:
       interaction
         .reply({

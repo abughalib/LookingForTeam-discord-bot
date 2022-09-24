@@ -17,7 +17,7 @@ import deleteMessage from "./deleteMessage";
 
 /*
   Args:
-    ButtonInteraction handler
+    ButtonInteraction
   Returns:
     void
 */
