@@ -252,7 +252,7 @@ function checkDurationValidation(duration: number): DurationValidation {
   Returns:
     Returns the array without the user passed in
 */
-function removeEntry<T>(arri: Array<T>, itemToRemove: string) {
+function removeEntry<T>(arri: Array<T>, itemToRemove: T) {
   let array: Array<T> = [];
 
   for (let i = 0; i < arri.length; i += 1) {
