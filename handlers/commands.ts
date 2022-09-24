@@ -2,14 +2,28 @@ import { Client, ApplicationCommandOptionType } from "discord.js";
 import CommandLocalizations from "../utils/localization";
 import { AppSettings } from "../utils/settings";
 
+/*
+  Args:
+    client: Discord Client
+  Returns:
+    void
+  Description:
+    Sets the commands for the bot
+*/
+
 function setCommands(client: Client) {
+  // If client application is null, return.
+  // Log the error to the console with client
   if (client.application == null) {
     console.error("ClientApplication null, client: ", client);
     return;
   }
 
+  // get the application commands
   const commands = client.application.commands;
 
+  // If the commands are null, return.
+  // Log the error to the console with client.application
   if (commands == null) {
     console.error(
       "Application Commands null, application: ",
@@ -18,6 +32,7 @@ function setCommands(client: Client) {
     return;
   }
 
+  // Create a new command
   commands
     .create({
       name: AppSettings.BOT_WING_COMMAND_NAME,

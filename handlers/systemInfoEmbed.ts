@@ -2,10 +2,29 @@ import { APIEmbedField, EmbedBuilder, RestOrArray } from "discord.js";
 import { AppSettings } from "../utils/settings";
 import SystemInfo from "../utils/systemInfoModel";
 
+/*
+  Args:
+    options: Array of strings
+    values: Array of strings
+  Returns:
+    Array of APIEmbedField
+  Description:
+    Creates an array of APIEmbedField from the options and values
+    Options are the names of the fields
+    Values are the values of the fields
+*/
+
 function getFields(
   options: string[],
   values: string[]
 ): RestOrArray<APIEmbedField> {
+  /*
+    Example:
+      options = ["A", "B", "C"]
+      values = [1, 2, 3]
+    Should Create a Map {values[i]: options[i]} => { A: 1, B: 2, C: 3 }
+  */
+
   let fields: RestOrArray<APIEmbedField> = Array.from(
     Array(Math.max(options.length, values.length)),
     (_, i): APIEmbedField => {
@@ -16,24 +35,44 @@ function getFields(
   return fields;
 }
 
+/*
+  Args:
+    systemInfo: SystemInfo
+  Returns:
+    EmbedBuilder
+  Description:
+    Creates an embeded message from the systemInfo
+*/
+
 function systemEmbedMessage(systemInfo: SystemInfo): EmbedBuilder {
+  // Last Time the EDSM was updated
   let lastUpdated: number = 0;
+  // Field Heading for the embeded message
   let options: string[] = [];
+  // Field Values for the embeded message
   let values: string[] = [];
 
-  systemInfo.factions.forEach((faction) => {
-    if (faction.influence * 100 < 1) {
-      return;
+  // Looping through the systemInfo
+  for (let i = 0; i < systemInfo.factions.length; i += 1) {
+    // If the factions influence is less then 1% then skip it
+    if (systemInfo.factions[i].influence * 100 < 1) {
+      continue;
     }
     options.push(
-      `${faction.name} (${faction.allegiance}-${faction.government})`
+      `${systemInfo.factions[i].name} (${systemInfo.factions[i].allegiance}-${systemInfo.factions[i].government})`
     );
-    values.push(
-      `${(faction.influence * 100).toPrecision(4)} (${faction.state})`
-    );
-    lastUpdated = Math.max(lastUpdated, faction.lastUpdate);
-  });
 
+    // Add faction influence in percentage
+    values.push(
+      `${(systemInfo.factions[i].influence * 100).toPrecision(4)} (${
+        systemInfo.factions[i].state
+      })`
+    );
+    // global LastUpdate should be least of all the factions
+    lastUpdated = Math.max(lastUpdated, systemInfo.factions[i].lastUpdate);
+  }
+
+  // Create the embeded message
   const embeded_message = new EmbedBuilder()
     .setColor(AppSettings.EMBEDED_MESSAGE_COLOR)
     .setTitle(systemInfo.name)

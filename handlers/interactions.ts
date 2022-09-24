@@ -13,7 +13,7 @@ import interactionCommandHandler from "./interactions/commandInteraction";
 async function handleInteractions(interaction: Interaction) {
   const menus = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
     new SelectMenuBuilder()
-      .setCustomId(AppSettings.SELECT_GAME_VERSION)
+      .setCustomId(AppSettings.SELECT_GAME_VERSION_ID)
       .setPlaceholder(AppSettings.SELECT_GAME_VERSION_PLACEHOLDER)
       .addOptions(AppSettings.AVAILABLE_GAME_VERSIONS)
   );

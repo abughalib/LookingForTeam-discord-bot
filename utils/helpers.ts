@@ -1,13 +1,17 @@
 import { SystemTrafficInfo } from "./models";
 import { AppSettings } from "./settings";
 
-function formatTime(duration: number): string {
-  // Added for cameld00d
-  if (duration < 0) {
-    return "For few hours maybe";
-  }
+/*
+  Args:
+    duration: number // Duration in hours
+  Returns:
+    string // Formatted Duration in hours and minutes or seconds
+  Description:
+    Returns the duration in a readable format
+*/
 
-  // Duration less then 1 i.e minutes
+function formatTime(duration: number): string {
+  // Duration less then 1 minutes
   if (duration < 1) {
     duration = 60 * duration;
     if (duration < 1) {
@@ -32,6 +36,15 @@ interface ShipsInfo {
   shipCount: Array<string>;
 }
 
+/*
+  Args:
+    systemTrafficInfo: [SystemTrafficInfo] // System Traffic Info received from EDSM
+  Returns:
+    [ShipsInfo]
+  Description:
+    Returns the ships info from the 
+    system traffic info by ship name and count
+*/
 function getEliteShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
   let shipNames: string[] = [];
   let shipCount: string[] = [];
@@ -210,22 +223,40 @@ enum DurationValidation {
   LIMIT_EXCEEDED,
 }
 
+/*
+  Args:
+    duration: The duration in hours
+  Returns:
+    [DurationValidation]
+*/
+
 function checkDurationValidation(duration: number): DurationValidation {
+  // Duration cannot be negative
   if (duration < 0) {
     return DurationValidation.INVALID;
   }
+
+  // Duration cannot be greater than [MAXIMUM_HOURS_TEAM]
   if (duration > AppSettings.MAXIMUM_HOURS_TEAM) {
     return DurationValidation.LIMIT_EXCEEDED;
   }
 
+  // Duration is valid
   return DurationValidation.VALID;
 }
 
-function removeEntry(arri: Array<string>, leavingUser: string) {
-  let array: Array<string> = [];
+/*
+  Args:
+    arri: Array<T> // Array of Elements
+    itemToRemove: T // Element to remove from the Array
+  Returns:
+    Returns the array without the user passed in
+*/
+function removeEntry<T>(arri: Array<T>, itemToRemove: string) {
+  let array: Array<T> = [];
 
   for (let i = 0; i < arri.length; i += 1) {
-    if (arri[i] !== leavingUser) {
+    if (arri[i] !== itemToRemove) {
       array.push(arri[i]);
     }
   }

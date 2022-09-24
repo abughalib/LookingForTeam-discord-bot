@@ -1,11 +1,23 @@
 import { AppSettings } from "./settings";
-import SystemInfo from "./systemInfoModel";
+import SystemFactionInfo from "./systemInfoModel";
 import { ServerStatusModel, SystemDeath, SystemTrafficInfo } from "./models";
+
+/*
+  EDSM API Queries here.
+*/
 
 class EDSM {
   constructor() {}
 
-  async fetchSystemInfo(systemName: string) {
+  /*
+    Args:
+      systemName: string // Elite Dangerous system Name
+    Returns:
+      json_data: json // EDSM system faction info [SystemFactionInfo]
+    Description:
+      Fetches system Factions from EDSM
+  */
+  async fetchSystemFactionInfo(systemName: string) {
     let resp = await fetch(AppSettings.BOT_SYSTEM_INFO_FETCH_URL, {
       method: "POST",
       body: JSON.stringify({
@@ -17,6 +29,7 @@ class EDSM {
     return resp.json();
   }
 
+  // Elite Dangerous server status
   async eliteServerStatus(): Promise<ServerStatusModel | null> {
     let resp = await fetch(AppSettings.BOT_ELITE_SERVER_FETCH_URL);
 
@@ -27,6 +40,7 @@ class EDSM {
     return serverStatus;
   }
 
+  // Elite Dangerous system Traffic info with Breakdown by ships
   async getSystemTrafficInfo(
     systemName: string
   ): Promise<SystemTrafficInfo | null> {
@@ -45,6 +59,12 @@ class EDSM {
     return systemTrafficInfo;
   }
 
+  /*
+    Args:
+      systemName: string // Elite Dangerous system Name
+    Returns:
+      systemDeath // [SystemDeath]
+  */
   async getSystemDeath(systemName: string): Promise<SystemDeath | null> {
     let resp = await fetch(AppSettings.BOT_SYSTEM_DEATHS_INFO_FETCH_URL, {
       method: "POST",
@@ -61,8 +81,15 @@ class EDSM {
     return systemDeath;
   }
 
-  async getSystemInfo(systemName: string): Promise<SystemInfo | null> {
-    let json_data = await this.fetchSystemInfo(systemName);
+  /*
+    Args:
+      systemName: string // Elite Dangerous system Name
+    Returns:
+      systemfactioninfo // [SystemFactionInfo]
+  */
+
+  async getSystemInfo(systemName: string): Promise<SystemFactionInfo | null> {
+    let json_data = await this.fetchSystemFactionInfo(systemName);
 
     if (!json_data) {
       console.error("EDSM not responding: ", json_data);
