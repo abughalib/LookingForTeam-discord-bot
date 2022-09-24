@@ -90,7 +90,7 @@ export class AppSettings {
   static readonly BOT_PING_REPLY = "Bots never sleeps";
 
   // Available Game Versions or Menu Interaction
-  static readonly SELECT_GAME_VERSION = "select_game_version";
+  static readonly SELECT_GAME_VERSION_ID = "select_game_version";
   static readonly SELECT_GAME_VERSION_PLACEHOLDER = "Game Version";
   static readonly AVAILABLE_GAME_VERSIONS = [
     {
