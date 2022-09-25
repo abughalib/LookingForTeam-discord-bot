@@ -10,7 +10,17 @@ import interactionMenuHandler from "./interactions/menuInteractions";
 import interactionButtonHandler from "./interactions/buttonInteractions";
 import interactionCommandHandler from "./interactions/commandInteraction";
 
+/*
+  Args:
+    interaction: The interaction object
+  Returns:
+    void
+  Description:
+    This function handles all interactions
+*/
 async function handleInteractions(interaction: Interaction) {
+
+  // Create Select Menu for the Game version
   const menus = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
     new SelectMenuBuilder()
       .setCustomId(AppSettings.SELECT_GAME_VERSION_ID)
@@ -18,6 +28,7 @@ async function handleInteractions(interaction: Interaction) {
       .addOptions(AppSettings.AVAILABLE_GAME_VERSIONS)
   );
 
+  // Create Buttons for the interaction message
   const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
     new ButtonBuilder()
       .setCustomId(AppSettings.BUTTON_JOIN_ID)
@@ -33,6 +44,7 @@ async function handleInteractions(interaction: Interaction) {
       .setStyle(ButtonStyle.Secondary)
   );
 
+  // Handle the different interaction types
   if (interaction.isCommand()) {
     interactionCommandHandler(interaction, menus, buttons);
   } else if (interaction.isButton()) {
