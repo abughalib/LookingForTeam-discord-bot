@@ -322,11 +322,15 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
 
         // Notify the interaction user that their request is accepted to the Team.
         // And add extra instructions to the user.
+
+        /// TODO - Add a Button to dissmiss the message.
         await interaction.editReply({
           content:
             `${interaction.message.mentions.users.last()}, Your request is accepted` +
             `\nMake sure you have ${interaction.message.mentions.users.first()} as your in-game friend`,
         });
+        // Delete the interaction message that the button responds to.
+        deleteMessage(interaction.message);
         // Delete the interaction.
         deleteInteractionButton(
           interaction,
