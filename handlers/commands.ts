@@ -89,18 +89,24 @@ function setCommands(client: Client) {
     })
     .catch((error) => console.error("Error creating command: ", error));
 
-  commands.create({
-    name: AppSettings.BOT_SYSTEM_INFO_COMMAND_NAME,
-    description: "Get Systems Factions Info",
-    options: [
-      {
-        name: "system_name",
-        description: "Elite Dangerous system name",
-        required: true,
-        type: ApplicationCommandOptionType.String,
-      },
-    ],
-  });
+  commands
+    .create({
+      name: AppSettings.BOT_SYSTEM_FACTION_INFO_COMMAND_NAME,
+      description: CommandLocalizations.SYTEM_FACTION_INFO_DESCRIPTION["en-US"],
+      description_localizations:
+        CommandLocalizations.SYTEM_FACTION_INFO_DESCRIPTION,
+      options: [
+        {
+          name: AppSettings.INTERACTION_SYSTEM_NAME_ID,
+          description: AppSettings.INTERACTION_SYSTEM_NAME_DESC,
+          required: true,
+          type: ApplicationCommandOptionType.String,
+        },
+      ],
+    })
+    .catch((error) =>
+      console.error("Error Get Systems Factions Info: ", error)
+    );
 
   commands
     .create({
