@@ -7,107 +7,140 @@ import {
   ButtonStyle,
 } from "discord.js";
 import EDSM from "../../utils/edsm";
-import formatTime from "../../utils/helpers";
+import {
+  checkDurationValidation,
+  DurationValidation,
+  formatTime,
+  getEliteShipAndCount,
+} from "../../utils/helpers";
 import { AppSettings } from "../../utils/settings";
 import SystemInfo from "../../utils/systemInfoModel";
-import { SystemTrafficInfo } from "../../utils/models";
 import getEpochTimeAfterHours from "../../utils/timestamp";
 import embedMessage from "../embeded_message";
 import systemEmbedMessage from "../systemInfoEmbed";
 import deleteInteraction from "./deleteInteractions";
 
+/*
+  Args:
+    interaction: CommandInteraction.
+    Menu: Menu Available for selection.
+    buttons: Buttons to be added to the message.
+  Returns:
+    void
+*/
 async function interactionCommandHandler(
   interaction: CommandInteraction,
   menus: ActionRowBuilder<SelectMenuBuilder>,
   buttons: ActionRowBuilder<ButtonBuilder>
 ) {
+  // CommandName and options
   const { commandName, options } = interaction;
 
+  // Check if the interaction.guild is null
   if (interaction.guild == null) {
-    console.error("interaction guild null: ");
-    interaction.reply({
-      content: "Some internal error occured. Please try again later.",
-    });
+    // Log Error interaction
+    console.error("interaction guild null: " + interaction);
+    // Reply to the interaction
+    // Show internal error message
+    await interaction
+      .reply({
+        ephemeral: true,
+        content: "Some internal error occured. Please try again later.",
+      })
+      .catch((err) => {
+        console.error(err);
+      });
     return;
   }
 
+  // fetch interacted user from the interaction.guild members
+  // To get the nick name of the user
   const userInterected = await interaction.guild.members.fetch(
     interaction.user.id
   );
+
+  // Get the name of the user which is used in the channel
+  // User can have different name in different channels
   const nickName = userInterected?.nickname || interaction.user.username;
 
-  const options_list = [
-    "What kind of mission/gameplay?",
-    "Star System/Location",
-    "Number of Space in Wing/Team Available",
-    "When to join?",
-  ];
+  // Heading for the embed message
+  const listFieldheading = AppSettings.BOT_WING_FIELDS;
 
+  // For EDSM API
   const edsm = new EDSM();
 
+  // BOT command Names
+  // Defined in [BOT_COMMANDS]
   if (commandName === AppSettings.BOT_WING_COMMAND_NAME) {
+    // Get specific option from the command
     const activity =
-      options.get("activity")?.value || AppSettings.DEFAULT_TEAM_ACTIVITY;
+      options.get(AppSettings.INTERACTION_ACTIVITY_ID)?.value ||
+      AppSettings.DEFAULT_TEAM_ACTIVITY;
     const location =
-      options.get("location")?.value || AppSettings.DEFAULT_TEAM_LOCATION;
-    let spots = options.get("spots")?.value || AppSettings.MAXIMUM_TEAM_SPOT;
+      options.get(AppSettings.INTERACTION_LOCATION_ID)?.value ||
+      AppSettings.DEFAULT_TEAM_LOCATION;
+    let spots =
+      options.get(AppSettings.INTERACTION_SPOTS_ID)?.value ||
+      AppSettings.MAXIMUM_TEAM_SPOT;
+
+    // How long the team will be active
     let duration: number = Number(
       (
-        (options.get("duration")?.value as number) ||
+        (options.get(AppSettings.INTERACTION_DURATION_ID)?.value as number) ||
         AppSettings.DEFAULT_TEAM_DURATION
       ).toFixed(2)
     );
+    // When the Team creator is looking for Team
     let when: number = Number(
-      ((options.get("when")?.value as number) || 0).toFixed(2)
+      (
+        (options.get(AppSettings.INTERACTION_WHEN_ID)?.value as number) || 0
+      ).toFixed(2)
     );
 
-    if (when < 0) {
-      interaction.reply({
-        content: "Please enter a valid hour",
-        ephemeral: true,
-      });
+    // Check if the duration and when is valid
+    if (
+      !(await isValidDuration(interaction, duration)) ||
+      !(await isValidDuration(interaction, when))
+    ) {
       return;
     }
 
+    // Defer the reply
+    await interaction.deferReply();
+
+    // If timer is more then [MAXIMUM_HOURS_TEAM] hours convert it into Minutes
     if (when > AppSettings.MAXIMUM_HOURS_TEAM) {
       when = when / 60;
     }
 
-    if (when > AppSettings.MAXIMUM_HOURS_TEAM * 60) {
-      interaction.reply({
-        ephemeral: true,
-        content: "You cannot set a time more than 10 hours",
-      });
-      return;
-    }
-
-    // Maximum spot in wing is MAXIMUM_TEAM_SPOT which is 3 as of now
-    if (spots > AppSettings.MAXIMUM_TEAM_SPOT) {
-      spots = AppSettings.MAXIMUM_TEAM_SPOT;
-    }
-    // If Duration is more then MAXIMUM_HOURS_TEAM hours convert it into Minutes
+    // If Duration is more then [MAXIMUM_HOURS_TEAM] hours convert it into Minutes
     if (duration > AppSettings.MAXIMUM_HOURS_TEAM) {
       duration = duration / 60;
     }
 
-    // If Duration is more then 10 hours dismiss it.
-    if (duration > AppSettings.MAXIMUM_HOURS_TEAM * 60) {
-      interaction.reply({
-        ephemeral: true,
-        content: "You cannnot request for more then 10 hours",
-      });
-      return;
+    // Maximum spot in wing is [MAXIMUM_TEAM_SPOT] which is 3 as of now
+    if (spots > AppSettings.MAXIMUM_TEAM_SPOT) {
+      spots = AppSettings.MAXIMUM_TEAM_SPOT;
     }
 
-    const options_values = [
+    /*
+      If when is 0 then it means the user is looking for team now
+      else it will be the time when the user is looking for team
+    */
+    const listFieldValue = [
       activity,
       location,
       parseInt(spots.toString()),
-      when === 0 ? "Now" : `<t:${getEpochTimeAfterHours(when)}:T>`,
+      when === 0
+        ? AppSettings.DEFAULT_WHEN_VALUE
+        : `<t:${getEpochTimeAfterHours(when)}:T>`,
+      `${interaction.user}`,
     ];
 
+    // Title for the embed message
     let title: string = AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
 
+    // Channel name for the embed message
     if (interaction.channelId === AppSettings.XBOX_CHANNEL_ID) {
       title = AppSettings.XBOX_WING_REQUEST_INTERACTION_TITLE;
     } else if (interaction.channelId === AppSettings.PS_CHANNEL_ID) {
@@ -116,135 +149,203 @@ async function interactionCommandHandler(
       title = AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
     }
 
+    // Create the embed message
     let embeded_message = embedMessage(
       title,
-      options_list,
-      options_values,
+      listFieldheading,
+      listFieldValue,
       nickName
     );
 
     // Adding time
     embeded_message.addFields({
-      name: "Duration",
+      name: AppSettings.BOT_WING_DURATION_FIELD_NAME,
       value: `${formatTime(duration)}`,
     });
 
-    // Time can't be negative;
-    if (duration < 0) {
-      duration = AppSettings.DEFAULT_TEAM_DURATION;
-    }
-
+    // Set footer for the embed message
     embeded_message.setFooter({
       text: `Expires in ${formatTime(duration + when)}`,
     });
 
+    // Defer message reply
+    await interaction
+      .deferReply({
+        ephemeral: false,
+      })
+      .catch((err) => {
+        console.error(`Error in deferReply: ${err}`);
+      });
+
+    // Send the embed message specific for the channel [PC, XBOX, PS]
     if (interaction.channelId === AppSettings.PC_CHANNEL_ID) {
-      await interaction.deferReply({
-        ephemeral: false,
-      });
-
       // Pretty Looking reply
-      await interaction.editReply({
-        embeds: [embeded_message],
-        components: [buttons, menus],
-      });
+      // Send the embed message
+      // Add the buttons and menu to the message
+      await interaction
+        .editReply({
+          embeds: [embeded_message],
+          components: [buttons, menus],
+        })
+        .catch((err) => {
+          console.error(`Error in editReply: ${err}`);
+        });
     } else {
-      await interaction.deferReply({
-        ephemeral: false,
-      });
-
       // Pretty Looking reply
-      await interaction.editReply({
-        embeds: [embeded_message],
-        components: [buttons],
-      });
+      await interaction
+        .editReply({
+          embeds: [embeded_message],
+          components: [buttons],
+        })
+        .catch((err) => {
+          console.error(`Error in deferReply: ${err}`);
+        });
     }
     // Auto Delete message after certain time.
     deleteInteraction(
       interaction,
       AppSettings.HOURS_TO_MILISEC * (duration + when)
     );
-  } else if (commandName == AppSettings.BOT_SYSTEM_INFO_COMMAND_NAME) {
-    const systemName: string =
-      options.get("system_name")?.value?.toString() ||
-      AppSettings.DEFAULT_SYSTEM_NAME;
-    await interaction.deferReply();
+  } else if (commandName == AppSettings.BOT_SYSTEM_FACTION_INFO_COMMAND_NAME) {
+    /*
+      System faction info command [BOT_SYSTEM_FACTION_INFO_COMMAND_NAME]
+    */
 
+    // Get the system name from the command
+    const systemName: string =
+      options.get(AppSettings.INTERACTION_SYSTEM_NAME_ID)?.value?.toString() ||
+      AppSettings.DEFAULT_SYSTEM_NAME;
+
+    // Defer message reply
+    // as API call may take more than 3 seconds
+    await interaction.deferReply().catch((err) => {
+      console.error(`Error in deferReply: ${err}`);
+    });
+
+    // Get the system info from EDSM API
     let systemInfo: SystemInfo | null = await edsm.getSystemInfo(systemName);
 
-    let dismissButton = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId("command_dismiss")
-        .setLabel("Delete")
-        .setStyle(ButtonStyle.Danger)
-    );
+    // Create a dismiss button for the replies
+    let dismissButton = createDismissButton();
 
+    // If API call returns null
+    // That means the system is not found
     if (!systemInfo || !systemInfo.id) {
-      await interaction.editReply({
-        content: "No System found with Name: " + systemName,
-        components: [dismissButton],
-      });
+      await interaction
+        .editReply({
+          content: "No System found with Name: " + systemName,
+          components: [dismissButton],
+        })
+        .catch((err) => {
+          console.error(`Error in editReply: ${err}`);
+        });
     } else if (
       !systemInfo.controllingFaction ||
       systemInfo.factions.length === 0
     ) {
-      await interaction.editReply({
-        embeds: [
-          new EmbedBuilder()
-            .setTitle(`Inhabitated System: ${systemInfo.name}`)
-            .setURL(systemInfo.url),
-        ],
-        components: [dismissButton],
-      });
+      /*
+        If the system is found but there is no controlling faction
+        Send a message saying that Inhabitated system.
+        Create a embed message
+        With System URL
+      */
+      await interaction
+        .editReply({
+          embeds: [
+            new EmbedBuilder()
+              .setTitle(`Inhabitated System: ${systemInfo.name}`)
+              .setURL(systemInfo.url),
+          ],
+          components: [dismissButton],
+        })
+        .catch((err) => {
+          console.error(`Error in editReply: ${err}`);
+        });
     } else {
+      // Create embed message for the system faction info
+      // Reply embed message
+      // With dismiss button
       let embeded_message = systemEmbedMessage(systemInfo);
-      await interaction.editReply({
-        embeds: [embeded_message],
-        components: [dismissButton],
-      });
+      await interaction
+        .editReply({
+          embeds: [embeded_message],
+          components: [dismissButton],
+        })
+        .catch((err) => {
+          console.error(`Error in editReply: ${err}`);
+        });
     }
 
+    // Delete the message after [HELP_MESSAGE_DISMISS_TIMEOUT]
     deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
   } else if (commandName === AppSettings.BOT_SYSTEM_TRAFFIC_COMMAND_NAME) {
+    // Title for the embed message
     const title: string = "System Traffic Info";
+
+    // Get system name from the command
     const systemName: string =
-      options.get("system_name")?.value?.toString() || "SOL";
+      options.get(AppSettings.INTERACTION_SYSTEM_NAME_ID)?.value?.toString() ||
+      "SOL";
+
+    // Get NickName for that specific server
     const nickName = userInterected?.nickname || interaction.user.username;
 
-    interaction.deferReply({
-      ephemeral: true,
-    });
+    // Defer message reply
+    // Ephermal true so that only the user can see the message
+    await interaction
+      .deferReply({
+        ephemeral: true,
+      })
+      .catch((err) => {
+        console.error(`Error in System Traffic Info: ${err}`);
+      });
 
+    // Get the system Traffic info from EDSM API
     const systemTrafficInfo = await edsm.getSystemTrafficInfo(systemName);
 
+    // If API call returns null
+    // That means the system is not found
     if (systemTrafficInfo === null) {
-      interaction.editReply({
-        content: "Cannot find Traffic Info",
-      });
+      await interaction
+        .editReply({
+          content: "Cannot find Traffic Info",
+        })
+        .catch((err) => {
+          console.error(
+            `Error in System Traffic Info__ Cannot find Traffic Info: ${err}`
+          );
+        });
       return;
     }
 
-    if (
-      systemTrafficInfo.breakdown === null ||
-      systemTrafficInfo.breakdown === undefined ||
-      systemTrafficInfo.traffic == null
-    ) {
-      interaction.editReply({
-        content: "No ship info is in EDSM for this system",
-      });
+    // If the breakdown is null or underfined
+    // That means there is no traffic info for that system
+    if (!systemTrafficInfo.breakdown || !systemTrafficInfo.traffic) {
+      await interaction
+        .editReply({
+          content: "No ship info is in EDSM for this system",
+        })
+        .catch((err) => {
+          console.error(
+            `Error in System Traffic Info__ No ship info is in EDSM for this system: ${err}`
+          );
+        });
       return;
     }
 
-    const shipsAndCount = getShipAndCount(systemTrafficInfo);
+    // Breakdown of the traffic info
+    // Ship name and count
+    const shipsAndCount = getEliteShipAndCount(systemTrafficInfo);
 
-    let options_list: string[] = [
+    // Embed message heading
+    const listFieldheading: string[] = [
       "System Name",
-      "Today",
-      "This Week",
-      "All Time",
+      ...AppSettings.SYSTEM_TIMELINE,
       ...shipsAndCount.shipNames,
     ];
-    let values: string[] = [
+
+    // Embed message Values
+    const listFieldValue: string[] = [
       systemTrafficInfo.name,
       systemTrafficInfo.traffic.day.toString(),
       systemTrafficInfo.traffic.week.toString(),
@@ -252,271 +353,206 @@ async function interactionCommandHandler(
       ...shipsAndCount.shipCount,
     ];
 
-    let embeded_message = embedMessage(
+    // Create the embed message
+    const embeded_message = embedMessage(
       title,
-      options_list,
-      values,
+      listFieldheading,
+      listFieldValue,
       nickName,
       true
     );
 
+    // Reply embed message
     interaction.editReply({
       embeds: [embeded_message],
     });
   } else if (commandName === AppSettings.BOT_SYSTEM_DEATH_COMMAND_NAME) {
+    // Get system name from the command
     const systemName: string =
-      options.get("system_name")?.value?.toString() || "SOL";
+      options.get(AppSettings.INTERACTION_SYSTEM_NAME_ID)?.value?.toString() ||
+      AppSettings.DEFAULT_STAR_SYSTEM_NAME;
+
+    // Get NickName for that specific server of that user
     const nickName = userInterected?.nickname || interaction.user.username;
 
+    // The title for the embed message
     const title: string = "System Death Info";
-    interaction.deferReply({
-      ephemeral: true,
-    });
+
+    // Defer message reply
+    await interaction
+      .deferReply({
+        ephemeral: true,
+      })
+      .catch((err) => {
+        console.error(`Error in System Death Info: ${err}`);
+      });
+
+    // Get the system Death from EDSM API
     const systemDeath = await edsm.getSystemDeath(systemName);
 
+    // System Death info is not found
+    // or System Death death is undefined
     if (systemDeath === null || systemDeath.deaths === undefined) {
-      interaction.editReply({
-        content: "Cannot find system Death Info!",
-      });
+      // Reply with a message
+      // Saying that there is no death info for that system
+      await interaction
+        .editReply({
+          content: "Cannot find system Death Info!",
+        })
+        .catch((err) => {
+          console.error(`Error in System Death Info: ${err}`);
+        });
       return;
     }
 
-    const options_list = ["System Name", "Today", "This Week", "All Time"];
+    // Breakdown of the death info
+    const listFieldheading = ["System Name", ...AppSettings.SYSTEM_TIMELINE];
 
-    const values = [
+    // Breakdown of the death info
+    // By Time
+    const listFieldValues = [
       systemDeath.name,
       systemDeath.deaths.day,
       systemDeath.deaths.week,
       systemDeath.deaths.total,
     ];
 
-    const embeded_message = embedMessage(title, options_list, values, nickName);
-
-    interaction.editReply({
-      embeds: [embeded_message],
-    });
-  } else if (commandName === AppSettings.BOT_HELP_COMMAND_NAME) {
-    const title: string = "How to use, Check example.";
-    const list_options = [
-      "Command",
-      "Game Version",
-      "What kind of mission/gameplay?",
-      "Star System/Location",
-      "Number of Space in Wing/Team Available",
-      "When to join?",
-      "Duration",
-    ];
-    const list_options_values = [
-      "Use `/wing`",
-      "Odyssey, Horizon 4.0, Horizon 3.8, ED Beyond",
-      "Mining, Bounty Hunting, etc...",
-      "SOL",
-      "2 Spots",
-      "25 (25 minutes from now)",
-      "1.5 (1 hours and 30 minutes)",
-    ];
-
-    let embeded_message = embedMessage(
+    // Create the embed message
+    const embeded_message = embedMessage(
       title,
-      list_options,
-      list_options_values,
-      interaction.user.username || "Unknown"
+      listFieldheading,
+      listFieldValues,
+      nickName
     );
 
+    // Reply embed message
+    await interaction
+      .editReply({
+        embeds: [embeded_message],
+      })
+      .catch((err) => {
+        console.error(`Error in System Death Info: ${err}`);
+      });
+  } else if (commandName === AppSettings.BOT_HELP_COMMAND_NAME) {
+    // Title for the embed message
+    const title: string = AppSettings.BOT_HELP_REPLY_TITLE;
+
+    // List of the fields for the embed message
+    const listFieldheading = [
+      ...AppSettings.BOT_HELP_FIELD_TITLE,
+      ...AppSettings.BOT_WING_FIELDS,
+      ...AppSettings.BOT_HELP_EXTRA_FIELDS,
+    ];
+
+    // List of the values for the embed message
+    const listFieldValue = AppSettings.BOT_HELP_COMMAND_REPLY_FIELD_VALUES;
+
+    // Create the embed message
+    const embeded_message = embedMessage(
+      title,
+      listFieldheading,
+      listFieldValue,
+      interaction.user.username
+    );
+
+    // set Message footer
     embeded_message.setFooter({
-      text: `Note: Messages may get delete by dyno`,
+      text: AppSettings.BOT_HELP_REPLY_FOOTER_NOTE,
     });
 
-    await interaction.deferReply({
-      ephemeral: true,
-    });
+    // Defer message reply
+    await interaction
+      .deferReply({
+        ephemeral: true,
+      })
+      .catch((err) => {
+        console.error(`Error in Help: ${err}`);
+      });
 
-    await interaction.editReply({
-      embeds: [embeded_message],
-    });
+    // Edit Reply of interaction with embed message
+    await interaction
+      .editReply({
+        embeds: [embeded_message],
+      })
+      .catch((err) => {
+        console.error(`Error in Help: ${err}`);
+      });
   } else if (commandName === AppSettings.BOT_PING_COMMAND_NAME) {
-    await interaction.reply({
-      content: "Bots never sleeps",
-      ephemeral: true,
-    });
+    // Reply with a message
+    await interaction
+      .reply({
+        content: AppSettings.BOT_PING_REPLY,
+        ephemeral: true,
+      })
+      .catch((err) => {
+        console.error(`Error in Ping: ${err}`);
+      });
   }
 }
 
-interface ShipsInfo {
-  shipNames: Array<string>;
-  shipCount: Array<string>;
+/*
+  Args:
+    None
+  Returns:
+    Buttons
+*/
+
+// To be removed in the future.
+function createDismissButton(): ActionRowBuilder<ButtonBuilder> {
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder()
+      .setCustomId(AppSettings.BUTTON_DISMISS_ID)
+      .setLabel(AppSettings.BUTTON_DISMISS_LABEL)
+      .setStyle(ButtonStyle.Danger)
+  );
 }
 
-function getShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
-  let shipNames: string[] = [];
-  let shipCount: string[] = [];
+/*
+  Args:
+    interaction: CommandInteraction
+  Returns:
+    boolean
 
-  if (systemTrafficInfo.breakdown !== null) {
-    if (
-      systemTrafficInfo.breakdown.Addar !== null &&
-      systemTrafficInfo.breakdown.Addar > 0
-    ) {
-      shipNames.push("Addar");
-      shipCount.push(systemTrafficInfo.breakdown.Addar.toString());
-    }
-    if (
-      systemTrafficInfo.breakdown.Anaconda !== null &&
-      systemTrafficInfo.breakdown.Anaconda > 0
-    ) {
-      shipNames.push("Anaconda");
-      shipCount.push(systemTrafficInfo.breakdown.Anaconda.toString());
-    }
-    if (
-      systemTrafficInfo.breakdown["Asp Explorer"] !== null &&
-      systemTrafficInfo.breakdown["Asp Explorer"] > 0
-    ) {
-      shipNames.push("Asp Explorer");
-      shipCount.push(systemTrafficInfo.breakdown["Asp Explorer"].toString());
-    }
-
-    if (
-      systemTrafficInfo.breakdown["Beluga Liner"] !== null &&
-      systemTrafficInfo.breakdown["Beluga Liner"] > 0
-    ) {
-      shipNames.push("Beluga Liner");
-      shipCount.push(systemTrafficInfo.breakdown["Beluga Liner"].toString());
-    }
-
-    if (
-      systemTrafficInfo.breakdown["Cobra MkIII"] !== null &&
-      systemTrafficInfo.breakdown["Cobra MkIII"] > 0
-    ) {
-      shipNames.push("Cobra MkIII");
-      shipCount.push(systemTrafficInfo.breakdown["Cobra MkIII"].toString());
-    }
-    if (
-      systemTrafficInfo.breakdown["Diamondback Explorer"] !== null &&
-      systemTrafficInfo.breakdown["Diamondback Explorer"] > 0
-    ) {
-      shipNames.push("Diamondback Explorer");
-      shipCount.push(
-        systemTrafficInfo.breakdown["Diamondback Explorer"].toString()
-      );
-    }
-    if (
-      systemTrafficInfo.breakdown.Dolphin !== null &&
-      systemTrafficInfo.breakdown.Dolphin > 0
-    ) {
-      shipNames.push("Dolphin");
-      shipCount.push(systemTrafficInfo.breakdown.Dolphin.toString());
-    }
-    if (
-      systemTrafficInfo.breakdown["Federal Assault Ship"] !== null &&
-      systemTrafficInfo.breakdown["Federal Assault Ship"] > 0
-    ) {
-      shipNames.push("Federal Assault Ship");
-      shipCount.push(
-        systemTrafficInfo.breakdown["Federal Assault Ship"].toString()
-      );
-    }
-    if (
-      systemTrafficInfo.breakdown["Federal Corvette"] !== null &&
-      systemTrafficInfo.breakdown["Federal Corvette"] > 0
-    ) {
-      shipNames.push("Federal Corvette");
-      shipCount.push(
-        systemTrafficInfo.breakdown["Federal Corvette"].toString()
-      );
-    }
-    if (
-      systemTrafficInfo.breakdown["Federal Gunship"] !== null &&
-      systemTrafficInfo.breakdown["Federal Gunship"] > 0
-    ) {
-      shipNames.push("Federal Gunship");
-      shipCount.push(systemTrafficInfo.breakdown["Federal Gunship"].toString());
-    }
-    if (
-      systemTrafficInfo.breakdown["Fer-de-Lance"] !== null &&
-      systemTrafficInfo.breakdown["Fer-de-Lance"] > 0
-    ) {
-      shipNames.push("Fer-de-Lance");
-      shipCount.push(systemTrafficInfo.breakdown["Fer-de-Lance"].toString());
-    }
-    if (
-      systemTrafficInfo.breakdown.Hauler !== null &&
-      systemTrafficInfo.breakdown.Hauler > 0
-    ) {
-      shipNames.push("Hauler");
-      shipCount.push(systemTrafficInfo.breakdown.Hauler.toString());
-    }
-    if (
-      systemTrafficInfo.breakdown["Imperial Clipper"] !== null &&
-      systemTrafficInfo.breakdown["Imperial Clipper"] > 0
-    ) {
-      shipNames.push("Imperial Clipper");
-      shipCount.push(
-        systemTrafficInfo.breakdown["Imperial Clipper"].toString()
-      );
-    }
-    if (
-      systemTrafficInfo.breakdown["Imperial Courier"] !== null &&
-      systemTrafficInfo.breakdown["Imperial Courier"] > 0
-    ) {
-      shipNames.push("Imperial Courier");
-      shipCount.push(
-        systemTrafficInfo.breakdown["Imperial Courier"].toString()
-      );
-    }
-    if (
-      systemTrafficInfo.breakdown["Imperial Cutter"] !== null &&
-      systemTrafficInfo.breakdown["Imperial Cutter"] > 0
-    ) {
-      shipNames.push("Imperial Cutter");
-      shipCount.push(systemTrafficInfo.breakdown["Imperial Cutter"].toString());
-    }
-    if (
-      systemTrafficInfo.breakdown.Orca !== null &&
-      systemTrafficInfo.breakdown.Orca > 0
-    ) {
-      shipNames.push("Orca");
-      shipCount.push(systemTrafficInfo.breakdown.Orca.toString());
-    }
-    if (
-      systemTrafficInfo.breakdown.Python !== null &&
-      systemTrafficInfo.breakdown.Python > 0
-    ) {
-      shipNames.push("Python");
-      shipCount.push(systemTrafficInfo.breakdown.Python.toString());
-    }
-    if (
-      systemTrafficInfo.breakdown["Type-9 Heavy"] !== null &&
-      systemTrafficInfo.breakdown["Type-9 Heavy"] > 0
-    ) {
-      shipNames.push("Type-9 Heavy");
-      shipCount.push(systemTrafficInfo.breakdown["Type-9 Heavy"].toString());
-    }
-    if (
-      systemTrafficInfo.breakdown["Viper MkIII"] !== null &&
-      systemTrafficInfo.breakdown["Viper MkIII"] > 0
-    ) {
-      shipNames.push("Viper MkIII");
-      shipCount.push(systemTrafficInfo.breakdown["Viper MkIII"].toString());
-    }
-    if (
-      systemTrafficInfo.breakdown["Viper MkIV"] !== null &&
-      systemTrafficInfo.breakdown["Viper MkIV"] > 0
-    ) {
-      shipNames.push("Viper MkIV");
-      shipCount.push(systemTrafficInfo.breakdown["Viper MkIV"].toString());
-    }
-    if (
-      systemTrafficInfo.breakdown["Vulture"] !== null &&
-      systemTrafficInfo.breakdown["Vulture"] > 0
-    ) {
-      shipNames.push("Vulture");
-      shipCount.push(systemTrafficInfo.breakdown["Vulture"].toString());
-    }
+  Description:
+    Check if the duration is Valid.
+    If the duration is valid, then return true.
+    else send a ephemeral message to the user and return false.
+*/
+async function isValidDuration(
+  interaction: CommandInteraction,
+  timer: number
+): Promise<boolean> {
+  // Check if the timer is valid
+  switch (checkDurationValidation(timer)) {
+    case DurationValidation.INVALID:
+      await interaction
+        .reply({
+          content: "Please enter a valid hour",
+          ephemeral: true,
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+      return false;
+    // In case if the Duration is more then allowd time [MAXIMUM_HOURS_TEAM]
+    case DurationValidation.LIMIT_EXCEEDED:
+      interaction
+        .reply({
+          ephemeral: true,
+          content: "You cannnot request for more then 10 hours",
+        })
+        .catch((err) => {
+          console.error(
+            `Error If Duration/Timer is more then 10 hours dismiss it: ${err}`
+          );
+        });
+      return false;
+    case DurationValidation.VALID:
+      break;
+    default:
+      break;
   }
-
-  return {
-    shipNames,
-    shipCount,
-  };
+  return true;
 }
 
 export default interactionCommandHandler;

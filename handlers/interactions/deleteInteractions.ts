@@ -1,11 +1,24 @@
 import { ButtonInteraction, CacheType, CommandInteraction } from "discord.js";
 import deleteMessage from "./deleteMessage";
 
+/*
+  Args:
+    interaction: ButtonInteraction | CommandInteraction
+    timeout: number
+  Returns:
+    void
+  Description:
+    Deletes the interaction reply after the timeout.
+    if the interaction deletion fails, it will try to delete the message.
+    if the deletion of the message fails, it will log the error.
+    
+*/
+
 async function deleteInteraction(
   interaction: ButtonInteraction<CacheType> | CommandInteraction<CacheType>,
   timeout: number
 ) {
-  let message = await interaction.fetchReply();
+  const message = await interaction.fetchReply();
   setTimeout(async () => {
     await interaction.deleteReply().catch((error) => {
       // Message Already Deleted
@@ -22,5 +35,4 @@ async function deleteInteraction(
   }, timeout);
 }
 
-// export {deleteInteractionCommand, deleteInteractionButton};
 export default deleteInteraction;

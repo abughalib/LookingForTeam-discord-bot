@@ -12,7 +12,7 @@ interface Factions {
   lastUpdate: number;
 }
 
-interface SystemInfo {
+interface SystemFactionInfo {
   id: string;
   id64: string;
   name: string;
@@ -26,4 +26,4 @@ interface SystemInfo {
   factions: Factions[];
 }
 
-export default SystemInfo;
+export default SystemFactionInfo;
