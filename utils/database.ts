@@ -88,6 +88,18 @@ class DatabaseOperation {
       return "Channel Updated Successfully";
     }
   }
+  async deleteChannelInfo(channelId: string): Promise<string> {
+    let db = await this.getDatabase();
+    let resp = await db.run(
+      `DELETE FROM channelIds WHERE channelId = '${channelId}'`
+    );
+
+    if (!resp.changes) {
+      return "Delete Failed Cannot Find Channel";
+    } else {
+      return "Channel Deleted Successfully";
+    }
+  }
 }
 
 export { DatabaseOperation };
