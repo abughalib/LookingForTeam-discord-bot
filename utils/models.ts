@@ -57,4 +57,19 @@ interface Breakdown {
   Vulture: number | null;
 }
 
-export { ServerStatusModel, SystemTrafficInfo, SystemDeath };
+interface TickHistory {
+  _id: string;
+  __v: number;
+  time: string;
+  updated_at: string;
+}
+
+interface TickInfo {
+  _id: string;
+  time: string;
+  updated_at: string;
+  __v: number;
+  history: TickHistory[] | null;
+}
+
+export { ServerStatusModel, SystemTrafficInfo, SystemDeath, TickInfo };
