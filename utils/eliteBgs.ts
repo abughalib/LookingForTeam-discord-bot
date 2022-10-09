@@ -6,10 +6,10 @@ class BGSInfo {
     const response = await fetch("https://elitebgs.app/api/ebgs/v5/ticks", {
       method: "GET",
       headers: AppSettings.BOT_HEADER,
-    })
+    });
 
     if (response.status !== 200) {
-      console.log("Error getting last tick")
+      console.log("Error getting last tick");
       return null;
     }
 
