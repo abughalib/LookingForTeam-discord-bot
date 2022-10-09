@@ -478,10 +478,14 @@ async function interactionCommandHandler(
         text: "Last Updated",
       });
 
+    // Create dismiss button
+    let dismissButton = createDismissButton();
+
     // Reply embed message
     await interaction
       .editReply({
         embeds: [embeded_message],
+        components: [dismissButton],
       })
       .catch((error) => {
         console.error(`Error in Elite Server Tick Info: ${error}`);
