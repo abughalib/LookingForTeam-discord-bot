@@ -5,6 +5,7 @@ export class AppSettings {
   static readonly EMBEDED_MESSAGE_COLOR = 0x0099ff;
   static readonly HOURS_TO_MILISEC = 60 * 60 * 1000; // 3600 seconds
   static readonly HELP_MESSAGE_DISMISS_TIMEOUT = 180 * 1000; // 3 Minutes
+  static readonly ERROR_MESSAGE_DIMISS_TIMEOUT = 60 * 1000; // 1 Minute
   static readonly DEFAULT_REQUEST_TEAM_TIMEOUT = 10 * 60 * 1000; // 10 Minutes
   static readonly DEFAULT_WHEN_VALUE = "Now";
   static readonly MAXIMUM_TEAM_SPOT = 3;
