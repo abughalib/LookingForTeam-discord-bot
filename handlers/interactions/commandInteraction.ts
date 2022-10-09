@@ -16,7 +16,7 @@ import {
 } from "../../utils/helpers";
 import { TickInfo } from "../../utils/models";
 import { AppSettings } from "../../utils/settings";
-import SystemInfo from "../../utils/systemInfoModel";
+import SystemFactionInfo from "../../utils/systemInfoModel";
 import getEpochTimeAfterHours from "../../utils/timestamp";
 import embedMessage from "../embeded_message";
 import systemEmbedMessage from "../systemInfoEmbed";
@@ -225,14 +225,15 @@ async function interactionCommandHandler(
     });
 
     // Get the system info from EDSM API
-    let systemInfo: SystemInfo | null = await edsm.getSystemInfo(systemName);
+    let systemFactionInfo: SystemFactionInfo | null =
+      await edsm.getSystemFactionInfo(systemName);
 
     // Create a dismiss button for the replies
     let dismissButton = createDismissButton();
 
     // If API call returns null
     // That means the system is not found
-    if (!systemInfo || !systemInfo.id) {
+    if (!systemFactionInfo || !systemFactionInfo.id) {
       await interaction
         .editReply({
           content: "No System found with Name: " + systemName,
@@ -241,9 +242,10 @@ async function interactionCommandHandler(
         .catch((err) => {
           console.error(`Error in editReply: ${err}`);
         });
+      deleteInteraction(interaction, AppSettings.ERROR_MESSAGE_DIMISS_TIMEOUT);
     } else if (
-      !systemInfo.controllingFaction ||
-      systemInfo.factions.length === 0
+      !systemFactionInfo.controllingFaction ||
+      systemFactionInfo.factions.length === 0
     ) {
       /*
         If the system is found but there is no controlling faction
@@ -255,19 +257,20 @@ async function interactionCommandHandler(
         .editReply({
           embeds: [
             new EmbedBuilder()
-              .setTitle(`Inhabitated System: ${systemInfo.name}`)
-              .setURL(systemInfo.url),
+              .setTitle(`Inhabitated System: ${systemFactionInfo.name}`)
+              .setURL(systemFactionInfo.url),
           ],
           components: [dismissButton],
         })
         .catch((err) => {
           console.error(`Error in editReply: ${err}`);
         });
+      deleteInteraction(interaction, AppSettings.ERROR_MESSAGE_DIMISS_TIMEOUT);
     } else {
       // Create embed message for the system faction info
       // Reply embed message
       // With dismiss button
-      let embeded_message = systemEmbedMessage(systemInfo);
+      let embeded_message = systemEmbedMessage(systemFactionInfo);
       await interaction
         .editReply({
           embeds: [embeded_message],
@@ -457,7 +460,7 @@ async function interactionCommandHandler(
       await interaction.editReply({
         content: "Cannot find Tick Info!",
       });
-      deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
+      deleteInteraction(interaction, AppSettings.ERROR_MESSAGE_DIMISS_TIMEOUT);
       return;
     }
 
@@ -587,7 +590,7 @@ async function isValidDuration(
       return false;
     // In case if the Duration is more then allowd time [MAXIMUM_HOURS_TEAM]
     case DurationValidation.LIMIT_EXCEEDED:
-      interaction
+      await interaction
         .reply({
           ephemeral: true,
           content: "You cannnot request for more then 10 hours",

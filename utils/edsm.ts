@@ -88,7 +88,7 @@ class EDSM {
       systemfactioninfo // [SystemFactionInfo]
   */
 
-  async getSystemInfo(systemName: string): Promise<SystemFactionInfo | null> {
+  async getSystemFactionInfo(systemName: string): Promise<SystemFactionInfo | null> {
     let json_data = await this.fetchSystemFactionInfo(systemName);
 
     if (!json_data) {
