@@ -7,12 +7,14 @@ import {
   ButtonStyle,
 } from "discord.js";
 import EDSM from "../../utils/edsm";
+import BGSInfo from "../../utils/eliteBgs";
 import {
   checkDurationValidation,
   DurationValidation,
   formatTime,
   getEliteShipAndCount,
 } from "../../utils/helpers";
+import { TickInfo } from "../../utils/models";
 import { AppSettings } from "../../utils/settings";
 import SystemInfo from "../../utils/systemInfoModel";
 import getEpochTimeAfterHours from "../../utils/timestamp";
@@ -433,6 +435,55 @@ async function interactionCommandHandler(
       .catch((err) => {
         console.error(`Error in System Death Info: ${err}`);
       });
+  } else if (commandName === AppSettings.BOT_ELITE_SERVER_TICK_INFO) {
+    // Defer interaction reply
+    await interaction.deferReply({
+      ephemeral: false,
+    });
+
+    // Initialize the Elite BGS Info Class
+    const eliteBGS = new BGSInfo();
+
+    // Title for the embed message
+    const title: string = AppSettings.BOT_ELITE_SERVER_TICK_INFO_TITLE;
+
+    // Get Tick Info from Elite BGS API
+    const tickInfo: TickInfo | null = await eliteBGS.getLastTick();
+
+    // If tick info is null
+    // That means there is no tick info or the API is down
+    if (!tickInfo) {
+      // Reply with a message
+      await interaction.editReply({
+        content: "Cannot find Tick Info!",
+      });
+      deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
+      return;
+    }
+
+    let embeded_message = new EmbedBuilder()
+      .setColor(AppSettings.EMBEDED_MESSAGE_COLOR)
+      .setTitle(title)
+      .addFields([
+        {
+          name: "Tick Time",
+          value: `<t:${Date.parse(tickInfo.time) / 1000}:F>`,
+        },
+      ])
+      .setTimestamp(Date.parse(tickInfo.updated_at))
+      .setFooter({
+        text: "Last Updated",
+      });
+
+    // Reply embed message
+    await interaction
+      .editReply({
+        embeds: [embeded_message],
+      })
+      .catch((error) => {
+        console.error(`Error in Elite Server Tick Info: ${error}`);
+      });
+    deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
   } else if (commandName === AppSettings.BOT_HELP_COMMAND_NAME) {
     // Title for the embed message
     const title: string = AppSettings.BOT_HELP_REPLY_TITLE;
