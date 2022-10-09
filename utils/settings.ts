@@ -34,6 +34,7 @@ export class AppSettings {
   static readonly BOT_WING_COMMAND_NAME = "wing";
   static readonly BOT_SYSTEM_FACTION_INFO_COMMAND_NAME = "systemfaction";
   static readonly BOT_SYSTEM_TRAFFIC_COMMAND_NAME = "systemtraffic";
+  static readonly BOT_ELITE_SERVER_TICK_INFO = "lastservertick";
   static readonly BOT_SYSTEM_DEATH_COMMAND_NAME = "systemdeath";
   static readonly BOT_HELP_COMMAND_NAME = "winghelp";
   static readonly BOT_PING_COMMAND_NAME = "ping";
@@ -84,6 +85,7 @@ export class AppSettings {
   static readonly SYSTEM_TIMELINE = ["Today", "This Week", "All Time"];
 
   /// BOT REPLY VALUES
+  static readonly BOT_ELITE_SERVER_TICK_INFO_TITLE = "Elite Last Server Tick";
   static readonly BOT_HELP_REPLY_TITLE = "How to use, Check example.";
   static readonly BOT_HELP_REPLY_FOOTER_NOTE =
     "Note: Messages may get delete by dyno";
