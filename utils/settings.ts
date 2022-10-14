@@ -22,7 +22,7 @@ export class AppSettings {
   static readonly PS_WING_REQUEST_INTERACTION_TITLE =
     "Play Station Wing Request";
   static readonly PS_CHANNEL_ID = "790162689887961089";
-  static readonly BOT_WING_DURATION_FIELD_NAME = "Duration";
+  static readonly BOT_WING_DURATION_FIELD_NAME = "Team Until";
   static readonly BOT_WING_FIELDS = [
     "What kind of mission/gameplay?",
     "Star System/Location",

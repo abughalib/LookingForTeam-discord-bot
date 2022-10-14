@@ -11,7 +11,6 @@ import BGSInfo from "../../utils/eliteBgs";
 import {
   checkDurationValidation,
   DurationValidation,
-  formatTime,
   getEliteShipAndCount,
 } from "../../utils/helpers";
 import { TickInfo } from "../../utils/models";
@@ -163,12 +162,14 @@ async function interactionCommandHandler(
     // Adding time
     embeded_message.addFields({
       name: AppSettings.BOT_WING_DURATION_FIELD_NAME,
-      value: `${formatTime(duration)}`,
+      value: `<t:${getEpochTimeAfterHours(duration + when).toString()}:T>`,
     });
+
+    console.log(duration + when);
 
     // Set footer for the embed message
     embeded_message.setFooter({
-      text: `Expires in ${formatTime(duration + when)}`,
+      text: `Posted at`,
     });
 
     // Defer message reply

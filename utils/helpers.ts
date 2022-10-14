@@ -1,36 +1,6 @@
 import { SystemTrafficInfo } from "./models";
 import { AppSettings } from "./settings";
 
-/*
-  Args:
-    duration: number // Duration in hours
-  Returns:
-    string // Formatted Duration in hours and minutes or seconds
-  Description:
-    Returns the duration in a readable format
-*/
-
-function formatTime(duration: number): string {
-  // Duration less then 1 minutes
-  if (duration < 1) {
-    duration = 60 * duration;
-    if (duration < 1) {
-      return `${Math.floor(duration * 60)} seconds`;
-    }
-    return `About ${Math.floor(duration)} Minutes`;
-  }
-  let str_duration = duration.toString();
-
-  if (str_duration.includes(".")) {
-    const duration_split = str_duration.split(".");
-    const hours = duration_split[0];
-    const minutes = Math.ceil(parseFloat("." + duration_split[1]) * 60);
-    return `About ${hours} hours and ${minutes} Minutes`;
-  }
-
-  return `About ${duration} Hours`;
-}
-
 interface ShipsInfo {
   shipNames: Array<string>;
   shipCount: Array<string>;
@@ -265,7 +235,6 @@ function removeEntry<T>(arri: Array<T>, itemToRemove: T) {
 }
 
 export {
-  formatTime,
   getEliteShipAndCount,
   removeEntry,
   checkDurationValidation,
