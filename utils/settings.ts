@@ -132,12 +132,12 @@ export class AppSettings {
   ];
   static readonly BOT_HELP_COMMAND_REPLY_FIELD_VALUES = [
     `"Use '${this.BOT_WING_COMMAND_NAME}'"`,
-    "Odyssey, Horizon 4.0, Horizon 3.8, ED Beyond",
     "Mining, Bounty Hunting, etc...",
     "SOL",
     "2 Spots",
     "25 (25 minutes from now)",
     "YourName\nPlayer1...",
     "1.5 (1 hours and 30 minutes)",
+    "Odyssey, Horizon 4.0, Horizon 3.8, ED Beyond",
   ];
 }
