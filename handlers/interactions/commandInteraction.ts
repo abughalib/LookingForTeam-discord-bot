@@ -102,7 +102,8 @@ async function interactionCommandHandler(
     // Check if the duration and when is valid
     if (
       !(await isValidDuration(interaction, duration)) ||
-      !(await isValidDuration(interaction, when))
+      !(await isValidDuration(interaction, when)) ||
+      !(await isValidDuration(interaction, duration + when))
     ) {
       return;
     }
@@ -581,6 +582,12 @@ async function isValidDuration(
   timer: number
 ): Promise<boolean> {
   // Check if the timer is valid
+
+  // If the duration is more than 10 hours consider it minutes
+  if (timer > 10) {
+    timer = timer / 60;
+  }
+
   switch (checkDurationValidation(timer)) {
     case DurationValidation.INVALID:
       await interaction
