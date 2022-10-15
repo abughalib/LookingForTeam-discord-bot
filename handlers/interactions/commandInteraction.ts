@@ -7,14 +7,15 @@ import {
   ButtonStyle,
 } from "discord.js";
 import EDSM from "../../utils/edsm";
+import BGSInfo from "../../utils/eliteBgs";
 import {
   checkDurationValidation,
   DurationValidation,
-  formatTime,
   getEliteShipAndCount,
 } from "../../utils/helpers";
+import { TickInfo } from "../../utils/models";
 import { AppSettings } from "../../utils/settings";
-import SystemInfo from "../../utils/systemInfoModel";
+import SystemFactionInfo from "../../utils/systemInfoModel";
 import getEpochTimeAfterHours from "../../utils/timestamp";
 import embedMessage from "../embeded_message";
 import systemEmbedMessage from "../systemInfoEmbed";
@@ -100,7 +101,8 @@ async function interactionCommandHandler(
     // Check if the duration and when is valid
     if (
       !(await isValidDuration(interaction, duration)) ||
-      !(await isValidDuration(interaction, when))
+      !(await isValidDuration(interaction, when)) ||
+      !(await isValidDuration(interaction, duration + when))
     ) {
       return;
     }
@@ -160,12 +162,14 @@ async function interactionCommandHandler(
     // Adding time
     embeded_message.addFields({
       name: AppSettings.BOT_WING_DURATION_FIELD_NAME,
-      value: `${formatTime(duration)}`,
+      value: `<t:${getEpochTimeAfterHours(duration + when).toString()}:T>`,
     });
+
+    console.log(duration + when);
 
     // Set footer for the embed message
     embeded_message.setFooter({
-      text: `Expires in ${formatTime(duration + when)}`,
+      text: `Posted at`,
     });
 
     // Defer message reply
@@ -223,14 +227,15 @@ async function interactionCommandHandler(
     });
 
     // Get the system info from EDSM API
-    let systemInfo: SystemInfo | null = await edsm.getSystemInfo(systemName);
+    let systemFactionInfo: SystemFactionInfo | null =
+      await edsm.getSystemFactionInfo(systemName);
 
     // Create a dismiss button for the replies
     let dismissButton = createDismissButton();
 
     // If API call returns null
     // That means the system is not found
-    if (!systemInfo || !systemInfo.id) {
+    if (!systemFactionInfo || !systemFactionInfo.id) {
       await interaction
         .editReply({
           content: "No System found with Name: " + systemName,
@@ -239,9 +244,10 @@ async function interactionCommandHandler(
         .catch((err) => {
           console.error(`Error in editReply: ${err}`);
         });
+      deleteInteraction(interaction, AppSettings.ERROR_MESSAGE_DIMISS_TIMEOUT);
     } else if (
-      !systemInfo.controllingFaction ||
-      systemInfo.factions.length === 0
+      !systemFactionInfo.controllingFaction ||
+      systemFactionInfo.factions.length === 0
     ) {
       /*
         If the system is found but there is no controlling faction
@@ -253,19 +259,20 @@ async function interactionCommandHandler(
         .editReply({
           embeds: [
             new EmbedBuilder()
-              .setTitle(`Inhabitated System: ${systemInfo.name}`)
-              .setURL(systemInfo.url),
+              .setTitle(`Inhabitated System: ${systemFactionInfo.name}`)
+              .setURL(systemFactionInfo.url),
           ],
           components: [dismissButton],
         })
         .catch((err) => {
           console.error(`Error in editReply: ${err}`);
         });
+      deleteInteraction(interaction, AppSettings.ERROR_MESSAGE_DIMISS_TIMEOUT);
     } else {
       // Create embed message for the system faction info
       // Reply embed message
       // With dismiss button
-      let embeded_message = systemEmbedMessage(systemInfo);
+      let embeded_message = systemEmbedMessage(systemFactionInfo);
       await interaction
         .editReply({
           embeds: [embeded_message],
@@ -433,6 +440,59 @@ async function interactionCommandHandler(
       .catch((err) => {
         console.error(`Error in System Death Info: ${err}`);
       });
+  } else if (commandName === AppSettings.BOT_ELITE_SERVER_TICK_INFO) {
+    // Defer interaction reply
+    await interaction.deferReply({
+      ephemeral: false,
+    });
+
+    // Initialize the Elite BGS Info Class
+    const eliteBGS = new BGSInfo();
+
+    // Title for the embed message
+    const title: string = AppSettings.BOT_ELITE_SERVER_TICK_INFO_TITLE;
+
+    // Get Tick Info from Elite BGS API
+    const tickInfo: TickInfo | null = await eliteBGS.getLastTick();
+
+    // If tick info is null
+    // That means there is no tick info or the API is down
+    if (!tickInfo) {
+      // Reply with a message
+      await interaction.editReply({
+        content: "Cannot find Tick Info!",
+      });
+      deleteInteraction(interaction, AppSettings.ERROR_MESSAGE_DIMISS_TIMEOUT);
+      return;
+    }
+
+    let embeded_message = new EmbedBuilder()
+      .setColor(AppSettings.EMBEDED_MESSAGE_COLOR)
+      .setTitle(title)
+      .addFields([
+        {
+          name: "Tick Time",
+          value: `<t:${Date.parse(tickInfo.time) / 1000}:F>`,
+        },
+      ])
+      .setTimestamp(Date.parse(tickInfo.updated_at))
+      .setFooter({
+        text: "Last Updated",
+      });
+
+    // Create dismiss button
+    let dismissButton = createDismissButton();
+
+    // Reply embed message
+    await interaction
+      .editReply({
+        embeds: [embeded_message],
+        components: [dismissButton],
+      })
+      .catch((error) => {
+        console.error(`Error in Elite Server Tick Info: ${error}`);
+      });
+    deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
   } else if (commandName === AppSettings.BOT_HELP_COMMAND_NAME) {
     // Title for the embed message
     const title: string = AppSettings.BOT_HELP_REPLY_TITLE;
@@ -523,6 +583,12 @@ async function isValidDuration(
   timer: number
 ): Promise<boolean> {
   // Check if the timer is valid
+
+  // If the duration is more than 10 hours consider it minutes
+  if (timer > 10) {
+    timer = timer / 60;
+  }
+
   switch (checkDurationValidation(timer)) {
     case DurationValidation.INVALID:
       await interaction
@@ -536,7 +602,7 @@ async function isValidDuration(
       return false;
     // In case if the Duration is more then allowd time [MAXIMUM_HOURS_TEAM]
     case DurationValidation.LIMIT_EXCEEDED:
-      interaction
+      await interaction
         .reply({
           ephemeral: true,
           content: "You cannnot request for more then 10 hours",

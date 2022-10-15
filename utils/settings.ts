@@ -5,6 +5,7 @@ export class AppSettings {
   static readonly EMBEDED_MESSAGE_COLOR = 0x0099ff;
   static readonly HOURS_TO_MILISEC = 60 * 60 * 1000; // 3600 seconds
   static readonly HELP_MESSAGE_DISMISS_TIMEOUT = 180 * 1000; // 3 Minutes
+  static readonly ERROR_MESSAGE_DIMISS_TIMEOUT = 60 * 1000; // 1 Minute
   static readonly DEFAULT_REQUEST_TEAM_TIMEOUT = 10 * 60 * 1000; // 10 Minutes
   static readonly DEFAULT_WHEN_VALUE = "Now";
   static readonly MAXIMUM_TEAM_SPOT = 3;
@@ -21,7 +22,7 @@ export class AppSettings {
   static readonly PS_WING_REQUEST_INTERACTION_TITLE =
     "Play Station Wing Request";
   static readonly PS_CHANNEL_ID = "790162689887961089";
-  static readonly BOT_WING_DURATION_FIELD_NAME = "Duration";
+  static readonly BOT_WING_DURATION_FIELD_NAME = "Team Until";
   static readonly BOT_WING_FIELDS = [
     "What kind of mission/gameplay?",
     "Star System/Location",
@@ -34,6 +35,7 @@ export class AppSettings {
   static readonly BOT_WING_COMMAND_NAME = "wing";
   static readonly BOT_SYSTEM_FACTION_INFO_COMMAND_NAME = "systemfaction";
   static readonly BOT_SYSTEM_TRAFFIC_COMMAND_NAME = "systemtraffic";
+  static readonly BOT_ELITE_SERVER_TICK_INFO = "lastservertick";
   static readonly BOT_SYSTEM_DEATH_COMMAND_NAME = "systemdeath";
   static readonly BOT_HELP_COMMAND_NAME = "winghelp";
   static readonly BOT_PING_COMMAND_NAME = "ping";
@@ -84,6 +86,7 @@ export class AppSettings {
   static readonly SYSTEM_TIMELINE = ["Today", "This Week", "All Time"];
 
   /// BOT REPLY VALUES
+  static readonly BOT_ELITE_SERVER_TICK_INFO_TITLE = "Elite Last Server Tick";
   static readonly BOT_HELP_REPLY_TITLE = "How to use, Check example.";
   static readonly BOT_HELP_REPLY_FOOTER_NOTE =
     "Note: Messages may get delete by dyno";
@@ -129,12 +132,12 @@ export class AppSettings {
   ];
   static readonly BOT_HELP_COMMAND_REPLY_FIELD_VALUES = [
     `"Use '${this.BOT_WING_COMMAND_NAME}'"`,
-    "Odyssey, Horizon 4.0, Horizon 3.8, ED Beyond",
     "Mining, Bounty Hunting, etc...",
     "SOL",
     "2 Spots",
     "25 (25 minutes from now)",
     "YourName\nPlayer1...",
     "1.5 (1 hours and 30 minutes)",
+    "Odyssey, Horizon 4.0, Horizon 3.8, ED Beyond",
   ];
 }

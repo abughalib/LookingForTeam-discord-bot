@@ -105,8 +105,23 @@ function setCommands(client: Client) {
       ],
     })
     .catch((error) =>
-      console.error("Error Get Systems Factions Info: ", error)
+      console.error(
+        "Error Creating command BOT_SYSTEM_FACTION_INFO_COMMAND_NAME: ",
+        error
+      )
     );
+
+  commands
+    .create({
+      name: AppSettings.BOT_ELITE_SERVER_TICK_INFO,
+      description:
+        CommandLocalizations.ELITE_SERVER_TICK_INFO_DESCRIPTION["en-US"],
+      description_localizations:
+        CommandLocalizations.ELITE_SERVER_TICK_INFO_DESCRIPTION,
+    })
+    .catch((error) => {
+      console.error("Error creating command: ", error);
+    });
 
   commands
     .create({
