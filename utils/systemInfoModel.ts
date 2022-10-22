@@ -4,6 +4,7 @@ interface Factions {
   allegiance: string;
   government: string;
   influence: number;
+  influenceHistory: Map<string, number> | null;
   state: string;
   activeStates: string;
   recoveringStates: string;
@@ -26,4 +27,4 @@ interface SystemFactionInfo {
   factions: Factions[];
 }
 
-export default SystemFactionInfo;
+export { SystemFactionInfo, Factions };
