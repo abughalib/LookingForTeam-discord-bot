@@ -1,5 +1,5 @@
 import { AppSettings } from "./settings";
-import SystemFactionInfo from "./systemInfoModel";
+import { SystemFactionInfo, Factions } from "./systemInfoModel";
 import { ServerStatusModel, SystemDeath, SystemTrafficInfo } from "./models";
 
 /*
@@ -17,11 +17,12 @@ class EDSM {
     Description:
       Fetches system Factions from EDSM
   */
-  async fetchSystemFactionInfo(systemName: string) {
+  async fetchSystemFactionInfo(systemName: string, showHistory: number = 0) {
     let resp = await fetch(AppSettings.BOT_SYSTEM_INFO_FETCH_URL, {
       method: "POST",
       body: JSON.stringify({
         systemName: systemName,
+        showHistory: showHistory,
       }),
       headers: AppSettings.BOT_HEADER,
     });
@@ -88,8 +89,11 @@ class EDSM {
       systemfactioninfo // [SystemFactionInfo]
   */
 
-  async getSystemFactionInfo(systemName: string): Promise<SystemFactionInfo | null> {
-    let json_data = await this.fetchSystemFactionInfo(systemName);
+  async getSystemFactionInfo(
+    systemName: string,
+    showHistory: number = 0
+  ): Promise<SystemFactionInfo | null> {
+    let json_data = await this.fetchSystemFactionInfo(systemName, showHistory);
 
     if (!json_data) {
       console.error("EDSM not responding: ", json_data);
@@ -104,6 +108,17 @@ class EDSM {
       controllingFaction: json_data.controllingFaction,
       factions: json_data.factions,
     };
+  }
+  async getSystemFactionsHistory(
+    systemName: string
+  ): Promise<Array<Factions> | null> {
+    let systemFactionInfo = await this.getSystemFactionInfo(systemName, 1);
+
+    if (!systemFactionInfo) {
+      return null;
+    }
+
+    return systemFactionInfo.factions;
   }
 }
 
