@@ -1,6 +1,6 @@
 import { APIEmbedField, EmbedBuilder, RestOrArray } from "discord.js";
 import { AppSettings } from "../utils/settings";
-import SystemInfo from "../utils/systemInfoModel";
+import { SystemFactionInfo } from "../utils/systemInfoModel";
 
 /*
   Args:
@@ -44,7 +44,7 @@ function getFields(
     Creates an embeded message from the systemInfo
 */
 
-function systemEmbedMessage(systemInfo: SystemInfo): EmbedBuilder {
+function systemEmbedMessage(systemInfo: SystemFactionInfo): EmbedBuilder {
   // Last Time the EDSM was updated
   let lastUpdated: number = 0;
   // Field Heading for the embeded message
