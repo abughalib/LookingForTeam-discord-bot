@@ -9,7 +9,7 @@ interface Factions {
   activeStates: string;
   recoveringStates: string;
   happiness: string;
-  isPlayer: false;
+  isPlayer: boolean;
   lastUpdate: number;
 }
 
