@@ -19,7 +19,6 @@ import interactionCommandHandler from "./interactions/commandInteraction";
     This function handles all interactions
 */
 async function handleInteractions(interaction: Interaction) {
-
   // Create Select Menu for the Game version
   const menus = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
     new SelectMenuBuilder()
