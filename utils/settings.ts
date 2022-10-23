@@ -34,6 +34,7 @@ export class AppSettings {
   // Interaction commands for the bot.
   static readonly BOT_WING_COMMAND_NAME = "wing";
   static readonly BOT_SYSTEM_FACTION_INFO_COMMAND_NAME = "systemfaction";
+  static readonly BOT_SYSTEM_FACTION_HISTORY_COMMAND_NAME = "factionhistory";
   static readonly BOT_SYSTEM_TRAFFIC_COMMAND_NAME = "systemtraffic";
   static readonly BOT_ELITE_SERVER_TICK_INFO = "lastservertick";
   static readonly BOT_SYSTEM_DEATH_COMMAND_NAME = "systemdeath";
@@ -46,13 +47,18 @@ export class AppSettings {
   static readonly INTERACTION_SPOTS_ID = "spots";
   static readonly INTERACTION_DURATION_ID = "duration";
   static readonly INTERACTION_WHEN_ID = "when";
+  static readonly INTERACTION_DAY_NAME_ID = "day";
   static readonly INTERACTION_SYSTEM_NAME_ID = "system_name";
   static readonly INTERACTION_DISMISS_ID = "command_dismiss";
 
   // Interaction field description
+  static readonly INTERACTION_FACTION_HISTROY_DESC =
+    "Get the faction history for a system";
   static readonly INTERACTION_SYSTEM_NAME_DESC = "Elite Dangerous System Name";
   static readonly INTERACTION_HELP_DESC = "Need help to use this BOT?";
   static readonly INTERACTION_PING_DESC = "Check if the Bot is up and Running";
+  static readonly INTERACTION_DAY_DESC =
+    "The day to get the faction history for";
 
   // Buttons customIDs
   static readonly BUTTON_JOIN_ID = "button_join";
