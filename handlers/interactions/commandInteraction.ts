@@ -248,10 +248,8 @@ async function interactionCommandHandler(
     let dismissButton = createDismissButton();
 
     // Get the history of the system
-    let systemFactioninfo: SystemFactionInfo | null = await edsm.getSystemFactionInfo(
-      systemName,
-      1
-    );
+    let systemFactioninfo: SystemFactionInfo | null =
+      await edsm.getSystemFactionInfo(systemName, 1);
 
     // If the system is not found
     if (!systemFactioninfo || !systemFactioninfo.factions) {
@@ -262,7 +260,6 @@ async function interactionCommandHandler(
       deleteInteraction(interaction, AppSettings.ERROR_MESSAGE_DIMISS_TIMEOUT);
       return;
     }
-
 
     const faction = systemFactioninfo.factions;
 
@@ -282,8 +279,7 @@ async function interactionCommandHandler(
     // Create the embed message
     let embeded_message = systemEmbedMessage(systemFactioninfo);
     embeded_message.setTitle(`Faction History for ${systemName}`);
-    embeded_message.setURL(chartUrl)
-      .setImage(chartUrl);
+    embeded_message.setURL(chartUrl).setImage(chartUrl);
 
     // Send embed message
     await interaction

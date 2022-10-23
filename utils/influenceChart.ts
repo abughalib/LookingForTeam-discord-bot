@@ -28,7 +28,6 @@ async function createInfluenceChart(
   factions: Factions[],
   days: number
 ): Promise<string | null> {
-
   // Factions Present in that system.
   let factionsName = [];
 
@@ -77,8 +76,8 @@ async function createInfluenceChart(
       legend: {
         position: "bottom",
         align: "start",
-      }
-    }
+      },
+    },
   });
 
   // Get the short URL of the chart

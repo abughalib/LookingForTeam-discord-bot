@@ -7,7 +7,7 @@ import { ServerStatusModel, SystemDeath, SystemTrafficInfo } from "./models";
 */
 
 class EDSM {
-  constructor() { }
+  constructor() {}
 
   /*
     Args:
