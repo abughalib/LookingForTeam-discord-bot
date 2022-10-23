@@ -7,7 +7,7 @@ import { ServerStatusModel, SystemDeath, SystemTrafficInfo } from "./models";
 */
 
 class EDSM {
-  constructor() {}
+  constructor() { }
 
   /*
     Args:
@@ -108,17 +108,6 @@ class EDSM {
       controllingFaction: json_data.controllingFaction,
       factions: json_data.factions,
     };
-  }
-  async getSystemFactionsHistory(
-    systemName: string
-  ): Promise<Array<Factions> | null> {
-    let systemFactionInfo = await this.getSystemFactionInfo(systemName, 1);
-
-    if (!systemFactionInfo) {
-      return null;
-    }
-
-    return systemFactionInfo.factions;
   }
 }
 
