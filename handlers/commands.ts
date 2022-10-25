@@ -111,6 +111,30 @@ function setCommands(client: Client) {
       )
     );
 
+  // Create faction history command
+  commands
+    .create({
+      name: AppSettings.BOT_SYSTEM_FACTION_HISTORY_COMMAND_NAME,
+      description: AppSettings.INTERACTION_FACTION_HISTROY_DESC,
+      options: [
+        {
+          name: AppSettings.INTERACTION_SYSTEM_NAME_ID,
+          description: AppSettings.INTERACTION_SYSTEM_NAME_DESC,
+          required: true,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
+          name: AppSettings.INTERACTION_DAY_NAME_ID,
+          description: AppSettings.INTERACTION_DAY_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.Number,
+        },
+      ],
+    })
+    .catch((error) => {
+      console.error("Error creating command: ", error);
+    });
+
   commands
     .create({
       name: AppSettings.BOT_ELITE_SERVER_TICK_INFO,
