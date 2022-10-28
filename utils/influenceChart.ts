@@ -39,27 +39,30 @@ async function createInfluenceChart(
   let timeAxis: Array<string> = getDayMonthRange(days);
 
   for (let i = 0; i < factions.length; i += 1) {
-    factionsName.push(factions[i].name);
+    // If the faction is present in the system
+    if (factions[i].influence >= 0.01) {
+      factionsName.push(factions[i].name);
 
-    let history = factions[i].influenceHistory;
+      let history = factions[i].influenceHistory;
 
-    // If history is not available
-    // Reason would be faction retreted.
-    if (!history) {
-      continue;
+      // If history is not available
+      // Reason would be faction retreted.
+      if (!history) {
+        continue;
+      }
+      // Fill databse based on history timestamp
+      let timeInfluence = lastDays(history, days);
+
+      // Populated dataset Array.
+      dataset.push({
+        label: factions[i].name,
+        data: timeInfluence,
+        fill: false,
+        pointRadius: 2,
+        lineTension: 0.4,
+        borderWidth: 1,
+      });
     }
-    // Fill databse based on history timestamp
-    let timeInfluence = lastDays(history, days);
-
-    // Populated dataset Array.
-    dataset.push({
-      label: factions[i].name,
-      data: timeInfluence,
-      fill: false,
-      pointRadius: 2,
-      lineTension: 0.4,
-      borderWidth: 1,
-    });
   }
 
   // Initialize quickChart
@@ -117,7 +120,7 @@ function lastDays(
   // Assuming that the influence is not changing if not being detected
   if (influence.length !== 0) {
     const last_value = influence[influence.length - 1];
-    for (let i = influence.length; i < days; i += 1) {
+    for (let i = influence.length; i <= days; i += 1) {
       influence.push(last_value);
     }
   }
@@ -144,7 +147,7 @@ function getDayMonthRange(days: number): Array<string> {
 
   // Increment date by one day
   // Populate the day_month array
-  for (let i = dateOnThatDate.getTime(); i < today; i += oneDayEpoch) {
+  for (let i = dateOnThatDate.getTime(); i <= today; i += oneDayEpoch) {
     const givenDate = new Date(i);
     day_month.push(givenDate.getDate() + "-" + givenDate.getMonth());
   }
