@@ -144,7 +144,7 @@ function getDayMonthRange(days: number): Array<string> {
 
   // Increment date by one day
   // Populate the day_month array
-  for (let i = dateOnThatDate.getTime(); i < today; i += oneDayEpoch) {
+  for (let i = dateOnThatDate.getTime(); i <= today; i += oneDayEpoch) {
     const givenDate = new Date(i);
     day_month.push(givenDate.getDate() + "-" + givenDate.getMonth());
   }
