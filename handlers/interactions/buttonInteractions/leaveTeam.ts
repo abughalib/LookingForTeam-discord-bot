@@ -8,6 +8,13 @@ import {
 import { removeEntry } from "../../../utils/helpers";
 import getMessageByID from "./manageMessages";
 
+/*
+  This function is used to leave the Team.
+  If the user is the Team Leader, it won't work, they have to use deleteTeam
+  If the user is not the Team Leader, it will remove the user from the Team
+  and update the Team invite message.
+*/
+
 async function leaveTeam(interaction: ButtonInteraction) {
   // If the Leave Team button is clicked.
   // Defer interaction reply.

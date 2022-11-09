@@ -1,14 +1,14 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
 import { AppSettings } from "../../../utils/settings";
 
+/*
+  A class to create buttons, which can use used everywhere.
+*/
+
 class CreateButtons {
   /*
-  Args:
-    None
-  Returns:
-    Buttons
+    Create a button to dissmiss the message.
   */
-  // To be removed in the future.
   createDismissButton(): ActionRowBuilder<ButtonBuilder> {
     return new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()

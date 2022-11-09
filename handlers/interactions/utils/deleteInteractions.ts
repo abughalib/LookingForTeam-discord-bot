@@ -2,6 +2,7 @@ import { ButtonInteraction, CacheType, CommandInteraction } from "discord.js";
 import deleteMessage from "./deleteMessage";
 
 /*
+  Deletes the interaction reply after the given time.
   Args:
     interaction: ButtonInteraction | CommandInteraction
     timeout: number

@@ -1,6 +1,10 @@
 import { CommandInteraction } from "discord.js";
 import { AppSettings } from "../../../utils/settings";
 
+/*
+  Classic Bot Ping Reply.
+*/
+
 async function pingReply(interaction: CommandInteraction) {
   // Reply with a message
   await interaction

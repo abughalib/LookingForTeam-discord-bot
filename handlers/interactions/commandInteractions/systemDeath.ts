@@ -3,6 +3,11 @@ import EDSM from "../../../utils/edsm";
 import { AppSettings } from "../../../utils/settings";
 import embedMessage from "../../embeded_message";
 
+/*
+  No of death in a particular system, these included PVP interactions
+  Data is fetched from EDSM.
+  Timeline: Day, Week, Total
+ */
 async function systemDeath(
   interaction: CommandInteraction,
   userInterected: GuildMember

@@ -2,8 +2,14 @@ import { CommandInteraction, EmbedBuilder } from "discord.js";
 import BGSInfo from "../../../utils/eliteBgs";
 import { TickInfo } from "../../../utils/models";
 import { AppSettings } from "../../../utils/settings";
-import deleteInteraction from "../deleteInteractions";
-import CreateButtons from "./createButtons";
+import deleteInteraction from "../utils/deleteInteractions";
+import CreateButtons from "../utils/createButtons";
+
+/*
+  Elite Dangerous Server Tick Info.
+  What is Tick?
+  Checkout: https://forums.frontier.co.uk/threads/when-and-what-is-the-tick.400292/
+*/
 
 async function eliteServerTickInfo(interaction: CommandInteraction) {
   // Defer interaction reply

@@ -8,9 +8,16 @@ import {
   User,
 } from "discord.js";
 import { AppSettings } from "../../../utils/settings";
-import deleteInteraction from "../deleteInteractions";
-import deleteMessage from "../deleteMessage";
+import deleteInteraction from "../utils/deleteInteractions";
+import deleteMessage from "../utils/deleteMessage";
 import getMessageByID from "./manageMessages";
+
+/*
+  This function is used to accept or reject a user's Team Request.
+  It will delete the message and the interaction.
+  Accept is only accessible to the Team Leader.
+  Reject/Cancel is accessible to the Team Leader and the user who sent the request.
+*/
 
 async function acceptOrReject(interaction: ButtonInteraction) {
   /*

@@ -6,6 +6,7 @@ import joinButton from "./buttonInteractions/joinTeam";
 import leaveTeam from "./buttonInteractions/leaveTeam";
 
 /*
+  Handles all button interactions.
   Args:
     ButtonInteraction
   Returns:

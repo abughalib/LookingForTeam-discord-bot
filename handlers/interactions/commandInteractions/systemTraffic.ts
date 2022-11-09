@@ -5,6 +5,11 @@ import { getEliteShipAndCount } from "../../../utils/helpers";
 import { AppSettings } from "../../../utils/settings";
 import embedMessage from "../../embeded_message";
 
+/*
+  No of ships passed through the system, breakdown by ships.
+  Timeline: Day, Week, Total
+*/
+
 async function systemTraffic(
   interaction: CommandInteraction,
   userInterected: GuildMember

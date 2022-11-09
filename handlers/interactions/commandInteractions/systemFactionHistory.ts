@@ -4,8 +4,14 @@ import createInfluenceChart from "../../../utils/influenceChart";
 import { AppSettings } from "../../../utils/settings";
 import { SystemFactionInfo } from "../../../utils/systemInfoModel";
 import systemEmbedMessage from "../../systemInfoEmbed";
-import deleteInteraction from "../deleteInteractions";
-import CreateButtons from "./createButtons";
+import deleteInteraction from "../utils/deleteInteractions";
+import CreateButtons from "../utils/createButtons";
+
+/*
+  Factions influence over a period of time in a particular system.
+  It will show the influence of all the factions in the system
+  and a chart will be generated for the same.
+*/
 
 async function systemfactionHistory(interaction: CommandInteraction) {
   // CommandName and options

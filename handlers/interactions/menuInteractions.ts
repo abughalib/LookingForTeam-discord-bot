@@ -8,6 +8,7 @@ import {
 import { AppSettings } from "../../utils/settings";
 
 /*
+  Handles all the menu interactions.
   Args:
     interaction: SelectMenuInteraction,
     button: ButtonBuilder,

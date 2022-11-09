@@ -7,8 +7,12 @@ import {
 import { AppSettings } from "../../../utils/settings";
 import getEpochTimeAfterHours from "../../../utils/timestamp";
 import embedMessage from "../../embeded_message";
-import deleteInteraction from "../deleteInteractions";
-import isValidDuration from "./durationValidation";
+import deleteInteraction from "../utils/deleteInteractions";
+import isValidDuration from "../utils/durationValidation";
+
+/*
+  Creates a new Team/Wing Request.
+*/
 
 async function wingInteraction(
   interaction: CommandInteraction,

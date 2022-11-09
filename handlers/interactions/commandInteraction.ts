@@ -16,6 +16,7 @@ import systemTraffic from "./commandInteractions/systemTraffic";
 import wingInteraction from "./commandInteractions/wingInteraction";
 
 /*
+  Handles all the command interactions.
   Args:
     interaction: CommandInteraction.
     Menu: Menu Available for selection.

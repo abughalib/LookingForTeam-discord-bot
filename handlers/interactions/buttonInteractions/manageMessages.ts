@@ -1,6 +1,7 @@
 import { ButtonInteraction, Message } from "discord.js";
 
 /*
+  This function is used to get the message by message Id from the interaction channel.
   Args:
     ButtonInteraction
   Returns:

@@ -1,11 +1,14 @@
 import { CommandInteraction, EmbedBuilder } from "discord.js";
 import EDSM from "../../../utils/edsm";
-import edsm from "../../../utils/edsm";
 import { AppSettings } from "../../../utils/settings";
 import { SystemFactionInfo } from "../../../utils/systemInfoModel";
 import systemEmbedMessage from "../../systemInfoEmbed";
-import deleteInteraction from "../deleteInteractions";
-import CreateButtons from "./createButtons";
+import deleteInteraction from "../utils/deleteInteractions";
+import CreateButtons from "../utils/createButtons";
+
+/*
+  Shows influence of all the factions in the system
+*/
 
 async function systemFactionInfo(interaction: CommandInteraction) {
   // CommandName and options
