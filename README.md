@@ -187,7 +187,7 @@ Change the values in [AppSetting](./utils/settings.ts)
 
   **Optional**
 - `BOT_WING_COMMAND_NAME`: Change the team invite command.
-- Change the titles of respective channel and their channel.
+- Change the titles of respective channel and their channel Names.
 - Comment out the API URLs if you don't need them or exclude the commands from discord server.
 
 # Info
