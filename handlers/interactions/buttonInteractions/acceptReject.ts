@@ -31,10 +31,14 @@ async function acceptOrReject(interaction: ButtonInteraction) {
     // Log the interaction.message
     // Send ephemeral message to the interaction user notifying the message is deleted.
     console.error("Interaction is null: " + interaction.message);
-    await interaction.reply({
-      content: "Original Message not Found",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "Original Message not Found",
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error("When original message is not found: ", error);
+      });
     return;
   }
   // If the message.reference.messageId is undefined.
@@ -45,10 +49,14 @@ async function acceptOrReject(interaction: ButtonInteraction) {
         interaction.message.reference
     );
     // Send ephemeral message to the interaction user notifying the message is deleted.
-    await interaction.reply({
-      content: "Original Message not Found",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "Original Message not Found",
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error("When message reference is null: " + error);
+      });
     return;
   }
 
@@ -61,10 +69,14 @@ async function acceptOrReject(interaction: ButtonInteraction) {
   // i.e message is deleted by admin or message interaction not found.
   if (message === null || message.interaction == null) {
     // Notify the interaction user that the message is deleted.
-    await interaction.reply({
-      content: "Original Message not Found",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "Original Message not Found",
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error("Message not found: " + error);
+      });
     return;
   }
 
@@ -73,10 +85,14 @@ async function acceptOrReject(interaction: ButtonInteraction) {
 
     // In case the interaction user is not the one who created the Team.
     if (interaction.user !== message.interaction.user) {
-      await interaction.reply({
-        ephemeral: true,
-        content: `You Cannot Perform this action`,
-      });
+      await interaction
+        .reply({
+          ephemeral: true,
+          content: `You Cannot Perform this action`,
+        })
+        .catch((error) => {
+          console.error("When non author accept request: ", error);
+        });
     } else {
       // If the interaction user is the one who created the Team.
 
@@ -94,16 +110,25 @@ async function acceptOrReject(interaction: ButtonInteraction) {
       // Log the errors and send ephemeral message to the interaction user.
       if (!title || !fields || !timestamp) {
         console.error("Cannot find original interaction embed fields");
-        await interaction.reply({
-          content: "Cannot find original message content",
-          ephemeral: true,
-        });
+        await interaction
+          .reply({
+            content: "Cannot find original message content",
+            ephemeral: true,
+          })
+          .catch((error) => {
+            console.error(
+              "Cannot find original interaction embed fields: ",
+              error
+            );
+          });
         return;
       }
 
       // Defer interaction reply.
       // This is to prevent the interaction being failed.
-      await interaction.deferReply();
+      await interaction.deferReply().catch((error) => {
+        console.error(error);
+      });
 
       // Create new embed with the original message embed fields.
       // Add the user name in embed message who got accepted to the Team.
@@ -172,11 +197,15 @@ async function acceptOrReject(interaction: ButtonInteraction) {
       // And add extra instructions to the user.
 
       /// TODO - Add a Button to dissmiss the message.
-      await interaction.editReply({
-        content:
-          `${interaction.message.mentions.users.last()}, Your request is accepted` +
-          `\nMake sure you have ${interaction.message.mentions.users.first()} as your in-game friend`,
-      });
+      await interaction
+        .editReply({
+          content:
+            `${interaction.message.mentions.users.last()}, Your request is accepted` +
+            `\nMake sure you have ${interaction.message.mentions.users.first()} as your in-game friend`,
+        })
+        .catch((error) => {
+          console.error("Team request failed: " + error);
+        });
       // Delete the interaction message that the button responds to.
       deleteMessage(interaction.message);
       // Delete the interaction.
@@ -184,27 +213,37 @@ async function acceptOrReject(interaction: ButtonInteraction) {
     }
   } else if (interaction.customId === AppSettings.BUTTON_REJECT_REQUEST_ID) {
     // Defer interaction reply.
-    await interaction.deferReply();
+    await interaction.deferReply().catch((error) => {
+      console.error(error);
+    });
     // If the Reject Team invite is clicked.
 
     // It should be done by either original author or the one requested.
     if (interaction.message.mentions.users.has(interaction.user.id)) {
       // It would only notify the user who rejected it.
-      /*
-              Don't know if it would be good to notify the user requested to know
-              if their request is rejected.
-            */
-      await interaction.editReply({
-        content: "Request Cancelled",
-      });
+
+      //Don't know if it would be good to notify the user requested to know
+      //if their request is rejected.
+      await interaction
+        .editReply({
+          content: "Request Cancelled",
+        })
+        .catch((error) => {
+          console.error("Reject Request listed user: " + error);
+        });
       // Delete the interaction message.
-      await deleteMessage(interaction.message);
+      deleteMessage(interaction.message);
+      deleteInteraction(interaction, AppSettings.ERROR_MESSAGE_DIMISS_TIMEOUT);
     } else {
       // If any other user tries to reject the request.
       // Notify the interaction user that they cannot perform this action.
-      await interaction.editReply({
-        content: "You cannot perform this action",
-      });
+      await interaction
+        .editReply({
+          content: "You cannot perform this action",
+        })
+        .catch((error) => {
+          console.error("Reject Request by non listed user: " + error);
+        });
     }
   }
 }
