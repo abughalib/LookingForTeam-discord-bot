@@ -193,4 +193,5 @@ Change the values in [AppSetting](./utils/settings.ts)
 # Info
 
 _EDSM, ELITE BGS and QuickChart are copyright of their respective owners_
+
 _Elite: Dangerous © 2012, 2013 Frontier Developments plc. All rights reserved._
