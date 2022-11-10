@@ -1,6 +1,9 @@
 # Looking For Team invite discord bot.
 
-**Specially Designed for Elite Dangerous Community.**
+**Specifically Designed for Elite Dangerous Community.**
+
+![image](https://github.com/abughalib/LookingForTeam-discord-bot/actions/workflows/node.js.yml/badge.svg)
+![image](https://github.com/abughalib/LookingForTeam-discord-bot/actions/workflows/docker-image.yml/badge.svg)
 
 ## Table of Contents
 
