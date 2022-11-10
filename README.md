@@ -1,6 +1,66 @@
 # Looking For Team invite discord bot.
 
-## Specially Designed for Elite Dangerous Community.
+**Specially Designed for Elite Dangerous Community.**
+
+## Table of Contents
+
+- [Features](#features)
+- [Technology Used](#technologies)
+- [Configuration](#configure)
+- [Build](#configure)
+- [Screenshots](#screenshots)
+- [Dependencies on Websites for data](#dependencies-on-websites)
+- [Configure it for different Game](#configure-it-for-different-game)
+
+## Technologies
+
+This project is created with:
+
+- [Node](https://nodejs.org)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Discordjs](https://discord.js.org/)
+- [Quickchart](https://quickchart.io/)
+- [Sqlite](https://www.sqlite.org/)
+
+## Dependencies on Websites
+
+- Current Faction Info: [EDSM](https://www.edsm.net/)
+- System Faction History: [EDSM](https://www.edsm.net/) and [QuickChart](https://quickchart.io/)
+- System Traffic: [EDSM](https://www.edsm.net/)
+- System Death: [EDSM](https://www.edsm.net/)
+- Last Tick Info: [ELITE BGS](https://elitebgs.app/bgsbot/)
+
+## Screenshots
+
+<details>
+  <summary>Show</summary>
+
+### Screenshot of Team Creations
+
+1. Creating new Team:
+   ![image](./screenshots/create_team.png)
+2. Initial Team Created:
+   ![image](./screenshots/initial_team_created.png)
+3. Select Game Version:
+   ![image](./screenshots/select_game_version.png)
+4. Final Team Creation Message
+   ![image](./screenshots/final_team_created.png)
+
+### Screenshot of Team Request
+
+1. Request Team invite
+   ![image](./screenshots/team_request.png)
+   ![image](./screenshots/team_request_accept.png)
+
+### Screenshot of Other Features
+
+1. System Faction History:
+   ![image](./screenshots/system_faction_history.png)
+2. System Traffic:
+   ![image](./screenshots/system_traffic.png)
+3. System Death Info:
+![image](./screenshots/system_death_info.png)
+</details>
 
 ## Configure
 
@@ -43,6 +103,10 @@
     - `Use Slash Commands`
 - Copy Generated Url and open it on a web browser and select Server.
 
+**Channel Specific Configuration**
+
+- Change the Channel IDs `[Platform]_CHANNEL_ID` in [AppSetting](./utils/settings.ts)
+
 ## Build
 
 - Using NPM
@@ -78,3 +142,50 @@
   ```bash
   docker-compose up
   ```
+
+# Features
+
+- Create/Delete Team.
+- Accept/Reject/Cancel Team Invite.
+- Auto Message Delete when team expires.
+- System Faction History, Traffic and Death.
+
+_Checkout the [Screenshots](#screenshots) section._
+
+# Features in Progress
+
+- Unit Testing.
+- Adding Sqlite for caching the API result.
+- Adding channel id for replies.
+
+# Future Plans
+
+- Adding more features like Exploration and Mining.
+- Make it available for other game without editing configuration
+
+# Contribution
+
+Before contributing, please read the [common contributors guide](https://opensource.guide/) for useful information.
+
+- If you have anything to ask, raise a issue.
+- Feel like something is missing raise an issue.
+- If you feel like you can help me with code, have a look at the issues section.
+
+# Configure it for Different Game.
+
+Change the values in [AppSetting](./utils/settings.ts)
+
+- `GAME_NAME`: Your Game Name
+- `DEFAULT_GAME_VERSION`: Your game Version.
+  _if you have only one version across Console and PC platform then leave `PC_CHANNEL_ID` empty_
+- `AVAILABLE_GAME_VERSIONS`: In case of Multiple game version.
+- `BOT_HELP_COMMAND_REPLY_FIELD_VALUES`: Change it according to your game.
+  **Optional**
+- `BOT_WING_COMMAND_NAME`: Change the team invite command.
+- Change the titles of respective channel and their channel.
+- Comment out the API URLs if you don't need them or exclude the commands from discord server.
+
+# Info
+
+_EDSM, ELITE BGS and QuickChart are copyright of their respective owners_
+_Elite: Dangerous © 2012, 2013 Frontier Developments plc. All rights reserved._
