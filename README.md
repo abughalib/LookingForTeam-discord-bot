@@ -40,28 +40,29 @@ This project is created with:
 
 ### Screenshot of Team Creations
 
-1. Creating new Team:
+1. Creating new Team:<br>
    ![image](./screenshots/create_team.png)
-2. Initial Team Created:
+2. Initial Team Created:<br>
    ![image](./screenshots/initial_team_created.png)
-3. Select Game Version:
+3. Select Game Version:<br>
    ![image](./screenshots/select_game_version.png)
-4. Final Team Creation Message
+4. Final Team Creation Message:<br>
    ![image](./screenshots/final_team_created.png)
 
 ### Screenshot of Team Request
 
-1. Request Team invite
+1. Request Team invite:<br>
    ![image](./screenshots/team_request.png)
+2. Team Request Accepted:<br>
    ![image](./screenshots/team_request_accept.png)
 
 ### Screenshot of Other Features
 
-1. System Faction History:
+1. System Faction History:<br>
    ![image](./screenshots/system_faction_history.png)
-2. System Traffic:
+2. System Traffic:<br>
    ![image](./screenshots/system_traffic.png)
-3. System Death Info:
+3. System Death Info:<br>
 ![image](./screenshots/system_death_info.png)
 </details>
 
