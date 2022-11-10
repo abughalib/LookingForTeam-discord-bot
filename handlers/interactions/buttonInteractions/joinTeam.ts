@@ -18,10 +18,14 @@ async function joinButton(interaction: ButtonInteraction) {
   if (interaction.message.interaction == null) {
     // In case of message interaction null or deleted by admin or bot.
     // sends ephemeral message to the interaction user.
-    await interaction.reply({
-      content: "Cannot perform this action",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "Cannot perform this action",
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error("When interaction.message.interaction is null: ", error);
+      });
     return;
   }
 
@@ -29,10 +33,14 @@ async function joinButton(interaction: ButtonInteraction) {
   // The one who crated is already in the Team and should not be able to join again.
   if (interaction.message.interaction.user === interaction.user) {
     // Sends ephemeral message to the interaction user.
-    await interaction.reply({
-      content: "You want to invite yourself in?",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "You want to invite yourself in?",
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error("When author is pressing join button: ", error);
+      });
     return;
   }
 
@@ -41,10 +49,14 @@ async function joinButton(interaction: ButtonInteraction) {
   // Why this check if data.fileds is not null? Refer to My github Repo.
   if (interaction.message.embeds[0].data.fields === undefined) {
     // If fields is undefined, send ephemeral message to the interaction user.
-    await interaction.reply({
-      content: "Undefined Team Invite",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "Undefined Team Invite",
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error("When fields is undefined: ", error);
+      });
     return;
   }
 
@@ -80,20 +92,28 @@ async function joinButton(interaction: ButtonInteraction) {
   // One user should be only onces in the Team.
   // If the user is already in the Team, send ephemeral message to the interaction user.
   if (joined_user.includes(interaction.user.toString())) {
-    await interaction.reply({
-      content: "You're already in the Team",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "You're already in the Team",
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error("When user is already in the Team: ", error);
+      });
     return;
   }
 
   // Check if the Team is Already full.
   // If the Team is full, send ephemeral message to the interaction user.
   if (spots <= 0) {
-    await interaction.reply({
-      ephemeral: true,
-      content: "Sorry, but the team is already full.",
-    });
+    await interaction
+      .reply({
+        ephemeral: true,
+        content: "Sorry, but the team is already full.",
+      })
+      .catch((error) => {
+        console.error("When Team is full: ", error);
+      });
     return;
   }
 
@@ -114,10 +134,14 @@ async function joinButton(interaction: ButtonInteraction) {
   );
   // In case of Requesting for Invite.
   // The user who request and the user who created the Team will be notified.
-  await interaction.reply({
-    content: `Hey ${originalUserInteraction}, ${currentUserInteraction} is looking for Team Invite`,
-    components: [buttons],
-  });
+  await interaction
+    .reply({
+      content: `Hey ${originalUserInteraction}, ${currentUserInteraction} is looking for Team Invite`,
+      components: [buttons],
+    })
+    .catch((error) => {
+      console.error("When requesting for Team Invite: ", error);
+    });
   // Delete the interaction after a certain Time.
   deleteInteraction(interaction, AppSettings.DEFAULT_REQUEST_TEAM_TIMEOUT);
 }

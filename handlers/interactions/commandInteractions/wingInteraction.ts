@@ -58,7 +58,9 @@ async function wingInteraction(
   }
 
   // Defer the reply
-  await interaction.deferReply();
+  await interaction.deferReply().catch((error) => {
+    console.error(error);
+  });
 
   // If timer is more then [MAXIMUM_HOURS_TEAM] hours convert it into Minutes
   if (when > AppSettings.MAXIMUM_HOURS_TEAM) {

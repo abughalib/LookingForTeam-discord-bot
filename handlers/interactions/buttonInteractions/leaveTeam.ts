@@ -19,17 +19,25 @@ async function leaveTeam(interaction: ButtonInteraction) {
   // If the Leave Team button is clicked.
   // Defer interaction reply.
 
-  await interaction.deferReply({
-    ephemeral: true,
-  });
+  await interaction
+    .deferReply({
+      ephemeral: true,
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 
   // interaction.message.interaction is null.
   if (interaction.message.interaction === null) {
     // Log the error and send ephemeral message to the interaction user.
     console.error("Interaction is null: " + interaction.message);
-    await interaction.editReply({
-      content: "Interaction null",
-    });
+    await interaction
+      .editReply({
+        content: "Interaction null",
+      })
+      .catch((error) => {
+        console.error("When interaction is null: " + error);
+      });
     return;
   }
 
@@ -47,9 +55,13 @@ async function leaveTeam(interaction: ButtonInteraction) {
         interaction.message.reference
     );
     // Send ephemeral message to the interaction user.
-    await interaction.editReply({
-      content: "Original Message reference not Found",
-    });
+    await interaction
+      .editReply({
+        content: "Original Message reference not Found",
+      })
+      .catch((error) => {
+        console.error("When interaction reference is undefined: " + error);
+      });
     return;
   }
 
@@ -57,9 +69,13 @@ async function leaveTeam(interaction: ButtonInteraction) {
   if (interaction.channel === null) {
     // Log the error and send ephemeral message to the interaction user.
     console.error("Interaction Channel is null: " + interaction);
-    await interaction.editReply({
-      content: "Original Channel not Found",
-    });
+    await interaction
+      .editReply({
+        content: "Original Channel not Found",
+      })
+      .catch((error) => {
+        console.error("When interaction channel is null: " + error);
+      });
     return;
   }
 
@@ -75,9 +91,13 @@ async function leaveTeam(interaction: ButtonInteraction) {
   if (message === null || message.interaction == null) {
     // Send ephemeral message to the interaction user.
     // Notify the user that the message is deleted.
-    await interaction.editReply({
-      content: "Original Message Not Found",
-    });
+    await interaction
+      .editReply({
+        content: "Original Message Not Found",
+      })
+      .catch((error) => {
+        console.error("When message is null: " + error);
+      });
     return;
   }
 
@@ -97,17 +117,25 @@ async function leaveTeam(interaction: ButtonInteraction) {
   if (!title || !fields || !timestamp) {
     // Log the error and send ephemeral message to the interaction user.
     console.error("Cannot find original interaction embed fields");
-    await interaction.editReply({
-      content: "Original Message Fields not Found",
-    });
+    await interaction
+      .editReply({
+        content: "Original Message Fields not Found",
+      })
+      .catch((error) => {
+        console.error("When original message fields are undefined: " + error);
+      });
     return;
   }
 
   // If the field of the original message is not defined.
   if (fields === undefined) {
-    await interaction.editReply({
-      content: "Original Message field not Defined",
-    });
+    await interaction
+      .editReply({
+        content: "Original Message field not Defined",
+      })
+      .catch((error) => {
+        console.error("When original message fields are undefined: " + error);
+      });
     return;
   }
 
@@ -144,9 +172,16 @@ async function leaveTeam(interaction: ButtonInteraction) {
     // Send ephemeral message to the interaction user.
     // Notify the user that they cannot leave the Team.
     // They have to delete it.
-    await interaction.editReply({
-      content: "You're the one created it, To leave please use `Delete` button",
-    });
+    await interaction
+      .editReply({
+        content:
+          "You're the one created it, To leave please use `Delete` button",
+      })
+      .catch((error) => {
+        console.error(
+          "When interaction user is the one who created the Team: " + error
+        );
+      });
     return;
   }
 
@@ -155,9 +190,15 @@ async function leaveTeam(interaction: ButtonInteraction) {
     // If the interaction user is not in the team_players.
     // Send ephemeral message to the interaction user.
     // Notify the user that they are not in the Team.
-    await interaction.editReply({
-      content: "You're not in the Team",
-    });
+    await interaction
+      .editReply({
+        content: "You're not in the Team",
+      })
+      .catch((error) => {
+        console.error(
+          "When interaction user is not in the team_players: " + error
+        );
+      });
     return;
   }
 
@@ -185,14 +226,22 @@ async function leaveTeam(interaction: ButtonInteraction) {
   new_embeded_message.setTimestamp(Date.parse(timestamp));
 
   // Edit the original message with the new embeded message.
-  await message.edit({
-    embeds: [new_embeded_message],
-  });
+  await message
+    .edit({
+      embeds: [new_embeded_message],
+    })
+    .catch((error) => {
+      console.error("When editing the original message: " + error);
+    });
 
   // Notify the user that they have left the Team.
-  await interaction.editReply({
-    content: `You left the Team`,
-  });
+  await interaction
+    .editReply({
+      content: `You left the Team`,
+    })
+    .catch((error) => {
+      console.error("When editing the interaction reply: " + error);
+    });
 }
 
 export default leaveTeam;

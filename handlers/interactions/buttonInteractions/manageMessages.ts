@@ -19,10 +19,14 @@ async function getMessageByID(
     // Notify the user that the channel is not found.
     // return null.
     console.error("Interaction Channel is null: " + interaction);
-    await interaction.reply({
-      content: "Original Channel not Found",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "Original Channel not Found",
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error("When interaction channel is null: " + error);
+      });
     return null;
   }
 

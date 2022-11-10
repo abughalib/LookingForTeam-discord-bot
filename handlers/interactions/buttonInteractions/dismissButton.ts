@@ -11,10 +11,14 @@ async function dismissButton(interaction: ButtonInteraction) {
 
   // If Interaction message is null or delete by admin.
   if (interaction.message.interaction === null) {
-    await interaction.reply({
-      content: "Cannot perform this action",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "Cannot perform this action",
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error("Message deletion when interaction is null: " + error);
+      });
     return;
   }
 
@@ -25,18 +29,26 @@ async function dismissButton(interaction: ButtonInteraction) {
     // Delete the request message.
     await deleteMessage(interaction.message);
     // Send ephemeral message to the user who requested the Team.
-    await interaction.reply({
-      content: "Your message is deleted",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "Your message is deleted",
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error("When author deleting message: ", error);
+      });
     return;
   } else {
     // If the anyone except the user who requested the Team
     // or the one created the Team declines the invite.
-    await interaction.reply({
-      content: "Cannot perform this action",
-      ephemeral: true,
-    });
+    await interaction
+      .reply({
+        content: "Cannot perform this action",
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error("When non author deleting message: ", error);
+      });
   }
 }
 

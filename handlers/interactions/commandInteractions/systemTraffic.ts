@@ -103,9 +103,13 @@ async function systemTraffic(
   );
 
   // Reply embed message
-  interaction.editReply({
-    embeds: [embeded_message],
-  });
+  interaction
+    .editReply({
+      embeds: [embeded_message],
+    })
+    .catch((error) => {
+      console.error(`Error in System Traffic Info: ${error}`);
+    });
 }
 
 export default systemTraffic;

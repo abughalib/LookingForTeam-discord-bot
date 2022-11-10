@@ -13,9 +13,13 @@ import CreateButtons from "../utils/createButtons";
 
 async function eliteServerTickInfo(interaction: CommandInteraction) {
   // Defer interaction reply
-  await interaction.deferReply({
-    ephemeral: false,
-  });
+  await interaction
+    .deferReply({
+      ephemeral: false,
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 
   // Initialize the Elite BGS Info Class
   const eliteBGS = new BGSInfo();
@@ -30,9 +34,13 @@ async function eliteServerTickInfo(interaction: CommandInteraction) {
   // That means there is no tick info or the API is down
   if (!tickInfo) {
     // Reply with a message
-    await interaction.editReply({
-      content: "Cannot find Tick Info!",
-    });
+    await interaction
+      .editReply({
+        content: "Cannot find Tick Info!",
+      })
+      .catch((error) => {
+        console.error("Cannot find Tick Info: " + error);
+      });
     deleteInteraction(interaction, AppSettings.ERROR_MESSAGE_DIMISS_TIMEOUT);
     return;
   }

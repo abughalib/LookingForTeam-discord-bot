@@ -98,7 +98,9 @@ async function interactionMenuHandler(
             components: [buttons],
             embeds: [new_embeded_message],
           })
-          .catch(console.error);
+          .catch((error) => {
+            console.error(error);
+          });
       }
     });
   }
