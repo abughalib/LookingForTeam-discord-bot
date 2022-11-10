@@ -184,6 +184,7 @@ Change the values in [AppSetting](./utils/settings.ts)
   _if you have only one version across Console and PC platform then leave `PC_CHANNEL_ID` empty_
 - `AVAILABLE_GAME_VERSIONS`: In case of Multiple game version.
 - `BOT_HELP_COMMAND_REPLY_FIELD_VALUES`: Change it according to your game.
+
   **Optional**
 - `BOT_WING_COMMAND_NAME`: Change the team invite command.
 - Change the titles of respective channel and their channel.
