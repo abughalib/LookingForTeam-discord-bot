@@ -1,16 +1,12 @@
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  Interaction,
-  SelectMenuBuilder,
-} from "discord.js";
-import { AppSettings } from "../utils/settings";
+import { Interaction } from "discord.js";
 import interactionMenuHandler from "./interactions/menuInteractions";
 import interactionButtonHandler from "./interactions/buttonInteractions";
 import interactionCommandHandler from "./interactions/commandInteraction";
+import { menus } from "./interactions/utils/createMenu";
+import CreateButtons from "./interactions/utils/createButtons";
 
 /*
+  Handles all the interactions.
   Args:
     interaction: The interaction object
   Returns:
@@ -19,37 +15,17 @@ import interactionCommandHandler from "./interactions/commandInteraction";
     This function handles all interactions
 */
 async function handleInteractions(interaction: Interaction) {
-  // Create Select Menu for the Game version
-  const menus = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-    new SelectMenuBuilder()
-      .setCustomId(AppSettings.SELECT_GAME_VERSION_ID)
-      .setPlaceholder(AppSettings.SELECT_GAME_VERSION_PLACEHOLDER)
-      .addOptions(AppSettings.AVAILABLE_GAME_VERSIONS)
-  );
+  const buttons: CreateButtons = new CreateButtons();
 
-  // Create Buttons for the interaction message
-  const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId(AppSettings.BUTTON_JOIN_ID)
-      .setLabel(AppSettings.BUTTON_JOIN_LABEL)
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId(AppSettings.BUTTON_DISMISS_ID)
-      .setLabel(AppSettings.BUTTON_DISMISS_LABEL)
-      .setStyle(ButtonStyle.Danger),
-    new ButtonBuilder()
-      .setCustomId(AppSettings.BUTTON_LEAVE_TEAM_ID)
-      .setLabel(AppSettings.BUTTON_LEAVE_TEAM_LABEL)
-      .setStyle(ButtonStyle.Secondary)
-  );
+  const interactionButtons = buttons.createInteractionButtons();
 
   // Handle the different interaction types
   if (interaction.isCommand()) {
-    interactionCommandHandler(interaction, menus, buttons);
+    interactionCommandHandler(interaction, menus, interactionButtons);
   } else if (interaction.isButton()) {
     interactionButtonHandler(interaction);
   } else if (interaction.isSelectMenu()) {
-    interactionMenuHandler(interaction, buttons);
+    interactionMenuHandler(interaction, interactionButtons);
   } else {
     // To be Implemented in Future if needed
     return;

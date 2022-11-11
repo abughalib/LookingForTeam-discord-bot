@@ -1,6 +1,7 @@
 import { Message } from "discord.js";
 
 /*
+  Deletes the message.
   Args:
     message: Message | null | undefined
   Returns:

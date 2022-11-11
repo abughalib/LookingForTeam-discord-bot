@@ -8,6 +8,7 @@ import {
 import { AppSettings } from "../../utils/settings";
 
 /*
+  Handles all the menu interactions.
   Args:
     interaction: SelectMenuInteraction,
     button: ButtonBuilder,
@@ -97,7 +98,9 @@ async function interactionMenuHandler(
             components: [buttons],
             embeds: [new_embeded_message],
           })
-          .catch(console.error);
+          .catch((error) => {
+            console.error(error);
+          });
       }
     });
   }

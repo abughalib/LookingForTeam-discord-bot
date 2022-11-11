@@ -137,7 +137,7 @@ export class AppSettings {
     this.SELECT_GAME_VERSION_PLACEHOLDER,
   ];
   static readonly BOT_HELP_COMMAND_REPLY_FIELD_VALUES = [
-    `"Use '${this.BOT_WING_COMMAND_NAME}'"`,
+    `Use **/${this.BOT_WING_COMMAND_NAME}**`,
     "Mining, Bounty Hunting, etc...",
     "SOL",
     "2 Spots",
