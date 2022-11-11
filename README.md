@@ -184,12 +184,14 @@ Change the values in [AppSetting](./utils/settings.ts)
   _if you have only one version across Console and PC platform then leave `PC_CHANNEL_ID` empty_
 - `AVAILABLE_GAME_VERSIONS`: In case of Multiple game version.
 - `BOT_HELP_COMMAND_REPLY_FIELD_VALUES`: Change it according to your game.
+
   **Optional**
 - `BOT_WING_COMMAND_NAME`: Change the team invite command.
-- Change the titles of respective channel and their channel.
+- Change the titles of respective channel and their channel Names.
 - Comment out the API URLs if you don't need them or exclude the commands from discord server.
 
 # Info
 
 _EDSM, ELITE BGS and QuickChart are copyright of their respective owners_
-_Elite: Dangerous © 2012, 2013 Frontier Developments plc. All rights reserved._
+
+_Elite Dangerous © 1984 - 2022 Frontier Developments Plc_
