@@ -77,6 +77,17 @@ function setCommands(client: Client) {
           type: ApplicationCommandOptionType.Number,
         },
         {
+          name: AppSettings.INTERACTION_GAME_MODE_ID,
+          description:
+            CommandLocalizations.LOOKING_FOR_TEAM_GAME_MODE_DESCRIPTION[
+              "en-US"
+            ],
+          description_localizations:
+            CommandLocalizations.LOOKING_FOR_TEAM_GAME_MODE_DESCRIPTION,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
           name: AppSettings.INTERACTION_WHEN_ID,
           description:
             CommandLocalizations.LOOKING_FOR_TEAM_WHEN_DESCRIPTION["en-US"],

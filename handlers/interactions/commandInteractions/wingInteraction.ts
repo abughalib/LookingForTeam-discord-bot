@@ -34,6 +34,9 @@ async function wingInteraction(
     options.get(AppSettings.INTERACTION_SPOTS_ID)?.value ||
     AppSettings.MAXIMUM_TEAM_SPOT;
 
+  let gameMode =
+    options.get(AppSettings.INTERACTION_GAME_MODE_ID)?.value || "Open Play";
+
   // How long the team will be active
   let duration: number = Number(
     (
@@ -85,6 +88,7 @@ async function wingInteraction(
     activity,
     location,
     parseInt(spots.toString()),
+    gameMode,
     when === 0
       ? AppSettings.DEFAULT_WHEN_VALUE
       : `<t:${getEpochTimeAfterHours(when)}:T>`,
