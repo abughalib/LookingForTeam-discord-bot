@@ -27,6 +27,7 @@ export class AppSettings {
     "What kind of mission/gameplay?",
     "Star System/Location",
     "Number of Space in Wing/Team Available",
+    "Game Mode",
     "When to join?",
     "Players Joined",
   ];
@@ -42,6 +43,7 @@ export class AppSettings {
   static readonly BOT_PING_COMMAND_NAME = "ping";
 
   // Interaction field IDs
+  static readonly INTERACTION_GAME_MODE_ID = "game_mode";
   static readonly INTERACTION_ACTIVITY_ID = "activity";
   static readonly INTERACTION_LOCATION_ID = "location";
   static readonly INTERACTION_SPOTS_ID = "spots";
@@ -52,6 +54,8 @@ export class AppSettings {
   static readonly INTERACTION_DISMISS_ID = "command_dismiss";
 
   // Interaction field description
+  static readonly INTERACTION_GAME_MODE_DESCRIPTION =
+    "Game Mode (Open, Private Group)";
   static readonly INTERACTION_FACTION_HISTROY_DESC =
     "Get the faction history for a system";
   static readonly INTERACTION_SYSTEM_NAME_DESC = "Elite Dangerous System Name";
@@ -141,6 +145,7 @@ export class AppSettings {
     "Mining, Bounty Hunting, etc...",
     "SOL",
     "2 Spots",
+    "Open Play or Private Group",
     "25 (25 minutes from now)",
     "YourName\nPlayer1...",
     "1.5 (1 hours and 30 minutes)",
