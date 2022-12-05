@@ -121,8 +121,6 @@ async function wingInteraction(
     value: `<t:${getEpochTimeAfterHours(duration + when).toString()}:T>`,
   });
 
-  console.log(duration + when);
-
   // Set footer for the embed message
   embeded_message.setFooter({
     text: `Posted at`,

@@ -213,9 +213,13 @@ async function acceptOrReject(interaction: ButtonInteraction) {
     }
   } else if (interaction.customId === AppSettings.BUTTON_REJECT_REQUEST_ID) {
     // Defer interaction reply.
-    await interaction.deferReply().catch((error) => {
-      console.error(error);
-    });
+    await interaction
+      .deferReply({
+        ephemeral: true,
+      })
+      .catch((error) => {
+        console.error(error);
+      });
     // If the Reject Team invite is clicked.
 
     // It should be done by either original author or the one requested.

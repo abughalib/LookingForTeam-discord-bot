@@ -4,7 +4,6 @@ import {
   SelectMenuBuilder,
   ButtonBuilder,
 } from "discord.js";
-import EDSM from "../../utils/edsm";
 import { AppSettings } from "../../utils/settings";
 import eliteServerTickInfo from "./commandInteractions/eliteServerTick";
 import helpReply from "./commandInteractions/helpReply";
