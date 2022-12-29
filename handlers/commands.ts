@@ -80,7 +80,7 @@ function setCommands(client: Client) {
           name: AppSettings.INTERACTION_GAME_MODE_ID,
           description:
             CommandLocalizations.LOOKING_FOR_TEAM_GAME_MODE_DESCRIPTION[
-              "en-US"
+            "en-US"
             ],
           description_localizations:
             CommandLocalizations.LOOKING_FOR_TEAM_GAME_MODE_DESCRIPTION,

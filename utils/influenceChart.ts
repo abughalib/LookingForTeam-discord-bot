@@ -1,4 +1,3 @@
-import EDSM from "./edsm";
 import QuickChart from "quickchart-js";
 import { Factions } from "./systemInfoModel";
 

@@ -5,12 +5,14 @@ import { CommandInteraction } from "discord.js";
 */
 
 async function defaultReply(interaction: CommandInteraction) {
-    // Reply with default message
-    await interaction.reply({
-        content: "Command Not Found",
-        ephemeral: true,
-    }).catch((err) => {
-        console.error(`Error in default reply: ${err}`);
+  // Reply with default message
+  await interaction
+    .reply({
+      content: "Command Not Found",
+      ephemeral: true,
+    })
+    .catch((err) => {
+      console.error(`Error in default reply: ${err}`);
     });
 }
 
