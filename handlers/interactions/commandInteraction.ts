@@ -5,6 +5,7 @@ import {
   ButtonBuilder,
 } from "discord.js";
 import { AppSettings } from "../../utils/settings";
+import defaultReply from "./commandInteractions/defaultReply";
 import eliteServerTickInfo from "./commandInteractions/eliteServerTick";
 import helpReply from "./commandInteractions/helpReply";
 import pingReply from "./commandInteractions/ping";
@@ -90,7 +91,7 @@ async function interactionCommandHandler(
       pingReply(interaction);
       break;
     default:
-      pingReply(interaction);
+      defaultReply(interaction);
       break;
   }
 }
