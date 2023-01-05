@@ -80,7 +80,7 @@ This project is created with:
       - Select the result it would take you to System Properties.
       - Click on Environment Variables
       - Under Uservariables for "Your Username"-> Click New.
-      - Variable Name: `LOOKING_BOT_TEAM_TOKEN` && Variable Value: `Your Bot Token`
+      - Variable Name: `LOOKING_FOR_TEAM_BOT_TOKEN` && Variable Value: `Your Bot Token`
       - Select OK -> OK -> OK, Restart your Terminal, CMD or IDE.
     - In Linux
       - Open your Terminal and use the command
