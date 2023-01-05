@@ -85,7 +85,7 @@ This project is created with:
     - In Linux
       - Open your Terminal and use the command
         ```bash
-        export LOOKING_BOT_TEAM_TOKEN=your_token_here
+        export LOOKING_FOR_TEAM_BOT_TOKEN=your_token_here
         ```
       - To make it persist add it to User's Profile
       - In Terminal
@@ -94,7 +94,7 @@ This project is created with:
         ```
       - Add the following at the end of the file
         ```bash
-        export LOOKING_BOT_TEAM_TOKEN=your_token_here
+        export LOOKING_FOR_TEAM_BOT_TOKEN=your_token_here
         ```
 
 - Select your bot on Discord Developer Portal->OAuth2->URL Generator
