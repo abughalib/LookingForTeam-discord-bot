@@ -50,6 +50,18 @@ function setCommands(client: Client) {
           type: ApplicationCommandOptionType.Number,
         },
         {
+          name: AppSettings.INTERACTION_GAME_VERSION_ID,
+          description:
+            CommandLocalizations.LOOKING_FOR_TEAM_GAME_MODE_DESCRIPTION[
+              "en-US"
+            ],
+          description_localizations:
+            CommandLocalizations.LOOKING_FOR_TEAM_GAME_MODE_DESCRIPTION,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+          choices: AppSettings.INTERACTION_GAME_VERSION_CHOICES,
+        },
+        {
           name: AppSettings.INTERACTION_ACTIVITY_ID,
           description:
             CommandLocalizations.LOOKING_FOR_TEAM_ACTIVITY_DESCRIPTION["en-US"],
@@ -57,6 +69,7 @@ function setCommands(client: Client) {
             CommandLocalizations.LOOKING_FOR_TEAM_ACTIVITY_DESCRIPTION,
           required: false,
           type: ApplicationCommandOptionType.String,
+          choices: AppSettings.INTERACTION_ACTIVITY_CHOICES,
         },
         {
           name: AppSettings.INTERACTION_LOCATION_ID,
@@ -75,17 +88,19 @@ function setCommands(client: Client) {
             CommandLocalizations.LOOKING_FOR_TEAM_SPOTS_DESCRIPTION,
           required: false,
           type: ApplicationCommandOptionType.Number,
+          choices: AppSettings.INTERACTION_SPOTS_CHOICES,
         },
         {
           name: AppSettings.INTERACTION_GAME_MODE_ID,
           description:
             CommandLocalizations.LOOKING_FOR_TEAM_GAME_MODE_DESCRIPTION[
-            "en-US"
+              "en-US"
             ],
           description_localizations:
             CommandLocalizations.LOOKING_FOR_TEAM_GAME_MODE_DESCRIPTION,
           required: false,
           type: ApplicationCommandOptionType.String,
+          choices: AppSettings.INTERACTION_GAME_MODE_CHOICES,
         },
         {
           name: AppSettings.INTERACTION_WHEN_ID,
