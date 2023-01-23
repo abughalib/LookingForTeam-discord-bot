@@ -10,11 +10,14 @@ export class AppSettings {
   static readonly DEFAULT_WHEN_VALUE = "Now";
   static readonly MAXIMUM_TEAM_SPOT = 3;
   static readonly MAXIMUM_HOURS_TEAM = 10;
-  static readonly DEFAULT_GAME_VERSION = "Odyssey";
+  static readonly DEFAULT_GAME_VERSION = "Elite Dangerous Odyssey";
   static readonly DEFAULT_TEAM_ACTIVITY = "Any";
   static readonly DEFAULT_TEAM_LOCATION = "Anywhere";
   static readonly DEFAULT_SYSTEM_NAME = "SOL";
   static readonly DEFAULT_TEAM_DURATION = 1;
+  static readonly DEFAULT_GAME_MODE = "Open Play";
+  static readonly INVALID_DURATION_MESSAGE =
+    "Duration should not exceed 10 hours";
   static readonly PC_WING_REQUEST_INTERACTION_TITLE = "PC Team + Wing Request";
   static readonly PC_CHANNEL_ID = "1010103086334873651";
   static readonly XBOX_WING_REQUEST_INTERACTION_TITLE = "XBOX Wing Request";
@@ -24,6 +27,7 @@ export class AppSettings {
   static readonly PS_CHANNEL_ID = "790162689887961089";
   static readonly BOT_WING_DURATION_FIELD_NAME = "Team Until";
   static readonly BOT_WING_FIELDS = [
+    "Game Version",
     "What kind of mission/gameplay?",
     "Star System/Location",
     "Number of Space in Wing/Team Available",
@@ -96,6 +100,10 @@ export class AppSettings {
       value: "xeno_hunting",
     },
     {
+      name: "AX Conflict Zone",
+      value: "ax_conflict_zone",
+    },
+    {
       name: "Bounty Hunting",
       value: "bounty_hunting",
     },
@@ -136,6 +144,10 @@ export class AppSettings {
       value: "exploration",
     },
     {
+      name: "CQC",
+      value: "cqc",
+    },
+    {
       name: "Help",
       value: "help",
     },
@@ -165,6 +177,10 @@ export class AppSettings {
 
   static readonly INTERACTION_SPOTS_CHOICES = [
     {
+      name: "Infinite",
+      value: 40,
+    },
+    {
       name: "3",
       value: 3,
     },
@@ -184,6 +200,7 @@ export class AppSettings {
   static readonly BUTTON_LEAVE_TEAM_ID = "command_leave_team";
   static readonly BUTTON_ACCEPT_REQUEST_ID = "accept_request";
   static readonly BUTTON_REJECT_REQUEST_ID = "reject_request";
+  static readonly BUTTON_DELETE_ACCEPT_MESSAGE = "delete_accept_message";
 
   // Button Labels corresponding to CustomIDs.
   static readonly BUTTON_JOIN_LABEL = "Request Team Invite";
@@ -250,12 +267,10 @@ export class AppSettings {
   // When BOT_HELP_COMMAND_NAME is used.
   // These are the fields of embeded messages sent on reply
   static readonly BOT_HELP_FIELD_TITLE = ["Command"];
-  static readonly BOT_HELP_EXTRA_FIELDS = [
-    this.BOT_WING_DURATION_FIELD_NAME,
-    this.SELECT_GAME_VERSION_PLACEHOLDER,
-  ];
+  static readonly BOT_HELP_EXTRA_FIELDS = [this.BOT_WING_DURATION_FIELD_NAME];
   static readonly BOT_HELP_COMMAND_REPLY_FIELD_VALUES = [
     `Use **/${this.BOT_WING_COMMAND_NAME}**`,
+    "Odyssey, Horizon 4.0, Horizon 3.8, ED Beyond",
     "Mining, Bounty Hunting, etc...",
     "SOL",
     "2 Spots",
@@ -263,6 +278,5 @@ export class AppSettings {
     "25 (25 minutes from now)",
     "YourName\nPlayer1...",
     "1.5 (1 hours and 30 minutes)",
-    "Odyssey, Horizon 4.0, Horizon 3.8, ED Beyond",
   ];
 }
