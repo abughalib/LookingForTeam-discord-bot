@@ -2,7 +2,6 @@ import {
   ActionRowBuilder,
   ButtonBuilder,
   CommandInteraction,
-  SelectMenuBuilder,
 } from "discord.js";
 import { AppSettings } from "../../../utils/settings";
 import getEpochTimeAfterHours from "../../../utils/timestamp";
@@ -18,24 +17,48 @@ async function wingInteraction(
   interaction: CommandInteraction,
   listFieldheading: string[],
   nickName: string,
-  buttons: ActionRowBuilder<ButtonBuilder>,
-  menus: ActionRowBuilder<SelectMenuBuilder>
+  buttons: ActionRowBuilder<ButtonBuilder>
 ) {
   // Defining options to get interaction options
   const { options } = interaction;
   // Get specific option from the command
-  const activity =
+  const activity_value =
     options.get(AppSettings.INTERACTION_ACTIVITY_ID)?.value ||
     AppSettings.DEFAULT_TEAM_ACTIVITY;
+  let activity_name = AppSettings.DEFAULT_TEAM_ACTIVITY;
+  AppSettings.INTERACTION_ACTIVITY_CHOICES.map((activity, _) => {
+    if (activity.value === activity_value) {
+      activity_name = activity.name;
+    }
+  });
   const location =
     options.get(AppSettings.INTERACTION_LOCATION_ID)?.value ||
     AppSettings.DEFAULT_TEAM_LOCATION;
-  let spots =
+  let spots = Number(
     options.get(AppSettings.INTERACTION_SPOTS_ID)?.value ||
-    AppSettings.MAXIMUM_TEAM_SPOT;
+      AppSettings.MAXIMUM_TEAM_SPOT
+  );
 
-  let gameMode =
-    options.get(AppSettings.INTERACTION_GAME_MODE_ID)?.value || "Open Play";
+  const gameMode =
+    options.get(AppSettings.INTERACTION_GAME_MODE_ID)?.value ||
+    AppSettings.DEFAULT_GAME_MODE;
+
+  let gameModeName: string = AppSettings.DEFAULT_GAME_MODE;
+  if (gameMode === "own_pg") {
+    gameModeName = `${nickName} Private Group`;
+  }
+
+  const gameVersion = options.get(
+    AppSettings.INTERACTION_GAME_VERSION_ID
+  )?.value;
+
+  let gameVersionName: string = AppSettings.DEFAULT_GAME_VERSION;
+  AppSettings.INTERACTION_GAME_VERSION_CHOICES.map((version, _) => {
+    if (version.value === gameVersion) {
+      gameVersionName = version.name;
+      return;
+    }
+  });
 
   // How long the team will be active
   let duration: number = Number(
@@ -57,6 +80,9 @@ async function wingInteraction(
     !(await isValidDuration(interaction, when)) ||
     !(await isValidDuration(interaction, duration + when))
   ) {
+    await interaction.reply({
+      content: AppSettings.INVALID_DURATION_MESSAGE,
+    });
     return;
   }
 
@@ -80,15 +106,21 @@ async function wingInteraction(
     spots = AppSettings.MAXIMUM_TEAM_SPOT;
   }
 
+  // Special case for AX Conflict Zone, where no of players are more than 3
+  if (activity_value === "ax_conflict_zone") {
+    spots = 40;
+  }
+
   /*
       If when is 0 then it means the user is looking for team now
       else it will be the time when the user is looking for team
     */
   const listFieldValue = [
-    activity,
+    gameVersionName,
+    activity_name,
     location,
     parseInt(spots.toString()),
-    gameMode,
+    gameModeName,
     when === 0
       ? AppSettings.DEFAULT_WHEN_VALUE
       : `<t:${getEpochTimeAfterHours(when)}:T>`,
@@ -139,11 +171,11 @@ async function wingInteraction(
   if (interaction.channelId === AppSettings.PC_CHANNEL_ID) {
     // Pretty Looking reply
     // Send the embed message
-    // Add the buttons and menu to the message
+    // Add the buttons
     await interaction
       .editReply({
         embeds: [embeded_message],
-        components: [buttons, menus],
+        components: [buttons],
       })
       .catch((err) => {
         console.error(`Error in editReply: ${err}`);
