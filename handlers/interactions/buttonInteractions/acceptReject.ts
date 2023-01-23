@@ -11,6 +11,7 @@ import { AppSettings } from "../../../utils/settings";
 import deleteInteraction from "../utils/deleteInteractions";
 import deleteMessage from "../utils/deleteMessage";
 import getMessageByID from "./manageMessages";
+import CreateButtons from "../utils/createButtons";
 
 /*
   This function is used to accept or reject a user's Team Request.
@@ -196,12 +197,19 @@ async function acceptOrReject(interaction: ButtonInteraction) {
       // Notify the interaction user that their request is accepted to the Team.
       // And add extra instructions to the user.
 
-      /// TODO - Add a Button to dissmiss the message.
+      // Dismiss the message.
+      // It should only be possible by either of the users mentioned
+      const createButton: CreateButtons = new CreateButtons();
+      const dismissButton = createButton.createDismissButton(
+        AppSettings.BUTTON_DELETE_ACCEPT_MESSAGE
+      );
+
       await interaction
         .editReply({
           content:
             `${interaction.message.mentions.users.last()}, Your request is accepted` +
             `\nMake sure you have ${interaction.message.mentions.users.first()} as your in-game friend`,
+          components: [dismissButton],
         })
         .catch((error) => {
           console.error("Team request failed: " + error);

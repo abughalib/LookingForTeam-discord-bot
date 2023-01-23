@@ -4,6 +4,7 @@ import acceptOrReject from "./buttonInteractions/acceptReject";
 import dismissButton from "./buttonInteractions/dismissButton";
 import joinButton from "./buttonInteractions/joinTeam";
 import leaveTeam from "./buttonInteractions/leaveTeam";
+import deleteAcceptMessage from "./buttonInteractions/dismiss_accept_msg";
 
 /*
   Handles all button interactions.
@@ -31,9 +32,19 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     case AppSettings.BUTTON_DISMISS_ID:
       dismissButton(interaction);
       break;
+    case AppSettings.BUTTON_DELETE_ACCEPT_MESSAGE:
+      deleteAcceptMessage(interaction);
+      break;
     default:
       // If More features are required
       // Would be Implemented later...
+      await interaction
+        .reply({
+          content: "This feature is not implemented yet",
+        })
+        .catch((err) => {
+          console.error("When button interaction is not implemented: " + err);
+        });
       break;
   }
 }
