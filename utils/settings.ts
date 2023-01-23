@@ -43,6 +43,7 @@ export class AppSettings {
   static readonly BOT_PING_COMMAND_NAME = "ping";
 
   // Interaction field IDs
+  static readonly INTERACTION_GAME_VERSION_ID = "game_version";
   static readonly INTERACTION_GAME_MODE_ID = "game_mode";
   static readonly INTERACTION_ACTIVITY_ID = "activity";
   static readonly INTERACTION_LOCATION_ID = "location";
@@ -54,6 +55,8 @@ export class AppSettings {
   static readonly INTERACTION_DISMISS_ID = "command_dismiss";
 
   // Interaction field description
+  static readonly INTERACTION_GAME_VERSION_DESCRIPTION =
+    "Game Version (odyssey, Horizon, ...)";
   static readonly INTERACTION_GAME_MODE_DESCRIPTION =
     "Game Mode (Open, Private Group)";
   static readonly INTERACTION_FACTION_HISTROY_DESC =
@@ -63,6 +66,117 @@ export class AppSettings {
   static readonly INTERACTION_PING_DESC = "Check if the Bot is up and Running";
   static readonly INTERACTION_DAY_DESC =
     "The day to get the faction history for";
+
+  // Interaction field choices
+  static readonly INTERACTION_GAME_VERSION_CHOICES = [
+    {
+      name: "Elite Dangerous Odyssey",
+      value: "odyssey",
+    },
+    {
+      name: "Elite Dangerous Horizon 4.0",
+      value: "horizon_four_zero",
+    },
+    {
+      name: "Elite Dangerous Horizon 3.8",
+      value: "horizon_three_eight",
+    },
+    {
+      name: "Elite Dangerous Beyond",
+      value: "beyond",
+    },
+    {
+      name: "Elite Dangerous any",
+      value: "any",
+    },
+  ];
+  static readonly INTERACTION_ACTIVITY_CHOICES = [
+    {
+      name: "Xeno Hunting",
+      value: "xeno_hunting",
+    },
+    {
+      name: "Bounty Hunting",
+      value: "bounty_hunting",
+    },
+    {
+      name: "Conflict Zone (Space)",
+      value: "cz_s",
+    },
+    {
+      name: "Conflict Zone (Ground)",
+      value: "cz_g",
+    },
+    {
+      name: "Ground Stuffs",
+      value: "ground_stuffs",
+    },
+    {
+      name: "Trading",
+      value: "trading",
+    },
+    {
+      name: "Mining",
+      value: "mining",
+    },
+    {
+      name: "Community Goal",
+      value: "cg",
+    },
+    {
+      name: "PVP",
+      value: "pvp",
+    },
+    {
+      name: "Smuggling",
+      value: "smuggling",
+    },
+    {
+      name: "Exploration",
+      value: "exploration",
+    },
+    {
+      name: "Help",
+      value: "help",
+    },
+    {
+      name: "Any",
+      value: "any",
+    },
+  ];
+  static readonly INTERACTION_GAME_MODE_CHOICES = [
+    {
+      name: "Open Play",
+      value: "open_play",
+    },
+    {
+      name: "Fatherhood PG",
+      value: "tf_pg",
+    },
+    {
+      name: "Anti-Xeno Initiative",
+      value: "axin_pg",
+    },
+    {
+      name: "My PG",
+      value: "own_pg",
+    },
+  ];
+
+  static readonly INTERACTION_SPOTS_CHOICES = [
+    {
+      name: "3",
+      value: 3,
+    },
+    {
+      name: "2",
+      value: 2,
+    },
+    {
+      name: "1",
+      value: 1,
+    },
+  ];
 
   // Buttons customIDs
   static readonly BUTTON_JOIN_ID = "button_join";

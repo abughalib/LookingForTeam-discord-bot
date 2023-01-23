@@ -31,6 +31,38 @@ export default class CommandLocalizations {
     uk: "Команди для пошуку команди",
   };
 
+  static readonly LOOKING_FOR_TEAM_GAME_VERSION_DESCRIPTION = {
+    "en-US": "Game Version",
+    "en-GB": "Game Version",
+    bg: "Версия на играта",
+    "zh-CN": "游戏版本",
+    "zh-TW": "遊戲版本",
+    hr: "Verzija igre",
+    cs: "Verze hry",
+    da: "Spilversion",
+    nl: "Spelversie",
+    fi: "Pelin versio",
+    fr: "Version du jeu",
+    de: "Spielversion",
+    el: "Έκδοση παιχνιδιού",
+    hi: "खेल संस्करण",
+    hu: "Játékverzió",
+    it: "Versione del gioco",
+    ja: "ゲームバージョン",
+    ko: "게임 버전",
+    lt: "Žaidimo versija",
+    no: "Spillversjon",
+    pl: "Wersja gry",
+    "pt-BR": "Versão do jogo",
+    ro: "Versiunea jocului",
+    ru: "Версия игры",
+    "es-ES": "Versión del juego",
+    "sv-SE": "Spelversion",
+    th: "เวอร์ชันเกม",
+    tr: "Oyun sürümü",
+    uk: "Версія гри",
+  };
+
   static readonly LOOKING_FOR_TEAM_DURATION_DESCRIPTION = {
     "en-US": "How long would you play (hours or minutes) numbers only?",
     "en-GB": "How long would you play (hours or minutes) numbers only?",
