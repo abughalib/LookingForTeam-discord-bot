@@ -100,7 +100,6 @@ function setCommands(client: Client) {
             CommandLocalizations.LOOKING_FOR_TEAM_GAME_MODE_DESCRIPTION,
           required: false,
           type: ApplicationCommandOptionType.String,
-          choices: AppSettings.INTERACTION_GAME_MODE_CHOICES,
         },
         {
           name: AppSettings.INTERACTION_WHEN_ID,

@@ -108,7 +108,7 @@ async function wingInteraction(
 
   // Special case for AX Conflict Zone, where no of players are more than 3
   if (activity_value === "ax_conflict_zone") {
-    spots = 40;
+    spots = AppSettings.MAXIMUM_PEOPLE_INSTANCE;
   }
 
   /*

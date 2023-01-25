@@ -10,6 +10,7 @@ export class AppSettings {
   static readonly DEFAULT_WHEN_VALUE = "Now";
   static readonly MAXIMUM_TEAM_SPOT = 3;
   static readonly MAXIMUM_HOURS_TEAM = 10;
+  static readonly MAXIMUM_PEOPLE_INSTANCE = 40;
   static readonly DEFAULT_GAME_VERSION = "Elite Dangerous Odyssey";
   static readonly DEFAULT_TEAM_ACTIVITY = "Any";
   static readonly DEFAULT_TEAM_LOCATION = "Anywhere";
