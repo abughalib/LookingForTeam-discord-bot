@@ -19,6 +19,15 @@ async function wingInteraction(
   nickName: string,
   buttons: ActionRowBuilder<ButtonBuilder>
 ) {
+  // Defer interaction reply
+  await interaction
+    .deferReply({
+      ephemeral: false,
+    })
+    .catch((err) => {
+      console.error(`Error in wing interaction deferReply: ${err}`);
+    });
+
   // Defining options to get interaction options
   const { options } = interaction;
   // Get specific option from the command
@@ -85,11 +94,6 @@ async function wingInteraction(
     });
     return;
   }
-
-  // Defer the reply
-  await interaction.deferReply().catch((error) => {
-    console.error(error);
-  });
 
   // If timer is more then [MAXIMUM_HOURS_TEAM] hours convert it into Minutes
   if (when > AppSettings.MAXIMUM_HOURS_TEAM) {
@@ -158,15 +162,6 @@ async function wingInteraction(
     text: `Posted at`,
   });
 
-  // Defer message reply
-  await interaction
-    .deferReply({
-      ephemeral: false,
-    })
-    .catch((err) => {
-      console.error(`Error in deferReply: ${err}`);
-    });
-
   // Send the embed message specific for the channel [PC, XBOX, PS]
   if (interaction.channelId === AppSettings.PC_CHANNEL_ID) {
     // Pretty Looking reply
@@ -178,7 +173,7 @@ async function wingInteraction(
         components: [buttons],
       })
       .catch((err) => {
-        console.error(`Error in editReply: ${err}`);
+        console.error(`Error in wing interaction editReply: ${err}`);
       });
   } else {
     // Pretty Looking reply
@@ -188,7 +183,7 @@ async function wingInteraction(
         components: [buttons],
       })
       .catch((err) => {
-        console.error(`Error in deferReply: ${err}`);
+        console.error(`Error in Wing interaction Reply: ${err}`);
       });
   }
   // Auto Delete message after certain time.
