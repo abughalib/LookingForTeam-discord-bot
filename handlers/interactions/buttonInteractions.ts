@@ -6,13 +6,10 @@ import joinButton from "./buttonInteractions/joinTeam";
 import leaveTeam from "./buttonInteractions/leaveTeam";
 import deleteAcceptMessage from "./buttonInteractions/dismiss_accept_msg";
 
-/*
-  Handles all button interactions.
-  Args:
-    ButtonInteraction
-  Returns:
-    void
-*/
+/**
+ * Handles all button interactions.*
+ * @param interaction Button Interaction
+ */
 async function interactionButtonHandler(interaction: ButtonInteraction) {
   // Check button custom id
 

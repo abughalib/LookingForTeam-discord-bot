@@ -2,11 +2,11 @@ import { CommandInteraction } from "discord.js";
 import { AppSettings } from "../../../utils/settings";
 import embedMessage from "../../embeded_message";
 
-/*
-  When user request for help using [BOT_HELP_COMMAND_NAME].
-  This function will reply with a help embed message
-  show a example of how to use the bot.
-*/
+/**
+ * When user request for help using [BOT_HELP_COMMAND_NAME].
+ * Reply with a help embed message
+ * show a example of how to use the bot.
+ */
 async function helpReply(interaction: CommandInteraction) {
   // Title for the embed message
   const title: string = AppSettings.BOT_HELP_REPLY_TITLE;

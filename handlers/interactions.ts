@@ -3,15 +3,10 @@ import interactionButtonHandler from "./interactions/buttonInteractions";
 import interactionCommandHandler from "./interactions/commandInteraction";
 import CreateButtons from "./interactions/utils/createButtons";
 
-/*
-  Handles all the interactions.
-  Args:
-    interaction: The interaction object
-  Returns:
-    void
-  Description:
-    This function handles all interactions
-*/
+/**
+ * Handles all the interactions.
+ * @param interaction
+ */
 async function handleInteractions(interaction: Interaction) {
   const buttons: CreateButtons = new CreateButtons();
 

@@ -2,17 +2,11 @@ import { APIEmbedField, EmbedBuilder, RestOrArray } from "discord.js";
 import { AppSettings } from "../utils/settings";
 import { SystemFactionInfo } from "../utils/systemInfoModel";
 
-/*
-  Args:
-    options: Array of strings
-    values: Array of strings
-  Returns:
-    Array of APIEmbedField
-  Description:
-    Creates an array of APIEmbedField from the options and values
-    Options are the names of the fields
-    Values are the values of the fields
-*/
+/**
+ *  Creates an array of APIEmbedField from the options and values
+ *  @param Options are the names of the fields
+ *  @param Values are the values of the fields
+ */
 
 function getFields(
   options: string[],
@@ -35,14 +29,10 @@ function getFields(
   return fields;
 }
 
-/*
-  Args:
-    systemInfo: SystemInfo
-  Returns:
-    EmbedBuilder
-  Description:
-    Creates an embeded message from the systemInfo
-*/
+/**
+ *  Creates an embeded message from the systemInfo
+ *  @param systemInfo is the systemInfo object
+ */
 
 function systemEmbedMessage(systemInfo: SystemFactionInfo): EmbedBuilder {
   // Last Time the EDSM was updated

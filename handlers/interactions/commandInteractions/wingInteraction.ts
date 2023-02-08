@@ -9,9 +9,9 @@ import embedMessage from "../../embeded_message";
 import deleteInteraction from "../utils/deleteInteractions";
 import isValidDuration from "../utils/durationValidation";
 
-/*
-  Creates a new Team/Wing Request.
-*/
+/**
+ * Creates a new Team/Wing Request.
+ */
 
 async function wingInteraction(
   interaction: CommandInteraction,

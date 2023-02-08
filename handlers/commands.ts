@@ -2,14 +2,14 @@ import { Client, ApplicationCommandOptionType } from "discord.js";
 import CommandLocalizations from "../utils/localization";
 import { AppSettings } from "../utils/settings";
 
-/*
-  Args:
-    client: Discord Client
-  Returns:
-    void
-  Description:
-    Sets the commands for the bot
-*/
+/**
+ * Args:
+ *   client: Discord Client
+ * Returns:
+ *   void
+ * Description:
+ *   Sets the commands for the bot
+ */
 
 function setCommands(client: Client) {
   // If client application is null, return.

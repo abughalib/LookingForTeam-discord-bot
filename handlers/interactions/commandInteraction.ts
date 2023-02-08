@@ -14,14 +14,11 @@ import systemFactionInfo from "./commandInteractions/systemFactionInfo";
 import systemTraffic from "./commandInteractions/systemTraffic";
 import wingInteraction from "./commandInteractions/wingInteraction";
 
-/*
-  Handles all the command interactions.
-  Args:
-    interaction: CommandInteraction.
-    buttons: Buttons to be added to the message.
-  Returns:
-    void
-*/
+/**
+ * Handles all the command interactions.
+ * @param interaction Command Interaction
+ * @param buttons Buttons used in the message
+ */
 async function interactionCommandHandler(
   interaction: CommandInteraction,
   buttons: ActionRowBuilder<ButtonBuilder>

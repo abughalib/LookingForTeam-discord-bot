@@ -12,16 +12,12 @@ interface InfluenceData {
   lineTension: number;
 }
 
-/*
-  Create a chart of faction influence over the days
-  Using quickchart.io
-
-  Args:
-    factions[]: factions to be plotted
-    days: number of days to be plotted
-  Returns:
-    url: url of the chart
-*/
+/**
+ * Create a chart of faction influence over the days
+ * Using quickchart.io
+ * @param factions Factions present in the system
+ * @param days Days for which the chart is required
+ */
 
 async function createInfluenceChart(
   factions: Factions[],
@@ -86,14 +82,11 @@ async function createInfluenceChart(
   return quickChart.getShortUrl();
 }
 
-/*
-  Get the influence of the faction for the last given days.
-  Args:
-    history: history of the faction
-    days: number of days to be plotted
-  Returns
-    influence: Array of influence of the faction
-*/
+/**
+ * Get the influence of the faction for the last given days.
+ * @param influenceHistory Influence history of the faction
+ * @param days Days for which the influence is required
+ */
 function lastDays(
   influenceHistory: Map<string, number>,
   days: number
@@ -126,14 +119,10 @@ function lastDays(
   return influence;
 }
 
-/*
-  Get the date range for the last given days.
-  format: DD-MM
-  Args:
-    days: number of days to be plotted
-  Returns
-    day_month: Array of date range
-*/
+/**
+ * Get the date range for the last given days.
+ * @param days No of days for which data needs to be fetched
+ */
 
 function getDayMonthRange(days: number): Array<string> {
   let day_month: Array<string> = [];

@@ -6,15 +6,11 @@ interface ShipsInfo {
   shipCount: Array<string>;
 }
 
-/*
-  Args:
-    systemTrafficInfo: [SystemTrafficInfo] // System Traffic Info received from EDSM
-  Returns:
-    [ShipsInfo]
-  Description:
-    Returns the ships info from the 
-    system traffic info by ship name and count
-*/
+/**
+ *  Returns the ships info from the
+ *  system traffic info by ship name and count
+ *  @param systemTrafficInfo
+ */
 function getEliteShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
   let shipNames: string[] = [];
   let shipCount: string[] = [];
@@ -193,12 +189,10 @@ enum DurationValidation {
   LIMIT_EXCEEDED,
 }
 
-/*
-  Args:
-    duration: The duration in hours
-  Returns:
-    [DurationValidation]
-*/
+/** Checks if the given duration is valid or not.
+ * Based on the conditions specified in settings.ts
+ * @param duration The duration in hours to check.
+ */
 
 function checkDurationValidation(duration: number): DurationValidation {
   // Duration cannot be negative
@@ -215,13 +209,10 @@ function checkDurationValidation(duration: number): DurationValidation {
   return DurationValidation.VALID;
 }
 
-/*
-  Args:
-    arri: Array<T> // Array of Elements
-    itemToRemove: T // Element to remove from the Array
-  Returns:
-    Returns the array without the user passed in
-*/
+/** Removes an element from an array by given value.
+ * @param arri The array to remove the element from.
+ * @param itemToRemove The element to remove.
+ */
 function removeEntry<T>(arri: Array<T>, itemToRemove: T) {
   let array: Array<T> = [];
 

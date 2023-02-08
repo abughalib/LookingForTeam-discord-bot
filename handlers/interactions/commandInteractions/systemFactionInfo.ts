@@ -6,9 +6,9 @@ import systemEmbedMessage from "../../systemInfoEmbed";
 import deleteInteraction from "../utils/deleteInteractions";
 import CreateButtons from "../utils/createButtons";
 
-/*
-  Shows influence of all the factions in the system
-*/
+/**
+ * Shows influence of all the factions in the system
+ */
 
 async function systemFactionInfo(interaction: CommandInteraction) {
   // CommandName and options

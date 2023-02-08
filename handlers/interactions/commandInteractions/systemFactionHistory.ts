@@ -7,11 +7,11 @@ import systemEmbedMessage from "../../systemInfoEmbed";
 import deleteInteraction from "../utils/deleteInteractions";
 import CreateButtons from "../utils/createButtons";
 
-/*
-  Factions influence over a period of time in a particular system.
-  It will show the influence of all the factions in the system
-  and a chart will be generated for the same.
-*/
+/**
+ * Factions influence over a period of time in a particular system.
+ * It will show the influence of all the factions in the system
+ * and a chart will be generated for the same.
+ */
 
 async function systemfactionHistory(interaction: CommandInteraction) {
   // CommandName and options

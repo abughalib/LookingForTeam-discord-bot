@@ -13,16 +13,17 @@ import deleteMessage from "../utils/deleteMessage";
 import getMessageByID from "./manageMessages";
 import CreateButtons from "../utils/createButtons";
 
-/*
-  This function is used to accept or reject a user's Team Request.
-  It will delete the message and the interaction.
-  Accept is only accessible to the Team Leader.
-  Reject/Cancel is accessible to the Team Leader and the user who sent the request.
-*/
+/**
+ * To accept or reject a user's Team Request.
+ * It will delete the message and the interaction.
+ * Accept is only accessible to the Team Leader.
+ * Reject/Cancel is accessible to the Team Leader and the user who sent the request.
+ * @param interaction Button Interaction
+ */
 
 async function acceptOrReject(interaction: ButtonInteraction) {
   /*
-    * Reason for using common function for both accept and reject button.
+    * Reason for using common function for both accept and reject button.*
     - Some of checks still needs to be done.
       - If the message.reference deleted my admin.
       - If the message.reference.messageId is undefined.
