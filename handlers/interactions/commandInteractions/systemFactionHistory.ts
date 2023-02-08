@@ -43,7 +43,7 @@ async function systemfactionHistory(interaction: CommandInteraction) {
 
   // Defer message reply
   await interaction.deferReply().catch((err) => {
-    console.error(`Error in deferReply: ${err}`);
+    console.error(`Error in System faction history deferReply: ${err}`);
   });
 
   // Initialization of create Button class
