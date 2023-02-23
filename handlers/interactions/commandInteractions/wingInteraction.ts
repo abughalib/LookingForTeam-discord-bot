@@ -106,7 +106,8 @@ async function wingInteraction(
   }
 
   // Maximum spot in wing is [MAXIMUM_TEAM_SPOT] which is 3 as of now
-  if (spots > AppSettings.MAXIMUM_TEAM_SPOT) {
+  // Maybe a better implementation is to check the activity and then set the maximum spot
+  if (activity_value !== "cqc" && spots > AppSettings.MAXIMUM_TEAM_SPOT) {
     spots = AppSettings.MAXIMUM_TEAM_SPOT;
   }
 
