@@ -1,13 +1,10 @@
 import { ButtonInteraction, Message } from "discord.js";
 
-/*
-  This function is used to get the message by message Id from the interaction channel.
-  Args:
-    ButtonInteraction
-  Returns:
-    Message if the message is found.
-    null if the message is not found.
-*/
+/**
+ * Get the message by message Id from the interaction channel.
+ * @param interaction Button Interaction
+ * @param messageId Message Id to fetch the message.
+ */
 async function getMessageByID(
   interaction: ButtonInteraction,
   messageId: string

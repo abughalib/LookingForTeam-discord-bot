@@ -1,19 +1,13 @@
 import { ButtonInteraction, CacheType, CommandInteraction } from "discord.js";
 import deleteMessage from "./deleteMessage";
 
-/*
-  Deletes the interaction reply after the given time.
-  Args:
-    interaction: ButtonInteraction | CommandInteraction
-    timeout: number
-  Returns:
-    void
-  Description:
-    Deletes the interaction reply after the timeout.
-    if the interaction deletion fails, it will try to delete the message.
-    if the deletion of the message fails, it will log the error.
-    
-*/
+/**
+ *  Deletes the interaction reply after the timeout.
+ *  If the interaction deletion fails, it will try to delete the message.
+ *  If the deletion of the message fails, it will log the error.
+ *  @param interaction Button Interaction
+ *  @param timeout Time in milliseconds to delete the interaction.
+ */
 
 async function deleteInteraction(
   interaction: ButtonInteraction<CacheType> | CommandInteraction<CacheType>,

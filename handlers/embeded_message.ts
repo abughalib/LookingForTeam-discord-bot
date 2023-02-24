@@ -1,17 +1,12 @@
 import { APIEmbedField, EmbedBuilder, RestOrArray } from "discord.js";
 import { AppSettings } from "../utils/settings";
 
-/*
-  Args:
-    options: Array of strings
-    values: Array of strings
-  Returns:
-    Array of APIEmbedField
-  Description:
-    Creates an array of APIEmbedField from the options and values
-    Options are the names of the fields
-    Values are the values of the fields
-*/
+/**
+ *  Creates an array of APIEmbedField from the options and values
+ *  @param Options are the names of the fields
+ *  @param Values are the values of the fields
+ *  @param Inline is a boolean to set the fields inline or not
+ */
 
 function getFields(
   options: string[],
@@ -28,18 +23,14 @@ function getFields(
   return fields;
 }
 
-/*
-  Args:
-    Title of the embeded message
-    Options for the embeded message
-    Values for the embeded message
-    Nickname of the user who created the embeded message
-    inline (optional): If the fields should be inline
-  Returns:
-    EmbedBuilder
-  Description:
-    Creates an embeded message from the given options and values
-*/
+/**
+ * Creates an embeded message from the given options and values
+ * @param Title is the title of the embeded message
+ * @param Options are the names of the fields
+ * @param Values are the values of the fields
+ * @param NickName is the name of the user who created the embeded message
+ * @param Inline is a boolean to set the fields inline or not
+ */
 
 function embedMessage(
   title: string,

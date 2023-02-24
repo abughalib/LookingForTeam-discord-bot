@@ -7,11 +7,11 @@ import {
 import { AppSettings } from "../../../utils/settings";
 import deleteInteraction from "../utils/deleteInteractions";
 
-/*
-  To Create a join Button, to be accessible by the user.
-  The user can click the button to request team invite.
-  User can only request team invite if the Team is not full.
-*/
+/**
+ * To Create a join Button, to be accessible by the user.
+ * The user can click the button to request team invite.
+ * User can only request team invite if the Team is not full.
+ */
 
 async function joinButton(interaction: ButtonInteraction) {
   // If Interaction message is null or delete by admin.

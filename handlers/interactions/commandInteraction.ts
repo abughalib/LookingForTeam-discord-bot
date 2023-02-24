@@ -1,7 +1,6 @@
 import {
   CommandInteraction,
   ActionRowBuilder,
-  SelectMenuBuilder,
   ButtonBuilder,
 } from "discord.js";
 import { AppSettings } from "../../utils/settings";
@@ -15,18 +14,13 @@ import systemFactionInfo from "./commandInteractions/systemFactionInfo";
 import systemTraffic from "./commandInteractions/systemTraffic";
 import wingInteraction from "./commandInteractions/wingInteraction";
 
-/*
-  Handles all the command interactions.
-  Args:
-    interaction: CommandInteraction.
-    Menu: Menu Available for selection.
-    buttons: Buttons to be added to the message.
-  Returns:
-    void
-*/
+/**
+ * Handles all the command interactions.
+ * @param interaction Command Interaction
+ * @param buttons Buttons used in the message
+ */
 async function interactionCommandHandler(
   interaction: CommandInteraction,
-  menus: ActionRowBuilder<SelectMenuBuilder>,
   buttons: ActionRowBuilder<ButtonBuilder>
 ) {
   // CommandName and options
@@ -67,7 +61,7 @@ async function interactionCommandHandler(
 
   switch (commandName) {
     case AppSettings.BOT_WING_COMMAND_NAME:
-      wingInteraction(interaction, listFieldheading, nickName, buttons, menus);
+      wingInteraction(interaction, listFieldheading, nickName, buttons);
       break;
     case AppSettings.BOT_SYSTEM_FACTION_HISTORY_COMMAND_NAME:
       systemfactionHistory(interaction);

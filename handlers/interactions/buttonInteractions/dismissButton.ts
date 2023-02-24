@@ -1,10 +1,9 @@
 import { ButtonInteraction } from "discord.js";
 import deleteMessage from "../utils/deleteMessage";
 
-/*
-  A common function to delete message button.
-  To Delete the message by the user who created the message.
-*/
+/**
+ * To Delete the message by the user who created the message.
+ */
 
 async function dismissButton(interaction: ButtonInteraction) {
   // If the user who created or the user who request the Team declines the invite.

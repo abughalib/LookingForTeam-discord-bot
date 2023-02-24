@@ -9,11 +9,14 @@ class CreateButtons {
   /*
     Create a button to dissmiss the message.
   */
-  createDismissButton(): ActionRowBuilder<ButtonBuilder> {
+  createDismissButton(
+    customId: string = AppSettings.BUTTON_DISMISS_ID,
+    customLabel: string = AppSettings.BUTTON_DISMISS_LABEL
+  ): ActionRowBuilder<ButtonBuilder> {
     return new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
-        .setCustomId(AppSettings.BUTTON_DISMISS_ID)
-        .setLabel(AppSettings.BUTTON_DISMISS_LABEL)
+        .setCustomId(customId)
+        .setLabel(customLabel)
         .setStyle(ButtonStyle.Danger)
     );
   }

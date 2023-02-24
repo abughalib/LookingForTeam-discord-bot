@@ -1,8 +1,9 @@
 import { CommandInteraction } from "discord.js";
 
-/*
-    Default Bot Reply
-*/
+/**
+ *  Default Bot Reply
+ *  If the command is not found, this function will be called.
+ */
 
 async function defaultReply(interaction: CommandInteraction) {
   // Reply with default message

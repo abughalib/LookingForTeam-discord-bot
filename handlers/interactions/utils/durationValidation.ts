@@ -4,17 +4,13 @@ import {
   DurationValidation,
 } from "../../../utils/helpers";
 
-/*
-  Args:
-    interaction: CommandInteraction
-  Returns:
-    boolean
-
-  Description:
-    Check if the duration is Valid.
-    If the duration is valid, then return true.
-    else send a ephemeral message to the user and return false.
-*/
+/**
+ *  Check if the duration is Valid.
+ *  If the duration is valid, then return true.
+ *  else send a ephemeral message to the user and return false.
+ *  @param interaction CommandInteraction
+ *  @param timer Time in hours
+ */
 async function isValidDuration(
   interaction: CommandInteraction,
   timer: number
