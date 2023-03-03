@@ -1,40 +1,22 @@
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  Interaction,
-  SelectMenuBuilder,
-} from "discord.js";
-import { AppSettings } from "../utils/settings";
-import interactionMenuHandler from "./interactions/menuInteractions";
+import { Interaction } from "discord.js";
 import interactionButtonHandler from "./interactions/buttonInteractions";
 import interactionCommandHandler from "./interactions/commandInteraction";
+import CreateButtons from "./interactions/utils/createButtons";
 
+/**
+ * Handles all the interactions.
+ * @param interaction
+ */
 async function handleInteractions(interaction: Interaction) {
-  const menus = new ActionRowBuilder<SelectMenuBuilder>().addComponents(
-    new SelectMenuBuilder()
-      .setCustomId("select_game_version")
-      .setPlaceholder("Game Version")
-      .addOptions(AppSettings.AVAILABLE_GAME_VERSIONS)
-  );
+  const buttons: CreateButtons = new CreateButtons();
 
-  const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId("command_join")
-      .setLabel("Request Team Invite")
-      .setStyle(ButtonStyle.Primary),
-    new ButtonBuilder()
-      .setCustomId("command_dismiss")
-      .setLabel("Delete")
-      .setStyle(ButtonStyle.Danger)
-  );
+  const interactionButtons = buttons.createInteractionButtons();
 
+  // Handle the different interaction types
   if (interaction.isCommand()) {
-    interactionCommandHandler(interaction, menus, buttons);
+    interactionCommandHandler(interaction, interactionButtons);
   } else if (interaction.isButton()) {
     interactionButtonHandler(interaction);
-  } else if (interaction.isSelectMenu()) {
-    interactionMenuHandler(interaction, buttons);
   } else {
     // To be Implemented in Future if needed
     return;

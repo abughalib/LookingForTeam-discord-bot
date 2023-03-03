@@ -4,15 +4,16 @@ interface Factions {
   allegiance: string;
   government: string;
   influence: number;
+  influenceHistory: Map<string, number> | null;
   state: string;
   activeStates: string;
   recoveringStates: string;
   happiness: string;
-  isPlayer: false;
+  isPlayer: boolean;
   lastUpdate: number;
 }
 
-interface SystemInfo {
+interface SystemFactionInfo {
   id: string;
   id64: string;
   name: string;
@@ -26,4 +27,4 @@ interface SystemInfo {
   factions: Factions[];
 }
 
-export default SystemInfo;
+export { SystemFactionInfo, Factions };

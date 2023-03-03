@@ -1,5 +1,10 @@
 import { Message } from "discord.js";
 
+/**
+ *  Deletes the message if it exists.
+ *  if the deletion of the message fails, it will log the error.
+ *  @param message Message to delete.
+ */
 async function deleteMessage(message: Message | null | undefined) {
   if (message === null || message === undefined) {
     return;
