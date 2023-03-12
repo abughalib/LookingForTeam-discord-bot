@@ -64,7 +64,7 @@ function systemEmbedMessage(systemInfo: SystemFactionInfo): EmbedBuilder {
 
   // Create the embeded message
   const embeded_message = new EmbedBuilder()
-    .setColor(AppSettings.EMBEDED_MESSAGE_COLOR)
+    .setColor(AppSettings.DEFAULT_EMBED_COLOR)
     .setTitle(systemInfo.name)
     .setAuthor({ name: `System Info` })
     .addFields(...getFields(options, values))
