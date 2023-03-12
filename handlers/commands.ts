@@ -41,12 +41,22 @@ function setCommands(client: Client) {
         CommandLocalizations.LOOKING_FOR_TEAM_DESCRIPTION,
       options: [
         {
+          name: AppSettings.INTERACTION_PLAYFORM_ID,
+          description:
+            CommandLocalizations.LOOKING_FOR_TEAM_PLATFORM_DESCRIPTION["en-US"],
+          description_localizations:
+            CommandLocalizations.LOOKING_FOR_TEAM_PLATFORM_DESCRIPTION,
+          required: true,
+          type: ApplicationCommandOptionType.String,
+          choices: AppSettings.INTERACTION_PLATFORM_CHOICES,
+        },
+        {
           name: AppSettings.INTERACTION_DURATION_ID,
           description:
             CommandLocalizations.LOOKING_FOR_TEAM_DURATION_DESCRIPTION["en-US"],
           description_localizations:
             CommandLocalizations.LOOKING_FOR_TEAM_DURATION_DESCRIPTION,
-          required: true,
+          required: false,
           type: ApplicationCommandOptionType.Number,
         },
         {
