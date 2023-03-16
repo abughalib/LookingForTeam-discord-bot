@@ -11,7 +11,11 @@ import isValidDuration from "../utils/durationValidation";
 
 /**
  * Creates a new Team/Wing Request.
- */
+ * @param interaction The interaction object.
+ * @param listFieldheading The list of field headings.
+ * @param nickName The nickname of the user.
+ * @param buttons The buttons to be added to the message.
+ * */
 
 async function wingInteraction(
   interaction: CommandInteraction,
@@ -37,7 +41,10 @@ async function wingInteraction(
     (options.get(AppSettings.INTERACTION_PLAYFORM_ID)?.value as string) ||
     AppSettings.DEFAULT_PLATFORM;
 
+  // Get the platform name of the user
   let platformName: string = AppSettings.DEFAULT_PLATFORM;
+
+  // Get the platform name from the platform value
   AppSettings.INTERACTION_PLATFORM_CHOICES.map((iter, _) => {
     if (iter.value === platformValue) {
       platformName = iter.name;
@@ -186,7 +193,15 @@ async function wingInteraction(
   );
 }
 
+/**
+ * Get Activity Name from the activity value from [AppSettings]
+ * @param platform Platform of the user
+ * @param activityValue Activity value of the user
+ * @returns Activity Name
+ * */
 function getActivityName(platform: string, activityValue: string): string {
+  // If the platform is Xbox or PS4 and the activity is Odyssey specific then
+  // return the default activity of the platform
   if (
     (platform === AppSettings.XBOX_PLATFORM ||
       platform === AppSettings.PS_PLATFORM) &&
@@ -199,6 +214,7 @@ function getActivityName(platform: string, activityValue: string): string {
 
   let activity_name = AppSettings.DEFAULT_TEAM_ACTIVITY;
 
+  // Get the activity name from the activity value
   AppSettings.INTERACTION_ACTIVITY_CHOICES.map((activity, _) => {
     if (activity.value === activityValue) {
       activity_name = activity.name;
@@ -208,15 +224,25 @@ function getActivityName(platform: string, activityValue: string): string {
   return activity_name;
 }
 
+/**
+ * Get the game version name from the game version value from [AppSettings]
+ * If the platform is Xbox or PS4 and the game version is [DEFAULT_CONSOLE_GAME_VERSION]
+ * or return the default game version of the platform
+ * @param platform  Platform of the user
+ * @param gameVersion Game version value of the user
+ * @returns Game version name
+ */
 function getGameVersionName(platform: string, gameVersion: string): string {
   let gameVersionName: string = AppSettings.DEFAULT_PC_GAME_VERSION;
 
+  // Get the game version name from the game version value
   AppSettings.INTERACTION_GAME_VERSION_CHOICES.map((version, _) => {
     if (version.value === gameVersion) {
       gameVersionName = version.name;
     }
   });
 
+  // If the platform is Xbox or PS4 and the game version is [DEFAULT_CONSOLE_GAME_VERSION]
   if (
     (platform === AppSettings.XBOX_PLATFORM ||
       platform === AppSettings.PS_PLATFORM) &&
@@ -229,14 +255,21 @@ function getGameVersionName(platform: string, gameVersion: string): string {
   return gameVersionName;
 }
 
+/**
+ * Get Embed Message Title based on the platform
+ * @param platform Platform of the user
+ * @returns Embed Message Title
+ * */
 function getWingMessageTitle(platform: string): string {
   switch (platform) {
+    // If the platform is PC then return the PC title
     case AppSettings.DEFAULT_PLATFORM:
       return AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
     case AppSettings.XBOX_PLATFORM:
       return AppSettings.XBOX_WING_REQUEST_INTERACTION_TITLE;
     case AppSettings.PS_PLATFORM:
       return AppSettings.PS_WING_REQUEST_INTERACTION_TITLE;
+    //  If the platform is not PC, Xbox or PS4 then return the PC title
     default:
       return AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
   }
