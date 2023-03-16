@@ -7,13 +7,24 @@
 
 ## Table of Contents
 
+- [Looking For Team invite discord bot.](#looking-for-team-invite-discord-bot)
+  - [Table of Contents](#table-of-contents)
+  - [Technologies](#technologies)
+  - [Dependencies on Websites](#dependencies-on-websites)
+  - [Screenshots](#screenshots)
+    - [Screenshot of Team Creations](#screenshot-of-team-creations)
+    - [Screenshot of Team Request](#screenshot-of-team-request)
+    - [Screenshot of Other Features](#screenshot-of-other-features)
+  - [Configure](#configure)
+  - [Build](#build)
+  - [Run dev mode](#run-dev-mode)
+  - [Run production mode](#run-production-mode)
 - [Features](#features)
-- [Technology Used](#technologies)
-- [Configuration](#configure)
-- [Build](#configure)
-- [Screenshots](#screenshots)
-- [Dependencies on Websites for data](#dependencies-on-websites)
-- [Configure it for different Game](#configure-it-for-different-game)
+- [Features in Progress](#features-in-progress)
+- [Future Plans](#future-plans)
+- [Contribution](#contribution)
+- [Configure it for Different Game.](#configure-it-for-different-game)
+- [Info](#info)
 
 ## Technologies
 
@@ -40,14 +51,14 @@ This project is created with:
 
 ### Screenshot of Team Creations
 
-1. Creating new Team:<br>
+1. Platform Selection: <br>
+   ![image](./screenshots/platform_selection.jpg)
+2. Creating new Team:<br>
    ![image](./screenshots/create_team.png)
-2. Initial Team Created:<br>
-   ![image](./screenshots/initial_team_created.png)
-3. Select Game Version:<br>
-   ![image](./screenshots/select_game_version.png)
+3. Select Game Activity:<br>
+   ![image](./screenshots/game_activity_selection.png)
 4. Final Team Creation Message:<br>
-   ![image](./screenshots/final_team_created.png)
+   ![image](./screenshots/xbox_wing_request.jpg)
 
 ### Screenshot of Team Request
 
@@ -70,18 +81,18 @@ This project is created with:
 
 - Make Sure you have [Node 18+ Installed](https://nodejs.org/en/download/)
 - [Create a Discord bot](https://discord.com/developers/applications)
-- Goto Bot in Discord Developer Portal->settings
+- Go to Bot in Discord Developer Portal→ settings
 
   - Give your Bot a nice name and Picture
   - Reset Token, Enter 2FA code (if you have any)
-  - Copy the Token and set your evironment variable.
+  - Copy the Token and set your environment variable.
     - In Windows
       - Search for `Edit the system enviroment variables`
       - Select the result it would take you to System Properties.
       - Click on Environment Variables
-      - Under Uservariables for "Your Username"-> Click New.
+      - Under User variables for "Your Username"-> Click New.
       - Variable Name: `LOOKING_FOR_TEAM_BOT_TOKEN` && Variable Value: `Your Bot Token`
-      - Select OK -> OK -> OK, Restart your Terminal, CMD or IDE.
+      - Select OK → OK → OK, Restart your Terminal, CMD or IDE.
     - In Linux
       - Open your Terminal and use the command
         ```bash
@@ -97,7 +108,7 @@ This project is created with:
         export LOOKING_FOR_TEAM_BOT_TOKEN=your_token_here
         ```
 
-- Select your bot on Discord Developer Portal->OAuth2->URL Generator
+- Select your bot on Discord Developer Portal→OAuth2→URL Generator
   - In scope
     - Select `bot`.
   - In Bot Permission
@@ -105,11 +116,7 @@ This project is created with:
     - `Send Messages`
     - `Manage Messages`
     - `Use Slash Commands`
-- Copy Generated Url and open it on a web browser and select Server.
-
-**Channel Specific Configuration**
-
-- Change the Channel IDs `[Platform]_CHANNEL_ID` in [AppSetting](./utils/settings.ts)
+- Copy Generated URL and open it on a web browser and select Server.
 
 ## Build
 
@@ -159,8 +166,8 @@ _Checkout the [Screenshots](#screenshots) section._
 # Features in Progress
 
 - Unit Testing.
-- Adding Sqlite for caching the API result.
-- Adding channel id for replies.
+- Adding SQLite for caching the API result.
+- Adding channel ID for replies.
 
 # Future Plans
 
