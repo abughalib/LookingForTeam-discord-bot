@@ -2,7 +2,6 @@ export class AppSettings {
   // DEFAULT COMMAND VALUES
   static readonly GAME_NAME = "Elite Dangerous";
   static readonly DEFAULT_STAR_SYSTEM_NAME = "SOL";
-  static readonly EMBEDED_MESSAGE_COLOR = 0x0099ff;
   static readonly HOURS_TO_MILISEC = 60 * 60 * 1000; // 3600 seconds
   static readonly HELP_MESSAGE_DISMISS_TIMEOUT = 180 * 1000; // 3 Minutes
   static readonly ERROR_MESSAGE_DIMISS_TIMEOUT = 60 * 1000; // 1 Minute
@@ -11,7 +10,8 @@ export class AppSettings {
   static readonly MAXIMUM_TEAM_SPOT = 3;
   static readonly MAXIMUM_HOURS_TEAM = 10;
   static readonly MAXIMUM_PEOPLE_INSTANCE = 40;
-  static readonly DEFAULT_GAME_VERSION = "Elite Dangerous Odyssey";
+  static readonly DEFAULT_PC_GAME_VERSION = "Elite Dangerous Odyssey";
+  static readonly DEFAULT_CONSOLE_GAME_VERSION = "Elite Dangerous Horizons 3.8";
   static readonly DEFAULT_TEAM_ACTIVITY = "Any";
   static readonly DEFAULT_TEAM_LOCATION = "Anywhere";
   static readonly DEFAULT_SYSTEM_NAME = "SOL";
@@ -20,14 +20,12 @@ export class AppSettings {
   static readonly INVALID_DURATION_MESSAGE =
     "Duration should not exceed 10 hours";
   static readonly PC_WING_REQUEST_INTERACTION_TITLE = "PC Team + Wing Request";
-  static readonly PC_CHANNEL_ID = "1010103086334873651";
   static readonly XBOX_WING_REQUEST_INTERACTION_TITLE = "XBOX Wing Request";
-  static readonly XBOX_CHANNEL_ID = "790162405342707713";
   static readonly PS_WING_REQUEST_INTERACTION_TITLE =
     "Play Station Wing Request";
-  static readonly PS_CHANNEL_ID = "790162689887961089";
   static readonly BOT_WING_DURATION_FIELD_NAME = "Team Until";
   static readonly BOT_WING_FIELDS = [
+    "Game Platform",
     "Game Version",
     "What kind of mission/gameplay?",
     "Star System/Location",
@@ -54,6 +52,7 @@ export class AppSettings {
   static readonly INTERACTION_LOCATION_ID = "location";
   static readonly INTERACTION_SPOTS_ID = "spots";
   static readonly INTERACTION_DURATION_ID = "duration";
+  static readonly INTERACTION_PLAYFORM_ID = "platform";
   static readonly INTERACTION_WHEN_ID = "when";
   static readonly INTERACTION_DAY_NAME_ID = "day";
   static readonly INTERACTION_SYSTEM_NAME_ID = "system_name";
@@ -72,8 +71,37 @@ export class AppSettings {
   static readonly INTERACTION_DAY_DESC =
     "The day to get the faction history for";
 
+  // Embed colors
+  static readonly DEFAULT_EMBED_COLOR = 0xb3b3b3; // Grey
+  static readonly EMBED_PC_COLOR = 0xff0000; // Red
+  static readonly EMBED_PS_COLOR = 0x0066ff; // Blue
+  static readonly EMBED_XBOX_COLOR = 0x00ff00; // Green
+
+  // Platform values
+  static readonly DEFAULT_PLATFORM = "pc";
+  static readonly XBOX_PLATFORM = "xbox";
+  static readonly PS_PLATFORM = "ps";
+
+  static readonly INTERACTION_PLATFORM_CHOICES: Array<
+    InteractionChoices<string>
+  > = [
+    {
+      name: "PC",
+      value: this.DEFAULT_PLATFORM,
+    },
+    {
+      name: "XBOX",
+      value: this.XBOX_PLATFORM,
+    },
+    {
+      name: "Play Station",
+      value: this.PS_PLATFORM,
+    },
+  ];
   // Interaction field choices
-  static readonly INTERACTION_GAME_VERSION_CHOICES = [
+  static readonly INTERACTION_GAME_VERSION_CHOICES: Array<
+    InteractionChoices<string>
+  > = [
     {
       name: "Elite Dangerous Odyssey",
       value: "odyssey",
@@ -95,7 +123,16 @@ export class AppSettings {
       value: "any",
     },
   ];
-  static readonly INTERACTION_ACTIVITY_CHOICES = [
+
+  // Odyssey specific activities
+  static readonly ODYSSEY_SPECIFIC_ACTIVITY: Array<string> = [
+    "cz_g",
+    "ground_stuffs",
+  ];
+
+  static readonly INTERACTION_ACTIVITY_CHOICES: Array<
+    InteractionChoices<string>
+  > = [
     {
       name: "Xeno Hunting",
       value: "xeno_hunting",
@@ -157,7 +194,9 @@ export class AppSettings {
       value: "any",
     },
   ];
-  static readonly INTERACTION_GAME_MODE_CHOICES = [
+  static readonly INTERACTION_GAME_MODE_CHOICES: Array<
+    InteractionChoices<string>
+  > = [
     {
       name: "Open Play",
       value: "open_play",
@@ -176,44 +215,45 @@ export class AppSettings {
     },
   ];
 
-  static readonly INTERACTION_SPOTS_CHOICES = [
-    {
-      name: "Infinite",
-      value: 40,
-    },
-    {
-      name: "8",
-      value: 8,
-    },
-    {
-      name: "7",
-      value: 7,
-    },
-    {
-      name: "6",
-      value: 6,
-    },
-    {
-      name: "5",
-      value: 5,
-    },
-    {
-      name: "4",
-      value: 4,
-    },
-    {
-      name: "3",
-      value: 3,
-    },
-    {
-      name: "2",
-      value: 2,
-    },
-    {
-      name: "1",
-      value: 1,
-    },
-  ];
+  static readonly INTERACTION_SPOTS_CHOICES: Array<InteractionChoices<number>> =
+    [
+      {
+        name: "Infinite",
+        value: 40,
+      },
+      {
+        name: "8",
+        value: 8,
+      },
+      {
+        name: "7",
+        value: 7,
+      },
+      {
+        name: "6",
+        value: 6,
+      },
+      {
+        name: "5",
+        value: 5,
+      },
+      {
+        name: "4",
+        value: 4,
+      },
+      {
+        name: "3",
+        value: 3,
+      },
+      {
+        name: "2",
+        value: 2,
+      },
+      {
+        name: "1",
+        value: 1,
+      },
+    ];
 
   // Buttons customIDs
   static readonly BUTTON_JOIN_ID = "button_join";
@@ -257,6 +297,14 @@ export class AppSettings {
   // Available Game Versions or Menu Interaction
   static readonly SELECT_GAME_VERSION_ID = "select_game_version";
   static readonly SELECT_GAME_VERSION_PLACEHOLDER = "Game Version";
+
+  // Available Game Versions
+  static readonly ELITE_DANGEROUS_ODYSSEY = "odyssey";
+  static readonly ELITE_DANGEROUS_HORIZON_4_0 = "horizon_four_zero";
+  static readonly ELITE_DANGEROUS_HORIZON_3_8 = "horizon_three_eight";
+  static readonly ELITE_DANGEROUS_BEYOND = "beyond";
+  static readonly ELITE_DANGEROUS_ANY = "any";
+
   static readonly AVAILABLE_GAME_VERSIONS = [
     {
       label: "Odyssey",
@@ -291,6 +339,7 @@ export class AppSettings {
   static readonly BOT_HELP_EXTRA_FIELDS = [this.BOT_WING_DURATION_FIELD_NAME];
   static readonly BOT_HELP_COMMAND_REPLY_FIELD_VALUES = [
     `Use **/${this.BOT_WING_COMMAND_NAME}**`,
+    "PC, PS, XBOX",
     "Odyssey, Horizon 4.0, Horizon 3.8, ED Beyond",
     "Mining, Bounty Hunting, etc...",
     "SOL",
@@ -301,3 +350,10 @@ export class AppSettings {
     "1.5 (1 hours and 30 minutes)",
   ];
 }
+
+interface InteractionChoices<T> {
+  name: string;
+  value: T;
+}
+
+export type { InteractionChoices };

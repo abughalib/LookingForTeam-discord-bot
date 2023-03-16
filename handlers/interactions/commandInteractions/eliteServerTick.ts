@@ -46,7 +46,7 @@ async function eliteServerTickInfo(interaction: CommandInteraction) {
   }
 
   let embeded_message = new EmbedBuilder()
-    .setColor(AppSettings.EMBEDED_MESSAGE_COLOR)
+    .setColor(AppSettings.DEFAULT_EMBED_COLOR)
     .setTitle(title)
     .addFields([
       {

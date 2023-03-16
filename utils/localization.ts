@@ -63,6 +63,38 @@ export default class CommandLocalizations {
     uk: "Версія гри",
   };
 
+  static readonly LOOKING_FOR_TEAM_PLATFORM_DESCRIPTION = {
+    "en-US": "Which platform are you playing on?",
+    "en-GB": "Which platform are you playing on?",
+    bg: "На коя платформа играете?",
+    "zh-CN": "你在哪个平台上玩？",
+    "zh-TW": "你在哪個平台上玩？",
+    hr: "Na kojoj platformi igraš?",
+    cs: "Na které platformě hrajete?",
+    da: "Hvilken platform spiller du på?",
+    nl: "Op welk platform speel je?",
+    fi: "Minkä alustan pelaat?",
+    fr: "Sur quelle plate-forme jouez-vous?",
+    de: "Auf welcher Plattform spielst du?",
+    el: "Σε ποια πλατφόρμα παίζετε;",
+    hi: "आप किस प्लेटफॉर्म पर खेल रहे हैं?",
+    hu: "Melyik platformon játszol?",
+    it: "Su quale piattaforma stai giocando?",
+    ja: "どのプラットフォームでプレイしていますか？",
+    ko: "어떤 플랫폼에서 게임을 하고 있습니까?",
+    lt: "Kurioje platformoje žaidžiate?",
+    no: "På hvilken plattform spiller du?",
+    pl: "Na jakiej platformie grasz?",
+    "pt-BR": "Em qual plataforma você está jogando?",
+    ro: "Pe ce platformă jucați?",
+    ru: "На какой платформе вы играете?",
+    "es-ES": "¿En qué plataforma estás jugando?",
+    "sv-SE": "På vilken plattform spelar du?",
+    th: "คุณกำลังเล่นบนแพลตฟอร์มใด?",
+    tr: "Hangi platformda oynuyorsun?",
+    uk: "На якій платформі ви граєте?",
+  };
+
   static readonly LOOKING_FOR_TEAM_DURATION_DESCRIPTION = {
     "en-US": "How long would you play (hours or minutes) numbers only?",
     "en-GB": "How long would you play (hours or minutes) numbers only?",

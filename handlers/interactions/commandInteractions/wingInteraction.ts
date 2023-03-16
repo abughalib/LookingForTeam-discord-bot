@@ -3,7 +3,7 @@ import {
   ButtonBuilder,
   CommandInteraction,
 } from "discord.js";
-import { AppSettings } from "../../../utils/settings";
+import { AppSettings, InteractionChoices } from "../../../utils/settings";
 import getEpochTimeAfterHours from "../../../utils/timestamp";
 import embedMessage from "../../embeded_message";
 import deleteInteraction from "../utils/deleteInteractions";
@@ -11,7 +11,11 @@ import isValidDuration from "../utils/durationValidation";
 
 /**
  * Creates a new Team/Wing Request.
- */
+ * @param interaction The interaction object.
+ * @param listFieldheading The list of field headings.
+ * @param nickName The nickname of the user.
+ * @param buttons The buttons to be added to the message.
+ * */
 
 async function wingInteraction(
   interaction: CommandInteraction,
@@ -31,43 +35,59 @@ async function wingInteraction(
   // Defining options to get interaction options
   const { options } = interaction;
   // Get specific option from the command
+
+  // Get the platform of the user
+  const platformValue: string =
+    (options.get(AppSettings.INTERACTION_PLAYFORM_ID)?.value as string) ||
+    AppSettings.DEFAULT_PLATFORM;
+
+  // Get the platform name of the user
+  let platformName: string = AppSettings.DEFAULT_PLATFORM;
+
+  // Get the platform name from the platform value
+  AppSettings.INTERACTION_PLATFORM_CHOICES.map((iter, _) => {
+    if (iter.value === platformValue) {
+      platformName = iter.name;
+    }
+  });
+
+  // Get the activity of the user
   const activity_value =
     options.get(AppSettings.INTERACTION_ACTIVITY_ID)?.value ||
     AppSettings.DEFAULT_TEAM_ACTIVITY;
-  let activity_name = AppSettings.DEFAULT_TEAM_ACTIVITY;
-  AppSettings.INTERACTION_ACTIVITY_CHOICES.map((activity, _) => {
-    if (activity.value === activity_value) {
-      activity_name = activity.name;
-    }
-  });
+
+  // Get the activity name of the user
+  let activity_name = getActivityName(platformValue, activity_value as string);
+
+  // Get the location of the user
   const location =
     options.get(AppSettings.INTERACTION_LOCATION_ID)?.value ||
     AppSettings.DEFAULT_TEAM_LOCATION;
+
+  // Get the number of spots in the team
   let spots = Number(
     options.get(AppSettings.INTERACTION_SPOTS_ID)?.value ||
       AppSettings.MAXIMUM_TEAM_SPOT
   );
 
+  // Get the game mode of the user
   const gameMode =
     options.get(AppSettings.INTERACTION_GAME_MODE_ID)?.value ||
     AppSettings.DEFAULT_GAME_MODE;
 
-  let gameModeName: string = AppSettings.DEFAULT_GAME_MODE;
-  if (gameMode === "own_pg") {
+  // If the game mode is own_pg, then the game mode name is the nickname of the user
+  let gameModeName: string = gameMode as string;
+  if (gameMode === "my_pg") {
     gameModeName = `${nickName} Private Group`;
   }
 
-  const gameVersion = options.get(
-    AppSettings.INTERACTION_GAME_VERSION_ID
-  )?.value;
+  const gameVersionValue = options.get(AppSettings.INTERACTION_GAME_VERSION_ID)
+    ?.value as string;
 
-  let gameVersionName: string = AppSettings.DEFAULT_GAME_VERSION;
-  AppSettings.INTERACTION_GAME_VERSION_CHOICES.map((version, _) => {
-    if (version.value === gameVersion) {
-      gameVersionName = version.name;
-      return;
-    }
-  });
+  let gameVersionName: string = getGameVersionName(
+    platformValue,
+    gameVersionValue
+  );
 
   // How long the team will be active
   let duration: number = Number(
@@ -121,6 +141,7 @@ async function wingInteraction(
       else it will be the time when the user is looking for team
     */
   const listFieldValue = [
+    platformName,
     gameVersionName,
     activity_name,
     location,
@@ -133,23 +154,16 @@ async function wingInteraction(
   ];
 
   // Title for the embed message
-  let title: string = AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
-
-  // Channel name for the embed message
-  if (interaction.channelId === AppSettings.XBOX_CHANNEL_ID) {
-    title = AppSettings.XBOX_WING_REQUEST_INTERACTION_TITLE;
-  } else if (interaction.channelId === AppSettings.PS_CHANNEL_ID) {
-    title = AppSettings.PS_WING_REQUEST_INTERACTION_TITLE;
-  } else {
-    title = AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
-  }
+  let title: string = getWingMessageTitle(platformValue);
 
   // Create the embed message
   let embeded_message = embedMessage(
     title,
     listFieldheading,
     listFieldValue,
-    nickName
+    nickName,
+    false,
+    platformValue
   );
 
   // Adding time
@@ -163,35 +177,102 @@ async function wingInteraction(
     text: `Posted at`,
   });
 
-  // Send the embed message specific for the channel [PC, XBOX, PS]
-  if (interaction.channelId === AppSettings.PC_CHANNEL_ID) {
-    // Pretty Looking reply
-    // Send the embed message
-    // Add the buttons
-    await interaction
-      .editReply({
-        embeds: [embeded_message],
-        components: [buttons],
-      })
-      .catch((err) => {
-        console.error(`Error in wing interaction editReply: ${err}`);
-      });
-  } else {
-    // Pretty Looking reply
-    await interaction
-      .editReply({
-        embeds: [embeded_message],
-        components: [buttons],
-      })
-      .catch((err) => {
-        console.error(`Error in Wing interaction Reply: ${err}`);
-      });
-  }
+  // Pretty Looking reply
+  await interaction
+    .editReply({
+      embeds: [embeded_message],
+      components: [buttons],
+    })
+    .catch((err) => {
+      console.error(`Error in Wing interaction Reply: ${err}`);
+    });
   // Auto Delete message after certain time.
   deleteInteraction(
     interaction,
     AppSettings.HOURS_TO_MILISEC * (duration + when)
   );
+}
+
+/**
+ * Get Activity Name from the activity value from [AppSettings]
+ * @param platform Platform of the user
+ * @param activityValue Activity value of the user
+ * @returns Activity Name
+ * */
+function getActivityName(platform: string, activityValue: string): string {
+  // If the platform is Xbox or PS4 and the activity is Odyssey specific then
+  // return the default activity of the platform
+  if (
+    (platform === AppSettings.XBOX_PLATFORM ||
+      platform === AppSettings.PS_PLATFORM) &&
+    AppSettings.ODYSSEY_SPECIFIC_ACTIVITY.find(
+      (activity) => activity === activityValue
+    )
+  ) {
+    return AppSettings.DEFAULT_TEAM_ACTIVITY;
+  }
+
+  let activity_name = AppSettings.DEFAULT_TEAM_ACTIVITY;
+
+  // Get the activity name from the activity value
+  AppSettings.INTERACTION_ACTIVITY_CHOICES.map((activity, _) => {
+    if (activity.value === activityValue) {
+      activity_name = activity.name;
+    }
+  });
+
+  return activity_name;
+}
+
+/**
+ * Get the game version name from the game version value from [AppSettings]
+ * If the platform is Xbox or PS4 and the game version is [DEFAULT_CONSOLE_GAME_VERSION]
+ * or return the default game version of the platform
+ * @param platform  Platform of the user
+ * @param gameVersion Game version value of the user
+ * @returns Game version name
+ */
+function getGameVersionName(platform: string, gameVersion: string): string {
+  let gameVersionName: string = AppSettings.DEFAULT_PC_GAME_VERSION;
+
+  // Get the game version name from the game version value
+  AppSettings.INTERACTION_GAME_VERSION_CHOICES.map((version, _) => {
+    if (version.value === gameVersion) {
+      gameVersionName = version.name;
+    }
+  });
+
+  // If the platform is Xbox or PS4 and the game version is [DEFAULT_CONSOLE_GAME_VERSION]
+  if (
+    (platform === AppSettings.XBOX_PLATFORM ||
+      platform === AppSettings.PS_PLATFORM) &&
+    (gameVersionName === AppSettings.ELITE_DANGEROUS_ODYSSEY ||
+      AppSettings.ELITE_DANGEROUS_HORIZON_4_0)
+  ) {
+    gameVersionName = AppSettings.DEFAULT_CONSOLE_GAME_VERSION;
+  }
+
+  return gameVersionName;
+}
+
+/**
+ * Get Embed Message Title based on the platform
+ * @param platform Platform of the user
+ * @returns Embed Message Title
+ * */
+function getWingMessageTitle(platform: string): string {
+  switch (platform) {
+    // If the platform is PC then return the PC title
+    case AppSettings.DEFAULT_PLATFORM:
+      return AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
+    case AppSettings.XBOX_PLATFORM:
+      return AppSettings.XBOX_WING_REQUEST_INTERACTION_TITLE;
+    case AppSettings.PS_PLATFORM:
+      return AppSettings.PS_WING_REQUEST_INTERACTION_TITLE;
+    //  If the platform is not PC, Xbox or PS4 then return the PC title
+    default:
+      return AppSettings.PC_WING_REQUEST_INTERACTION_TITLE;
+  }
 }
 
 export default wingInteraction;
