@@ -24,6 +24,7 @@ export class AppSettings {
   static readonly PS_WING_REQUEST_INTERACTION_TITLE =
     "Play Station Wing Request";
   static readonly BOT_WING_DURATION_FIELD_NAME = "Team Until";
+  static readonly BOT_WING_ADDITIONAL_FIELD_NAME = "Additional Info";
   static readonly BOT_WING_FIELDS = [
     "Game Platform",
     "Game Version",
@@ -57,6 +58,7 @@ export class AppSettings {
   static readonly INTERACTION_DAY_NAME_ID = "day";
   static readonly INTERACTION_SYSTEM_NAME_ID = "system_name";
   static readonly INTERACTION_DISMISS_ID = "command_dismiss";
+  static readonly INTERACTION_EXTRA_ID = "extra";
 
   // Interaction field description
   static readonly INTERACTION_GAME_VERSION_DESCRIPTION =
