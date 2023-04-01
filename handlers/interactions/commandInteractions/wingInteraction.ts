@@ -103,6 +103,10 @@ async function wingInteraction(
     ).toFixed(2)
   );
 
+  // Additional Infomation if provided
+  let additionalInfo: string =
+    options.get(AppSettings.INTERACTION_EXTRA_ID)?.value?.toString() || "";
+
   // Check if the duration and when is valid
   if (
     !(await isValidDuration(interaction, duration)) ||
@@ -152,6 +156,12 @@ async function wingInteraction(
       : `<t:${getEpochTimeAfterHours(when)}:T>`,
     `${interaction.user}`,
   ];
+
+  // If additional info is provided then add it to the list
+  if (additionalInfo !== "") {
+    listFieldValue.push(additionalInfo);
+    listFieldheading.push(AppSettings.BOT_WING_ADDITIONAL_FIELD_NAME);
+  }
 
   // Title for the embed message
   let title: string = getWingMessageTitle(platformValue);

@@ -120,6 +120,15 @@ function setCommands(client: Client) {
           required: false,
           type: ApplicationCommandOptionType.Number,
         },
+        {
+          name: AppSettings.INTERACTION_EXTRA_ID,
+          description:
+            CommandLocalizations.LOOKING_FOR_TEAM_EXTRA_DESCRIPTION["en-US"],
+          description_localizations:
+            CommandLocalizations.LOOKING_FOR_TEAM_EXTRA_DESCRIPTION,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
       ],
     })
     .catch((error) => console.error("Error creating command: ", error));
