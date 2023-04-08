@@ -161,6 +161,14 @@ async function wingInteraction(
   if (additionalInfo !== "") {
     listFieldValue.push(additionalInfo);
     listFieldheading.push(AppSettings.BOT_WING_ADDITIONAL_FIELD_NAME);
+  } else {
+    // If additional info is not provided then remove the field from the list
+    if (
+      listFieldValue.length > 0 &&
+      listFieldheading[listFieldheading.length - 1] ===
+        AppSettings.BOT_WING_ADDITIONAL_FIELD_NAME
+    )
+      listFieldheading.pop();
   }
 
   // Title for the embed message
