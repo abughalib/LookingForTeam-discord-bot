@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:latest
 
 # Env
 ENV LOOKING_FOR_TEAM_BOT_TOKEN="DISCORD BOT API KEY"
