@@ -7,7 +7,7 @@ export class AppSettings {
   static readonly ERROR_MESSAGE_DIMISS_TIMEOUT = 60 * 1000; // 1 Minute
   static readonly DEFAULT_REQUEST_TEAM_TIMEOUT = 10 * 60 * 1000; // 10 Minutes
   static readonly DEFAULT_WHEN_VALUE = "Now";
-  static readonly MAXIMUM_TEAM_SPOT = 3;
+  static readonly MAXIMUM_TEAM_SPOT = 40;
   static readonly MAXIMUM_HOURS_TEAM = 10;
   static readonly MAXIMUM_PEOPLE_INSTANCE = 40;
   static readonly DEFAULT_PC_GAME_VERSION = "Elite Dangerous Odyssey";
