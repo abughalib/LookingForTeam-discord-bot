@@ -131,7 +131,7 @@ async function joinButton(interaction: ButtonInteraction) {
     new ButtonBuilder()
       .setCustomId(AppSettings.BUTTON_REJECT_REQUEST_ID)
       .setLabel(AppSettings.BUTTON_REQUEST_REQUEST_LABEL)
-      .setStyle(ButtonStyle.Danger)
+      .setStyle(ButtonStyle.Danger),
   );
   // In case of Requesting for Invite.
   // The user who request and the user who created the Team will be notified.

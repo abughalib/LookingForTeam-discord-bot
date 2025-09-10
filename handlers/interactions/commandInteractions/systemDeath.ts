@@ -16,7 +16,7 @@ import CreateButtons from "../utils/createButtons";
  */
 async function systemDeath(
   interaction: CommandInteraction,
-  userInterected: GuildMember
+  userInterected: GuildMember,
 ) {
   let chatInputInteraction = interaction as ChatInputCommandInteraction;
 
@@ -83,7 +83,7 @@ async function systemDeath(
     title,
     listFieldheading,
     listFieldValues,
-    nickName
+    nickName,
   );
 
   // Reply embed message

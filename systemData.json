@@ -1,0 +1,144 @@
+{
+  "v": 5,
+  "rev": 0,
+  "cmdr": null,
+  "name": "California Sector AA-Q b5-0",
+  "id64": 667195548737,
+  "architect": null,
+  "pos": [-283.5, -264.46875, -888.75],
+  "reserveLevel": null,
+  "bodies": [
+    {
+      "name": "California Sector AA-Q b5-0 A",
+      "num": 1,
+      "distLS": 0,
+      "parents": [0],
+      "type": "st",
+      "subType": "M (Red dwarf) Star",
+      "features": []
+    },
+    {
+      "name": "California Sector AA-Q b5-0 barycentre 2",
+      "num": 2,
+      "distLS": 0,
+      "parents": [],
+      "type": "bc",
+      "subType": null,
+      "features": []
+    },
+    {
+      "name": "California Sector AA-Q b5-0 B",
+      "num": 3,
+      "distLS": 13571.136112,
+      "parents": [2, 0],
+      "type": "st",
+      "subType": "L (Brown dwarf) Star",
+      "features": []
+    },
+    {
+      "name": "California Sector AA-Q b5-0 C",
+      "num": 4,
+      "distLS": 13588.765829,
+      "parents": [2, 0],
+      "type": "st",
+      "subType": "L (Brown dwarf) Star",
+      "features": []
+    },
+    {
+      "name": "California Sector AA-Q b5-0 A 1",
+      "num": 5,
+      "distLS": 484.791759,
+      "parents": [1, 0],
+      "type": "hmc",
+      "subType": "High metal content world",
+      "features": []
+    },
+    {
+      "name": "California Sector AA-Q b5-0 A 1 a",
+      "num": 6,
+      "distLS": 484.397774,
+      "parents": [5, 1, 0],
+      "type": "rb",
+      "subType": "Rocky body",
+      "features": ["tidal"]
+    },
+    {
+      "name": "California Sector AA-Q b5-0 A 2",
+      "num": 7,
+      "distLS": 653.643091,
+      "parents": [1, 0],
+      "type": "hmc",
+      "subType": "High metal content world",
+      "features": []
+    },
+    {
+      "name": "California Sector AA-Q b5-0 A 3",
+      "num": 8,
+      "distLS": 892.38336,
+      "parents": [1, 0],
+      "type": "hmc",
+      "subType": "High metal content world",
+      "features": []
+    },
+    {
+      "name": "California Sector AA-Q b5-0 A 4",
+      "num": 9,
+      "distLS": 1147.33164,
+      "parents": [1, 0],
+      "type": "ib",
+      "subType": "Icy body",
+      "features": ["volcanism"]
+    },
+    {
+      "name": "California Sector AA-Q b5-0 barycentre 10",
+      "num": 10,
+      "distLS": 0,
+      "parents": [],
+      "type": "bc",
+      "subType": null,
+      "features": []
+    },
+    {
+      "name": "California Sector AA-Q b5-0 A 5",
+      "num": 11,
+      "distLS": 1599.117953,
+      "parents": [10, 1, 0],
+      "type": "ib",
+      "subType": "Icy body",
+      "features": ["volcanism", "tidal"]
+    },
+    {
+      "name": "California Sector AA-Q b5-0 A 6",
+      "num": 12,
+      "distLS": 1601.117038,
+      "parents": [10, 1, 0],
+      "type": "ib",
+      "subType": "Icy body",
+      "features": ["volcanism", "tidal"]
+    },
+    {
+      "name": "California Sector AA-Q b5-0 A 7",
+      "num": 13,
+      "distLS": 2074.730155,
+      "parents": [1, 0],
+      "type": "ib",
+      "subType": "Icy body",
+      "features": ["volcanism"]
+    }
+  ],
+  "sites": [],
+  "deleteIDs": [],
+  "updateIDs": [],
+  "revs": [
+    {
+      "rev": 0,
+      "cmdr": "unknown",
+      "time": "2025-08-09T19:18:47.472713+00:00"
+    }
+  ],
+  "slots": {},
+  "pop": null,
+  "open": false
+}
+
+//https://ravencolonial100-awcbdvabgze4c5cq.canadacentral-01.azurewebsites.net/api/v2/system/California%20Sector%20AA-Q%20b5-0

@@ -59,7 +59,7 @@ function getEliteShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
     ) {
       shipNames.push("Diamondback Explorer");
       shipCount.push(
-        systemTrafficInfo.breakdown["Diamondback Explorer"].toString()
+        systemTrafficInfo.breakdown["Diamondback Explorer"].toString(),
       );
     }
     if (
@@ -75,7 +75,7 @@ function getEliteShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
     ) {
       shipNames.push("Federal Assault Ship");
       shipCount.push(
-        systemTrafficInfo.breakdown["Federal Assault Ship"].toString()
+        systemTrafficInfo.breakdown["Federal Assault Ship"].toString(),
       );
     }
     if (
@@ -84,7 +84,7 @@ function getEliteShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
     ) {
       shipNames.push("Federal Corvette");
       shipCount.push(
-        systemTrafficInfo.breakdown["Federal Corvette"].toString()
+        systemTrafficInfo.breakdown["Federal Corvette"].toString(),
       );
     }
     if (
@@ -114,7 +114,7 @@ function getEliteShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
     ) {
       shipNames.push("Imperial Clipper");
       shipCount.push(
-        systemTrafficInfo.breakdown["Imperial Clipper"].toString()
+        systemTrafficInfo.breakdown["Imperial Clipper"].toString(),
       );
     }
     if (
@@ -123,7 +123,7 @@ function getEliteShipAndCount(systemTrafficInfo: SystemTrafficInfo): ShipsInfo {
     ) {
       shipNames.push("Imperial Courier");
       shipCount.push(
-        systemTrafficInfo.breakdown["Imperial Courier"].toString()
+        systemTrafficInfo.breakdown["Imperial Courier"].toString(),
       );
     }
     if (

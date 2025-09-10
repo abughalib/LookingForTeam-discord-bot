@@ -27,7 +27,7 @@ function setCommands(client: Client) {
   if (commands == null) {
     console.error(
       "Application Commands null, application: ",
-      client.application
+      client.application,
     );
     return;
   }
@@ -151,8 +151,8 @@ function setCommands(client: Client) {
     .catch((error) =>
       console.error(
         "Error Creating command BOT_SYSTEM_FACTION_INFO_COMMAND_NAME: ",
-        error
-      )
+        error,
+      ),
     );
 
   // Create faction history command

@@ -72,4 +72,16 @@ interface TickInfo {
   history: TickHistory[] | null;
 }
 
-export { ServerStatusModel, SystemTrafficInfo, SystemDeath, TickInfo };
+interface Position {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export {
+  ServerStatusModel,
+  SystemTrafficInfo,
+  SystemDeath,
+  TickInfo,
+  Position,
+};

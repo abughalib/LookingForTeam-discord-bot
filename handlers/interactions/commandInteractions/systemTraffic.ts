@@ -16,7 +16,7 @@ import embedMessage from "../../embeded_message";
 
 async function systemTraffic(
   interaction: CommandInteraction,
-  userInterected: GuildMember
+  userInterected: GuildMember,
 ) {
   const chatInputInteraction = interaction as ChatInputCommandInteraction;
 
@@ -36,11 +36,9 @@ async function systemTraffic(
 
   // Defer message reply
   // Ephermal true so that only the user can see the message
-  await interaction
-    .deferReply()
-    .catch((err) => {
-      console.error(`Error in System Traffic Info: ${err}`);
-    });
+  await interaction.deferReply().catch((err) => {
+    console.error(`Error in System Traffic Info: ${err}`);
+  });
   // Initialize the EDSM
   const edsm = new EDSM();
 
@@ -56,7 +54,7 @@ async function systemTraffic(
       })
       .catch((err) => {
         console.error(
-          `Error in System Traffic Info__ Cannot find Traffic Info: ${err}`
+          `Error in System Traffic Info__ Cannot find Traffic Info: ${err}`,
         );
       });
     return;
@@ -71,7 +69,7 @@ async function systemTraffic(
       })
       .catch((err) => {
         console.error(
-          `Error in System Traffic Info__ No ship info is in EDSM for this system: ${err}`
+          `Error in System Traffic Info__ No ship info is in EDSM for this system: ${err}`,
         );
       });
     return;
@@ -103,7 +101,7 @@ async function systemTraffic(
     listFieldheading,
     listFieldValue,
     nickName,
-    true
+    true,
   );
 
   // Reply embed message

@@ -22,7 +22,7 @@ import wingInteraction from "./commandInteractions/wingInteraction";
  */
 async function interactionCommandHandler(
   interaction: CommandInteraction,
-  buttons: ActionRowBuilder<ButtonBuilder>
+  buttons: ActionRowBuilder<ButtonBuilder>,
 ) {
   // CommandName and options
   const { commandName } = interaction;
@@ -47,7 +47,7 @@ async function interactionCommandHandler(
   // fetch interacted user from the interaction.guild members
   // To get the nick name of the user
   const userInterected = await interaction.guild.members.fetch(
-    interaction.user.id
+    interaction.user.id,
   );
 
   // Get the name of the user which is used in the channel

@@ -7,7 +7,7 @@ import { ButtonInteraction, Message, MessageFlags } from "discord.js";
  */
 async function getMessageByID(
   interaction: ButtonInteraction,
-  messageId: string
+  messageId: string,
 ): Promise<Message | null> {
   // Get the channel of the interaction.
   // If the channel is null.

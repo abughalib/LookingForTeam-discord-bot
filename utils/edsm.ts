@@ -43,7 +43,7 @@ class EDSM {
 
   // Elite Dangerous system Traffic info with Breakdown by ships
   async getSystemTrafficInfo(
-    systemName: string
+    systemName: string,
   ): Promise<SystemTrafficInfo | null> {
     let resp = await fetch(AppSettings.BOT_SYSTEM_TRAFFIC_FETCH_URL, {
       method: "POST",
@@ -91,7 +91,7 @@ class EDSM {
 
   async getSystemFactionInfo(
     systemName: string,
-    showHistory: number = 0
+    showHistory: number = 0,
   ): Promise<SystemFactionInfo | null> {
     let json_data = await this.fetchSystemFactionInfo(systemName, showHistory);
 

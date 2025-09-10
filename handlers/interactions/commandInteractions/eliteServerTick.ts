@@ -13,11 +13,9 @@ import CreateButtons from "../utils/createButtons";
 
 async function eliteServerTickInfo(interaction: CommandInteraction) {
   // Defer interaction reply
-  await interaction
-    .deferReply()
-    .catch((error) => {
-      console.error(error);
-    });
+  await interaction.deferReply().catch((error) => {
+    console.error(error);
+  });
 
   // Initialize the Elite BGS Info Class
   const eliteBGS = new BGSInfo();

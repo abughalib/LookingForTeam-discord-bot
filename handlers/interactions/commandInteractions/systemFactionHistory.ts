@@ -1,4 +1,8 @@
-import { ChatInputCommandInteraction, CommandInteraction, MessageFlags } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  CommandInteraction,
+  MessageFlags,
+} from "discord.js";
 import EDSM from "../../../utils/edsm";
 import createInfluenceChart from "../../../utils/influenceChart";
 import { AppSettings } from "../../../utils/settings";
@@ -16,7 +20,7 @@ import CreateButtons from "../utils/createButtons";
 async function systemfactionHistory(interaction: CommandInteraction) {
   // CommandName and options
 
-  const chatInputInteraction = (interaction as ChatInputCommandInteraction);
+  const chatInputInteraction = interaction as ChatInputCommandInteraction;
 
   const options = chatInputInteraction.options;
 

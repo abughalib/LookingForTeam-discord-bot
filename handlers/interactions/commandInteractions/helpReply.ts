@@ -26,7 +26,7 @@ async function helpReply(interaction: CommandInteraction) {
     title,
     listFieldheading,
     listFieldValue,
-    interaction.user.username
+    interaction.user.username,
   );
 
   // set Message footer

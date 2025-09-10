@@ -2,3 +2,6 @@
 dist
 /Dockerfile.test
 docker-compose.test.yml
+.env
+*.db
+coverage

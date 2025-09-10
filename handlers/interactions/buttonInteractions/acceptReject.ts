@@ -49,7 +49,7 @@ async function acceptOrReject(interaction: ButtonInteraction) {
     // Log the interaction.message.reference
     console.error(
       "Interaction Reference MessageId undefined: " +
-        interaction.message.reference
+        interaction.message.reference,
     );
     // Send ephemeral message to the interaction user notifying the message is deleted.
     await interaction
@@ -121,7 +121,7 @@ async function acceptOrReject(interaction: ButtonInteraction) {
           .catch((error) => {
             console.error(
               "Cannot find original interaction embed fields: ",
-              error
+              error,
             );
           });
         return;
@@ -203,7 +203,7 @@ async function acceptOrReject(interaction: ButtonInteraction) {
       // It should only be possible by either of the users mentioned
       const createButton: CreateButtons = new CreateButtons();
       const dismissButton = createButton.createDismissButton(
-        AppSettings.BUTTON_DELETE_ACCEPT_MESSAGE
+        AppSettings.BUTTON_DELETE_ACCEPT_MESSAGE,
       );
 
       await interaction

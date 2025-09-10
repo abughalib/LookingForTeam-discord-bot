@@ -1,0 +1,37 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+model ColonizationData {
+    id              Int            @id @default(autoincrement())
+    projectName     String
+    systemName      String
+    timeLeft        BigInt? // Time in seconds
+    positionX       Float?
+    positionY       Float?
+    positionZ       Float?
+    architect       String
+    progress        Int?
+    starPortType    String
+    isPrimaryPort   Boolean
+    srv_survey_link String
+    isCompleted     Boolean
+    createdAt       DateTime       @default(now())
+    updatedAt       DateTime       @updatedAt
+    addedBy         String
+    notes           String?
+    participants    Participants[]
+}
+
+model Participants {
+    id                 Int              @id @default(autoincrement())
+    joinedAt           DateTime         @default(now())
+    userId             String
+    colonizationDataId Int
+    colonizationData   ColonizationData @relation(fields: [colonizationDataId], references: [id])
+}

@@ -82,7 +82,6 @@ This project is created with:
 - Make Sure you have [Node 18+ Installed](https://nodejs.org/en/download/)
 - [Create a Discord bot](https://discord.com/developers/applications)
 - Go to Bot in Discord Developer Portal→ settings
-
   - Give your Bot a nice name and Picture
   - Reset Token, Enter 2FA code (if you have any)
   - Copy the Token and set your environment variable.
@@ -193,6 +192,7 @@ Change the values in [AppSetting](./utils/settings.ts)
 - `BOT_HELP_COMMAND_REPLY_FIELD_VALUES`: Change it according to your game.
 
   **Optional**
+
 - `BOT_WING_COMMAND_NAME`: Change the team invite command.
 - Change the titles of respective channel and their channel Names.
 - Comment out the API URLs if you don't need them or exclude the commands from discord server.
