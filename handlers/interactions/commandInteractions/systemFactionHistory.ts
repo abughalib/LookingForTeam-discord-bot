@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, CommandInteraction, MessageFlags } from "discord.js";
 import EDSM from "../../../utils/edsm";
 import createInfluenceChart from "../../../utils/influenceChart";
 import { AppSettings } from "../../../utils/settings";
@@ -15,7 +15,10 @@ import CreateButtons from "../utils/createButtons";
 
 async function systemfactionHistory(interaction: CommandInteraction) {
   // CommandName and options
-  const { options } = interaction;
+
+  const chatInputInteraction = (interaction as ChatInputCommandInteraction);
+
+  const options = chatInputInteraction.options;
 
   // Get the system name from the command
   const systemName: string =
@@ -32,7 +35,7 @@ async function systemfactionHistory(interaction: CommandInteraction) {
     // Send the error message
     await interaction
       .reply({
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
         content: `Days should not be more than 100`,
       })
       .catch((err) => {

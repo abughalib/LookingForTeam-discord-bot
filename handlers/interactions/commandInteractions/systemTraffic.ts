@@ -1,6 +1,10 @@
-import { CommandInteraction, GuildMember } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  CommandInteraction,
+  GuildMember,
+  MessageFlags,
+} from "discord.js";
 import EDSM from "../../../utils/edsm";
-import edsm from "../../../utils/edsm";
 import { getEliteShipAndCount } from "../../../utils/helpers";
 import { AppSettings } from "../../../utils/settings";
 import embedMessage from "../../embeded_message";
@@ -14,8 +18,10 @@ async function systemTraffic(
   interaction: CommandInteraction,
   userInterected: GuildMember
 ) {
+  const chatInputInteraction = interaction as ChatInputCommandInteraction;
+
   // CommandName and options
-  const { options } = interaction;
+  const options = chatInputInteraction.options;
 
   // Title for the embed message
   const title: string = "System Traffic Info";
@@ -31,9 +37,7 @@ async function systemTraffic(
   // Defer message reply
   // Ephermal true so that only the user can see the message
   await interaction
-    .deferReply({
-      ephemeral: true,
-    })
+    .deferReply()
     .catch((err) => {
       console.error(`Error in System Traffic Info: ${err}`);
     });

@@ -1,7 +1,9 @@
 import {
   ActionRowBuilder,
   ButtonBuilder,
+  ChatInputCommandInteraction,
   CommandInteraction,
+  MessageFlags,
 } from "discord.js";
 import { AppSettings, InteractionChoices } from "../../../utils/settings";
 import getEpochTimeAfterHours from "../../../utils/timestamp";
@@ -24,16 +26,14 @@ async function wingInteraction(
   buttons: ActionRowBuilder<ButtonBuilder>
 ) {
   // Defer interaction reply
-  await interaction
-    .deferReply({
-      ephemeral: false,
-    })
-    .catch((err) => {
-      console.error(`Error in wing interaction deferReply: ${err}`);
-    });
+  await interaction.deferReply().catch((err) => {
+    console.error(`Error in wing interaction deferReply: ${err}`);
+  });
+
+  const chatInputInteraction = interaction as ChatInputCommandInteraction;
 
   // Defining options to get interaction options
-  const { options } = interaction;
+  const options = chatInputInteraction.options;
   // Get specific option from the command
 
   // Get the platform of the user

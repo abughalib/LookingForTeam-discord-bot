@@ -2,6 +2,7 @@ import {
   CommandInteraction,
   ActionRowBuilder,
   ButtonBuilder,
+  MessageFlags,
 } from "discord.js";
 import { AppSettings } from "../../utils/settings";
 import defaultReply from "./commandInteractions/defaultReply";
@@ -34,7 +35,7 @@ async function interactionCommandHandler(
     // Show internal error message
     await interaction
       .reply({
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
         content: "Some internal error occured. Please try again later.",
       })
       .catch((err) => {

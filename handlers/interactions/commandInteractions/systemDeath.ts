@@ -1,7 +1,13 @@
-import { CommandInteraction, GuildMember } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  CommandInteraction,
+  GuildMember,
+  MessageFlags,
+} from "discord.js";
 import EDSM from "../../../utils/edsm";
 import { AppSettings } from "../../../utils/settings";
 import embedMessage from "../../embeded_message";
+import CreateButtons from "../utils/createButtons";
 
 /**
  * No of death in a particular system, these included PVP interactions
@@ -12,8 +18,10 @@ async function systemDeath(
   interaction: CommandInteraction,
   userInterected: GuildMember
 ) {
+  let chatInputInteraction = interaction as ChatInputCommandInteraction;
+
   // CommandName and options
-  const { options } = interaction;
+  const options = chatInputInteraction.options;
 
   // Get system name from the command
   const systemName: string =
@@ -27,13 +35,9 @@ async function systemDeath(
   const title: string = "System Death Info";
 
   // Defer message reply
-  await interaction
-    .deferReply({
-      ephemeral: true,
-    })
-    .catch((err) => {
-      console.error(`Error in System Death Info: ${err}`);
-    });
+  await interaction.deferReply().catch((err) => {
+    console.error(`Error in System Death Info: ${err}`);
+  });
 
   // Initialize the EDSM
   const edsm = new EDSM();
@@ -68,6 +72,12 @@ async function systemDeath(
     systemDeath.deaths.total,
   ];
 
+  // Initialization of create Button class
+  const createButton = new CreateButtons();
+
+  // Create dismiss button
+  let dismissButton = createButton.createDismissButton();
+
   // Create the embed message
   const embeded_message = embedMessage(
     title,
@@ -80,6 +90,7 @@ async function systemDeath(
   await interaction
     .editReply({
       embeds: [embeded_message],
+      components: [dismissButton],
     })
     .catch((err) => {
       console.error(`Error in System Death Info: ${err}`);

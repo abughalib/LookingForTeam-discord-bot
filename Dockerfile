@@ -1,8 +1,5 @@
 FROM node:latest
 
-# Env
-ENV LOOKING_FOR_TEAM_BOT_TOKEN="DISCORD BOT API KEY"
-
 WORKDIR /usr/app
 # Copy package.json file
 COPY ["package.json", "./"]

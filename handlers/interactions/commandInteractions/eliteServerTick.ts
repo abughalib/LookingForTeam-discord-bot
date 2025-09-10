@@ -1,4 +1,4 @@
-import { CommandInteraction, EmbedBuilder } from "discord.js";
+import { CommandInteraction, EmbedBuilder, MessageFlags } from "discord.js";
 import BGSInfo from "../../../utils/eliteBgs";
 import { TickInfo } from "../../../utils/models";
 import { AppSettings } from "../../../utils/settings";
@@ -14,9 +14,7 @@ import CreateButtons from "../utils/createButtons";
 async function eliteServerTickInfo(interaction: CommandInteraction) {
   // Defer interaction reply
   await interaction
-    .deferReply({
-      ephemeral: false,
-    })
+    .deferReply()
     .catch((error) => {
       console.error(error);
     });

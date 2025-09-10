@@ -1,4 +1,8 @@
-import { Client, GatewayIntentBits, IntentsBitField } from "discord.js";
+import {
+  Client,
+  GatewayIntentBits,
+  IntentsBitField,
+} from "discord.js";
 import setCommands from "./handlers/commands";
 import handleInteractions from "./handlers/interactions";
 
@@ -10,7 +14,7 @@ const client = new Client({
   ],
 });
 
-client.on("ready", () => {
+client.on("clientReady", () => {
   console.log("The bot is ready!");
   setCommands(client);
 });

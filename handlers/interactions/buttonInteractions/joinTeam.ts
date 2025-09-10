@@ -3,6 +3,7 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  MessageFlags,
 } from "discord.js";
 import { AppSettings } from "../../../utils/settings";
 import deleteInteraction from "../utils/deleteInteractions";
@@ -15,13 +16,13 @@ import deleteInteraction from "../utils/deleteInteractions";
 
 async function joinButton(interaction: ButtonInteraction) {
   // If Interaction message is null or delete by admin.
-  if (interaction.message.interaction == null) {
+  if (interaction.message.interactionMetadata == null) {
     // In case of message interaction null or deleted by admin or bot.
     // sends ephemeral message to the interaction user.
     await interaction
       .reply({
         content: "Cannot perform this action",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       })
       .catch((error) => {
         console.error("When interaction.message.interaction is null: ", error);
@@ -31,12 +32,12 @@ async function joinButton(interaction: ButtonInteraction) {
 
   // Check if the original interaction user is the same as the user who clicked the button.
   // The one who crated is already in the Team and should not be able to join again.
-  if (interaction.message.interaction.user === interaction.user) {
+  if (interaction.message.interactionMetadata.user === interaction.user) {
     // Sends ephemeral message to the interaction user.
     await interaction
       .reply({
         content: "You want to invite yourself in?",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       })
       .catch((error) => {
         console.error("When author is pressing join button: ", error);
@@ -52,7 +53,7 @@ async function joinButton(interaction: ButtonInteraction) {
     await interaction
       .reply({
         content: "Undefined Team Invite",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       })
       .catch((error) => {
         console.error("When fields is undefined: ", error);
@@ -61,7 +62,7 @@ async function joinButton(interaction: ButtonInteraction) {
   }
 
   // Get the original interaction messages user
-  const originalUserInteraction = interaction.message.interaction.user;
+  const originalUserInteraction = interaction.message.interactionMetadata.user;
   // Get original interaction messages embed message fields.
   const fields = interaction.message.embeds[0].data.fields;
   // Get current interaction user.
@@ -95,7 +96,7 @@ async function joinButton(interaction: ButtonInteraction) {
     await interaction
       .reply({
         content: "You're already in the Team",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       })
       .catch((error) => {
         console.error("When user is already in the Team: ", error);
@@ -108,7 +109,7 @@ async function joinButton(interaction: ButtonInteraction) {
   if (spots <= 0) {
     await interaction
       .reply({
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
         content: "Sorry, but the team is already full.",
       })
       .catch((error) => {

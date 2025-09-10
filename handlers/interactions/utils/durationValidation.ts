@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, MessageFlags } from "discord.js";
 import {
   checkDurationValidation,
   DurationValidation,
@@ -27,7 +27,7 @@ async function isValidDuration(
       await interaction
         .reply({
           content: "Please enter a valid hour",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         })
         .catch((err) => {
           console.error(err);
@@ -37,7 +37,7 @@ async function isValidDuration(
     case DurationValidation.LIMIT_EXCEEDED:
       await interaction
         .reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           content: "You cannnot request for more then 10 hours",
         })
         .catch((err) => {
