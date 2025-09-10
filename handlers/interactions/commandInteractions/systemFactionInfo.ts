@@ -1,4 +1,8 @@
-import { CommandInteraction, EmbedBuilder } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  CommandInteraction,
+  EmbedBuilder,
+} from "discord.js";
 import EDSM from "../../../utils/edsm";
 import { AppSettings } from "../../../utils/settings";
 import { SystemFactionInfo } from "../../../utils/systemInfoModel";
@@ -11,8 +15,10 @@ import CreateButtons from "../utils/createButtons";
  */
 
 async function systemFactionInfo(interaction: CommandInteraction) {
+  const chatInputInteraction = interaction as ChatInputCommandInteraction;
+
   // CommandName and options
-  const { options } = interaction;
+  const options = chatInputInteraction.options;
 
   /*
     System faction info command [BOT_SYSTEM_FACTION_INFO_COMMAND_NAME]

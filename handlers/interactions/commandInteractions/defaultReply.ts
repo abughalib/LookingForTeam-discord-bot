@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, MessageFlags } from "discord.js";
 
 /**
  *  Default Bot Reply
@@ -10,7 +10,7 @@ async function defaultReply(interaction: CommandInteraction) {
   await interaction
     .reply({
       content: "Command Not Found",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     })
     .catch((err) => {
       console.error(`Error in default reply: ${err}`);

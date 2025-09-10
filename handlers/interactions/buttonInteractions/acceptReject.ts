@@ -5,6 +5,7 @@ import {
   Embed,
   EmbedBuilder,
   Message,
+  MessageFlags,
   User,
 } from "discord.js";
 import { AppSettings } from "../../../utils/settings";
@@ -36,7 +37,7 @@ async function acceptOrReject(interaction: ButtonInteraction) {
     await interaction
       .reply({
         content: "Original Message not Found",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       })
       .catch((error) => {
         console.error("When original message is not found: ", error);
@@ -54,7 +55,7 @@ async function acceptOrReject(interaction: ButtonInteraction) {
     await interaction
       .reply({
         content: "Original Message not Found",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       })
       .catch((error) => {
         console.error("When message reference is null: " + error);
@@ -69,12 +70,12 @@ async function acceptOrReject(interaction: ButtonInteraction) {
 
   // If the message is null or message.interaction is null
   // i.e message is deleted by admin or message interaction not found.
-  if (message === null || message.interaction == null) {
+  if (message === null || message.interactionMetadata == null) {
     // Notify the interaction user that the message is deleted.
     await interaction
       .reply({
         content: "Original Message not Found",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       })
       .catch((error) => {
         console.error("Message not found: " + error);
@@ -86,10 +87,10 @@ async function acceptOrReject(interaction: ButtonInteraction) {
     // If the button id is BUTTON_ACCEPT_REQUEST_ID
 
     // In case the interaction user is not the one who created the Team.
-    if (interaction.user !== message.interaction.user) {
+    if (interaction.user !== message.interactionMetadata.user) {
       await interaction
         .reply({
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
           content: `You Cannot Perform this action`,
         })
         .catch((error) => {
@@ -115,7 +116,7 @@ async function acceptOrReject(interaction: ButtonInteraction) {
         await interaction
           .reply({
             content: "Cannot find original message content",
-            ephemeral: true,
+            flags: MessageFlags.Ephemeral,
           })
           .catch((error) => {
             console.error(
@@ -224,7 +225,7 @@ async function acceptOrReject(interaction: ButtonInteraction) {
     // Defer interaction reply.
     await interaction
       .deferReply({
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       })
       .catch((error) => {
         console.error(error);

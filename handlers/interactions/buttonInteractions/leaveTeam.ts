@@ -4,6 +4,7 @@ import {
   Embed,
   EmbedBuilder,
   Message,
+  MessageFlags,
 } from "discord.js";
 import { removeEntry } from "../../../utils/helpers";
 import getMessageByID from "./manageMessages";
@@ -20,14 +21,14 @@ async function leaveTeam(interaction: ButtonInteraction) {
 
   await interaction
     .deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     })
     .catch((error) => {
       console.error(error);
     });
 
   // interaction.message.interaction is null.
-  if (interaction.message.interaction === null) {
+  if (interaction.message.interactionMetadata === null) {
     // Log the error and send ephemeral message to the interaction user.
     console.error("Interaction is null: " + interaction.message);
     await interaction
@@ -47,7 +48,7 @@ async function leaveTeam(interaction: ButtonInteraction) {
       This can be null if the message is deleted either by the one who created the Team
       or Admin user.
     */
-  if (interaction.message.interaction.id === undefined) {
+  if (interaction.message.interactionMetadata.id === undefined) {
     // Log the error and interaction.message.references.
     console.error(
       "Interaction Reference MessageId undefined: " +
@@ -87,7 +88,7 @@ async function leaveTeam(interaction: ButtonInteraction) {
 
   // If the message is null.
   // It is possible deleted.
-  if (message === null || message.interaction == null) {
+  if (message === null || message.interactionMetadata == null) {
     // Send ephemeral message to the interaction user.
     // Notify the user that the message is deleted.
     await interaction

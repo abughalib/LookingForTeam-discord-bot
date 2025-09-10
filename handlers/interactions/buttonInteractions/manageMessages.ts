@@ -1,4 +1,4 @@
-import { ButtonInteraction, Message } from "discord.js";
+import { ButtonInteraction, Message, MessageFlags } from "discord.js";
 
 /**
  * Get the message by message Id from the interaction channel.
@@ -19,7 +19,7 @@ async function getMessageByID(
     await interaction
       .reply({
         content: "Original Channel not Found",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       })
       .catch((error) => {
         console.error("When interaction channel is null: " + error);

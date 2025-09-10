@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, MessageFlags } from "discord.js";
 import { AppSettings } from "../../../utils/settings";
 import embedMessage from "../../embeded_message";
 
@@ -37,7 +37,7 @@ async function helpReply(interaction: CommandInteraction) {
   // Defer message reply
   await interaction
     .deferReply({
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     })
     .catch((err) => {
       console.error(`Error in Help: ${err}`);

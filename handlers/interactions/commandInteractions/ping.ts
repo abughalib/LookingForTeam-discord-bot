@@ -1,4 +1,4 @@
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, MessageFlags } from "discord.js";
 import { AppSettings } from "../../../utils/settings";
 
 /**
@@ -10,7 +10,7 @@ async function pingReply(interaction: CommandInteraction) {
   await interaction
     .reply({
       content: AppSettings.BOT_PING_REPLY,
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     })
     .catch((err) => {
       console.error(`Error in Ping: ${err}`);
