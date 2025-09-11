@@ -5,6 +5,8 @@ import dismissButton from "./buttonInteractions/dismissButton";
 import joinButton from "./buttonInteractions/joinTeam";
 import leaveTeam from "./buttonInteractions/leaveTeam";
 import deleteAcceptMessage from "./buttonInteractions/dismiss_accept_msg";
+import nextColonizationList from "./buttonInteractions/nextColonizationList";
+import selectColonizationProject from "./buttonInteractions/selectColonizationProject";
 
 /**
  * Handles all button interactions.*
@@ -32,7 +34,16 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
     case AppSettings.BUTTON_DELETE_ACCEPT_MESSAGE:
       deleteAcceptMessage(interaction);
       break;
+    case AppSettings.BUTTON_NEXT_COLONIZATION_LIST_ID:
+      nextColonizationList(interaction);
+      break;
     default:
+      // Handle colonization project selection buttons (colonization_list_select_1, colonization_list_select_2, etc.)
+      if (interaction.customId.startsWith("colonization_list_select_")) {
+        selectColonizationProject(interaction);
+        break;
+      }
+
       // If More features are required
       // Would be Implemented later...
       await interaction

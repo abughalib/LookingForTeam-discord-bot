@@ -43,11 +43,14 @@ export class Colonization {
       AppSettings.INTERACTION_COLONIZATION_SYSTEM_NAME_ID,
       true,
     );
-    const projectName =
+    const rawProjectName =
       options.getString(
         AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
         true,
       ) ?? randomUUID().toLowerCase().slice(0, 8);
+
+    // Replace spaces with underscores to avoid issues in button customIds and ensure lowercase
+    const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
     const architect =
       (options.getString(
         AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
@@ -142,10 +145,13 @@ export class Colonization {
   }
 
   async remove() {
-    const projectName = this.chatInputInteraction.options.getString(
+    const rawProjectName = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
       true,
     ) as string;
+
+    // Replace spaces with underscores to match stored project name format and ensure lowercase
+    const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
 
     await this.interaction.deferReply({
       flags: MessageFlags.Ephemeral,
@@ -166,10 +172,15 @@ export class Colonization {
   }
 
   async list() {
-    const projectName = this.chatInputInteraction.options.getString(
+    const rawProjectName = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
       false,
     ) as string | null;
+
+    // Replace spaces with underscores to match stored project name format (if provided) and ensure lowercase
+    const projectName = rawProjectName
+      ? rawProjectName.replace(/\s+/g, "_").toLowerCase()
+      : null;
 
     const architectName = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
@@ -268,10 +279,11 @@ export class Colonization {
 
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(nextButton);
     // Add button to select project 1 to length of activeProjects
-    for (let i = 1; i <= activeProjects.length; i++) {
+    for (let i = 0; i < activeProjects.length; i++) {
+      const project = activeProjects[i];
       const projectButton = new ButtonBuilder()
-        .setCustomId(`colonization_list_select_${i}`)
-        .setLabel(`${i}`)
+        .setCustomId(`colonization_list_select_${project.projectName}`)
+        .setLabel(`${i + 1}`)
         .setStyle(ButtonStyle.Secondary);
       row.addComponents(projectButton);
     }
@@ -286,10 +298,13 @@ export class Colonization {
   }
 
   async progress() {
-    const projectName = this.chatInputInteraction.options.getString(
+    const rawProjectName = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
       true,
     ) as string;
+
+    // Replace spaces with underscores to match stored project name format and ensure lowercase
+    const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
 
     await this.interaction.deferReply();
 
@@ -360,10 +375,13 @@ export class Colonization {
   }
 
   async participate() {
-    const projectName = this.chatInputInteraction.options.getString(
+    const rawProjectName = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
       true,
     ) as string;
+
+    // Replace spaces with underscores to match stored project name format and ensure lowercase
+    const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
 
     const dismissButton = this.dismissButton.createDismissButton();
 
@@ -448,10 +466,12 @@ export class Colonization {
 
   async updateProgress() {
     const options = this.chatInputInteraction.options;
-    const projectName = options.getString(
+    const rawProjectName = options.getString(
       AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
       true,
     ) as string;
+    // Replace spaces with underscores to match stored project name format and ensure lowercase
+    const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
     const progress = options.getNumber(
       AppSettings.INTERACTION_COLONIZATION_PROGRESS_ID,
       true,
