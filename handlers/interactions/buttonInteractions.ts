@@ -44,6 +44,22 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
         break;
       }
 
+      // Handle next colonization list pagination buttons (next_colonization_list_2_{"filters"}, etc.)
+      if (
+        interaction.customId.startsWith(
+          AppSettings.BUTTON_NEXT_COLONIZATION_LIST_ID + "_",
+        )
+      ) {
+        nextColonizationList(interaction);
+        break;
+      }
+
+      // Handle previous colonization list pagination buttons (prev_colonization_list_1_{"filters"}, etc.)
+      if (interaction.customId.startsWith("prev_colonization_list_")) {
+        nextColonizationList(interaction); // Same handler can handle both next and previous
+        break;
+      }
+
       // If More features are required
       // Would be Implemented later...
       if (interaction.replied || interaction.deferred) {

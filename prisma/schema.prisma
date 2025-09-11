@@ -9,7 +9,7 @@ datasource db {
 
 model ColonizationData {
     id              Int            @id @default(autoincrement())
-    projectName     String
+    projectName     String         @unique
     systemName      String
     timeLeft        Int? // Time in seconds
     positionX       Float?
@@ -34,4 +34,15 @@ model Participants {
     userId             String
     colonizationDataId Int
     colonizationData   ColonizationData @relation(fields: [colonizationDataId], references: [id])
+}
+
+model SystemInfoCache {
+    id            Int      @id @default(autoincrement())
+    systemName    String   @unique
+    positionX     Float
+    positionY     Float
+    positionZ     Float
+    coordsLocked  Boolean
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
 }

@@ -9,7 +9,7 @@ class BGSInfo {
     });
 
     if (response.status !== 200) {
-      console.log("Error getting last tick");
+      console.error("Error getting last tick");
       return null;
     }
 

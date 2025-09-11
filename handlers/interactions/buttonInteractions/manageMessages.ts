@@ -32,7 +32,7 @@ async function getMessageByID(
   const message = await interaction.channel.messages
     .fetch(messageId)
     .catch((error) => {
-      console.log("Cannot find message: " + error);
+      console.error("Cannot find message: " + error);
       return null;
     });
   return message;

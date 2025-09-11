@@ -1,10 +1,14 @@
-import { ColonizationData, PrismaClient } from "@prisma/client";
-import { Position } from "./models";
+import {
+  ColonizationData,
+  PrismaClient,
+  SystemInfoCache,
+} from "@prisma/client";
+import { Position, SystemInfo } from "./models";
 
 const prisma = new PrismaClient();
 
 export async function addColonizationData(
-  colonization_data: ColonizationData,
+  colonization_data: Omit<ColonizationData, "id">,
 ): Promise<number> {
   try {
     const result = await prisma.colonizationData.create({
@@ -212,6 +216,125 @@ export async function removeColonizationDataByProjectName(
     });
   } catch (error) {
     console.error("Error removing colonization data by project name:", error);
+    throw error;
+  }
+}
+
+export async function getSystemInfoFromCache(
+  systemName: string,
+): Promise<SystemInfo | null> {
+  try {
+    const cached = await prisma.systemInfoCache.findUnique({
+      where: { systemName: systemName.toLowerCase() },
+    });
+
+    if (!cached) {
+      return null;
+    }
+
+    return {
+      name: cached.systemName,
+      coords: {
+        x: cached.positionX,
+        y: cached.positionY,
+        z: cached.positionZ,
+      },
+      coordsLocked: cached.coordsLocked,
+    };
+  } catch (error) {
+    console.error("Error fetching system info from cache:", error);
+    throw error;
+  }
+}
+
+export async function getSystemInfoFromCacheWithAge(
+  systemName: string,
+  maxAgeHours: number = 24,
+): Promise<{ systemInfo: SystemInfo | null; isExpired: boolean }> {
+  try {
+    const cached = await prisma.systemInfoCache.findUnique({
+      where: { systemName: systemName.toLowerCase() },
+    });
+
+    if (!cached) {
+      return { systemInfo: null, isExpired: false };
+    }
+
+    const now = new Date();
+    const cacheAge = now.getTime() - cached.updatedAt.getTime();
+    const maxAge = maxAgeHours * 60 * 60 * 1000; // Convert hours to milliseconds
+    const isExpired = cacheAge > maxAge;
+
+    const systemInfo: SystemInfo = {
+      name: cached.systemName,
+      coords: {
+        x: cached.positionX,
+        y: cached.positionY,
+        z: cached.positionZ,
+      },
+      coordsLocked: cached.coordsLocked,
+    };
+
+    return { systemInfo, isExpired };
+  } catch (error) {
+    console.error("Error fetching system info from cache with age:", error);
+    throw error;
+  }
+}
+
+export async function cacheSystemInfo(systemInfo: SystemInfo): Promise<void> {
+  try {
+    await prisma.systemInfoCache.upsert({
+      where: { systemName: systemInfo.name.toLowerCase() },
+      update: {
+        positionX: systemInfo.coords.x,
+        positionY: systemInfo.coords.y,
+        positionZ: systemInfo.coords.z,
+        coordsLocked: systemInfo.coordsLocked,
+        updatedAt: new Date(),
+      },
+      create: {
+        systemName: systemInfo.name.toLowerCase(),
+        positionX: systemInfo.coords.x,
+        positionY: systemInfo.coords.y,
+        positionZ: systemInfo.coords.z,
+        coordsLocked: systemInfo.coordsLocked,
+      },
+    });
+  } catch (error) {
+    console.error("Error caching system info:", error);
+    throw error;
+  }
+}
+
+export async function clearSystemInfoCache(): Promise<void> {
+  try {
+    await prisma.systemInfoCache.deleteMany({});
+  } catch (error) {
+    console.error("Error clearing system info cache:", error);
+    throw error;
+  }
+}
+
+export async function getSystemInfoCacheStats(): Promise<{
+  totalEntries: number;
+  oldestEntry: Date | null;
+  newestEntry: Date | null;
+}> {
+  try {
+    const stats = await prisma.systemInfoCache.aggregate({
+      _count: { id: true },
+      _min: { createdAt: true },
+      _max: { updatedAt: true },
+    });
+
+    return {
+      totalEntries: stats._count.id || 0,
+      oldestEntry: stats._min.createdAt,
+      newestEntry: stats._max.updatedAt,
+    };
+  } catch (error) {
+    console.error("Error fetching cache stats:", error);
     throw error;
   }
 }

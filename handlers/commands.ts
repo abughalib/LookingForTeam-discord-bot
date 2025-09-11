@@ -349,6 +349,13 @@ function setCommands(client: Client) {
       console.error("Error creating command: ", error);
     });
 
+  commands.create({
+    name: AppSettings.BOT_COLONIZATION_HELP_COMMAND_NAME,
+    description: AppSettings.INTERACTION_HELP_DESC,
+    description_localizations:
+      CommandLocalizations.LOOKING_FOR_TEAM_HELP_DESCRIPTION,
+  });
+
   commands
     .create({
       name: AppSettings.BOT_ELITE_SERVER_TICK_INFO,

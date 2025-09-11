@@ -107,12 +107,20 @@ export class Colonization {
     // Implementation for adding colonization
     await this.interaction.deferReply();
 
-    console.log(systemInfo);
-
     try {
+      // Check if a project with the same name already exists
+      const existingProject =
+        await getColonizationDataByProjectName(projectName);
+      if (existingProject) {
+        await this.interaction.editReply({
+          content: `A colonization project with the name **${projectName}** already exists. Please choose a different project name.`,
+        });
+        return;
+      }
+
       const userNickname = await this.getUserNickname();
+      const userId = this.interaction.user.id;
       const colonization_id = await addColonizationData({
-        id: 0,
         projectName,
         systemName: systemInfo.name,
         architect,
@@ -130,14 +138,14 @@ export class Colonization {
         updatedAt: nowTime,
         addedBy: userNickname,
       });
-      await participateInColonizationData(colonization_id, userNickname);
+      await participateInColonizationData(colonization_id, userId);
       await this.interaction.editReply({
         content: `Colonization project Name: **${projectName}** Added successfully.`,
       });
     } catch (error) {
       console.error("Error adding colonization data:", error);
       await this.interaction.followUp({
-        content: `Failed to add colonization project: **${projectName}**`,
+        content: `Failed to add colonization project: **${projectName}**. Please try again or contact an administrator.`,
       });
     }
   }
@@ -313,30 +321,76 @@ export class Colonization {
       });
     });
 
-    // Add Next Button
-    const nextButton = new ButtonBuilder()
-      .setCustomId(AppSettings.BUTTON_NEXT_COLONIZATION_LIST_ID)
-      .setLabel(AppSettings.BUTTON_NEXT_COLONIZATION_LIST_LABEL)
-      .setStyle(ButtonStyle.Primary);
+    if (referenceSystem) {
+      embed.setDescription(`Reference System: **${referenceSystem}**`);
+    }
 
-    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(nextButton);
-    // Add button to select project 1 to length of activeProjects
-    for (let i = 0; i < activeProjects.length; i++) {
+    // Create button components with proper row distribution
+    const components: ActionRowBuilder<ButtonBuilder>[] = [];
+
+    // First row: Next button and project selection buttons (max 4 project buttons to stay under 5 total)
+    const firstRow = new ActionRowBuilder<ButtonBuilder>();
+
+    const currentPage = 1;
+    const totalPages = Math.ceil(totalProjects / 5);
+
+    // Only show next button if there are more pages
+    if (currentPage < totalPages) {
+      const nextButton = new ButtonBuilder()
+        .setCustomId(
+          `${AppSettings.BUTTON_NEXT_COLONIZATION_LIST_ID}_${currentPage + 1}_${JSON.stringify({ projectName, architectName, referenceSystem })}`,
+        )
+        .setLabel(AppSettings.BUTTON_NEXT_COLONIZATION_LIST_LABEL)
+        .setStyle(ButtonStyle.Primary);
+      firstRow.addComponents(nextButton);
+    }
+
+    // Add up to remaining slots for project selection buttons (account for next button)
+    const maxProjectButtonsInFirstRow = Math.min(
+      5 - firstRow.components.length,
+      activeProjects.length,
+    );
+    for (let i = 0; i < maxProjectButtonsInFirstRow; i++) {
       const project = activeProjects[i];
       const projectButton = new ButtonBuilder()
         .setCustomId(`colonization_list_select_${project.projectName}`)
         .setLabel(`${i + 1}`)
         .setStyle(ButtonStyle.Secondary);
-      row.addComponents(projectButton);
+      firstRow.addComponents(projectButton);
     }
+    components.push(firstRow);
 
-    row.addComponents(dismissButton.components[0]);
+    // Second row: Remaining project buttons (if any) and dismiss button
+    if (
+      activeProjects.length > maxProjectButtonsInFirstRow ||
+      dismissButton.components[0]
+    ) {
+      const secondRow = new ActionRowBuilder<ButtonBuilder>();
+
+      // Add remaining project buttons
+      for (
+        let i = maxProjectButtonsInFirstRow;
+        i < activeProjects.length;
+        i++
+      ) {
+        const project = activeProjects[i];
+        const projectButton = new ButtonBuilder()
+          .setCustomId(`colonization_list_select_${project.projectName}`)
+          .setLabel(`${i + 1}`)
+          .setStyle(ButtonStyle.Secondary);
+        secondRow.addComponents(projectButton);
+      }
+
+      // Add dismiss button
+      secondRow.addComponents(dismissButton.components[0]);
+      components.push(secondRow);
+    }
 
     embed.setFooter({
       text: `Page 1 of ${Math.ceil(totalProjects / 5)}`,
     });
 
-    await this.interaction.editReply({ embeds: [embed], components: [row] });
+    await this.interaction.editReply({ embeds: [embed], components });
   }
 
   async progress() {
@@ -408,8 +462,11 @@ export class Colonization {
       )
       .setAuthor({ name: "Added By: " + colonizationData.addedBy })
       .setFooter({ text: `Created At: ${colonizationData.createdAt}` })
-      .setURL(colonizationData.srv_survey_link)
       .setTimestamp();
+
+    if (colonizationData.srv_survey_link) {
+      embed.setURL(colonizationData.srv_survey_link);
+    }
 
     await this.interaction.editReply({
       embeds: [embed],
@@ -443,12 +500,16 @@ export class Colonization {
 
     try {
       const userNickname = await this.getUserNickname();
+      const userId = this.interaction.user.id; // Use Discord user ID instead of nickname
 
-      // Check if user is already participating
+      // Check if user is already participating (check both ID and nickname for legacy data)
       const participants = await getParticipantsByColonizationId(
         colonizationData.id,
       );
-      if (participants.includes(userNickname)) {
+      if (
+        participants.includes(userId) ||
+        participants.includes(userNickname)
+      ) {
         await this.interaction.editReply({
           content: `You already joined the colonization project **${projectName}**.`,
           components: [dismissButton],
@@ -456,7 +517,7 @@ export class Colonization {
         return;
       }
 
-      await participateInColonizationData(colonizationData.id, userNickname);
+      await participateInColonizationData(colonizationData.id, userId);
       await this.interaction.editReply({
         content: `You have successfully joined the colonization project **${projectName}**.`,
         components: [dismissButton],
@@ -471,51 +532,143 @@ export class Colonization {
   }
 
   async help() {
-    const embed = new EmbedBuilder()
-      .setTitle("Colonization Command Help")
+    // Create main help embed
+    const mainEmbed = new EmbedBuilder()
+      .setTitle("🚀 System Colonization Tracking")
       .setColor(0x00ff00)
       .setDescription(
-        "Manage and track colonization projects with the following commands:",
-      )
+        "This comprehensive guide will help you track and manage Elite Dangerous colonization projects.\n\n" +
+          "🔹 **Distance calculation** when reference system provided\n" +
+          "🔹 **Authorization system** - only participants/creators can update progress\n" +
+          "🔹 **Interactive buttons** for easy navigation",
+      );
+
+    // Commands overview embed
+    const commandsEmbed = new EmbedBuilder()
+      .setTitle("📋 Available Commands")
+      .setColor(0x0099ff)
       .addFields(
         {
-          name: "/colonization add",
+          name: "🆕 `/colonization_add`",
           value:
-            "Add a new colonization project. Required fields: system name, project name, starport type. Optional fields: architect, notes, time left, is primary port, progress, SRV survey link.",
+            "**Create a new colonization project**\n" +
+            "• **Required:** `system_name`, `project_name`, `starport_type`\n" +
+            "• **Optional:** `architect`, `notes`, `time_left`, `is_primary_port`, `progress`, `srv_survey_link`\n" +
+            '• **Example:** `/colonization add system_name:"Colonia" project_name:"My Station" starport_type:"Coriolis"`',
         },
         {
-          name: "/colonization remove",
+          name: "📋 `/colonization_list`",
           value:
-            "Remove an existing colonization project by specifying the project name.",
+            "**List all active projects with filtering options**\n" +
+            "• **Optional filters:** `project_name`, `architect_name`, `reference_system`\n" +
+            "• **Distance sorting:** Use `reference_system` to sort by distance from your location\n" +
+            "• **Interactive:** Use numbered buttons to select projects\n" +
+            '• **Example:** `/colonization list reference_system:"Sol"`',
         },
         {
-          name: "/colonization list",
+          name: "👥 `/colonization_participate`",
           value:
-            "List all active colonization projects. Optional filters: project name, architect name, reference system for distance sorting.",
+            "**Join an existing colonization project**\n" +
+            "• **Required:** `project_name`\n" +
+            "• **Note:** You'll be automatically added as a participant\n" +
+            '• **Example:** `/colonization participate project_name:"my_station"`',
         },
-        {
-          name: "/colonization progress",
-          value:
-            "View detailed information about a specific colonization project by providing the project name.",
-        },
-        {
-          name: "/colonization participate",
-          value:
-            "Join a colonization project as a participant by specifying the project name.",
-        },
-        {
-          name: "/colonization update-progress",
-          value:
-            "Update the progress of an existing colonization project. Required fields: project name, progress percentage.",
-        },
-        {
-          name: "/colonization help",
-          value: "Display this help message.",
-        },
-      )
-      .setTimestamp();
+      );
 
-    await this.interaction.reply({ embeds: [embed], ephemeral: true });
+    // More commands embed
+    const moreCommandsEmbed = new EmbedBuilder()
+      .setTitle("🔧 Management Commands")
+      .setColor(0xff9900)
+      .addFields(
+        {
+          name: "📊 `/colonization_progress`",
+          value:
+            "**View detailed information about a project**\n" +
+            "• **Required:** `project_name`\n" +
+            "• **Shows:** All project details, participants, coordinates, survey links\n" +
+            '• **Example:** `/colonization_progress project_name:"my_station"`',
+        },
+        {
+          name: "📈 `/colonization_update_progress`",
+          value:
+            "**Update project completion percentage**\n" +
+            "• **Required:** `project_name`, `progress` (0-100)\n" +
+            "• **Authorization:** Only participants or project creator can update\n" +
+            "• **Auto-complete:** Project marked complete at 100%\n" +
+            '• **Example:** `/colonization_update_progress project_name:"my_station" progress:75`',
+        },
+        {
+          name: "🗑️ `/colonization_remove`",
+          value:
+            "**Delete a colonization project**\n" +
+            "• **Required:** `project_name`\n" +
+            "• **Authorization:** Only the project creator can remove projects\n" +
+            "• **Warning:** This action cannot be undone!\n" +
+            '• **Example:** `/colonization_remove project_name:"my_station"`',
+        },
+      );
+
+    // Tips and examples embed
+    const tipsEmbed = new EmbedBuilder()
+      .setTitle("💡 Tips & Examples")
+      .setColor(0x9900ff)
+      .addFields(
+        {
+          name: "⏰ Time Format Examples",
+          value:
+            "Use combinations of weeks (w), days (d), hours (h), minutes (m):\n" +
+            "• `1w 3d 2h 30m` = 1 week, 3 days, 2 hours, 30 minutes\n" +
+            "• `5d` = 5 days\n" +
+            "• `2h 15m` = 2 hours, 15 minutes\n" +
+            "• `0` = No time limit",
+        },
+        {
+          name: "🌟 Best Practices",
+          value:
+            "• **Project names:** Use underscores instead of spaces (auto-converted)\n" +
+            "• **System names:** Use exact names from EDSM database\n" +
+            "• **Architect field:** Defaults to your Discord nickname if not specified\n" +
+            "• **Reference system:** Use your current location for distance sorting\n" +
+            "• **SRV surveys:** Include survey links to help other players",
+        },
+        {
+          name: "🔒 Authorization System",
+          value:
+            "• **Project creators** can remove their own projects\n" +
+            "• **Participants + creators** can update project progress\n" +
+            "• **Anyone** can view project details and join projects\n" +
+            "• **Discord nicknames** are used for all user identification",
+        },
+      );
+
+    // Starport types embed
+    const starportEmbed = new EmbedBuilder()
+      .setTitle("🏗️ Starport Types")
+      .setColor(0x00ff99)
+      .addFields({
+        name: "Available Starport Types",
+        value:
+          "• **Coriolis** - Standard rotating station\n" +
+          "• **Ocellus** - Spherical station\n" +
+          "• **Orbis** - Hexagonal station\n" +
+          "• **Outpost** - Small landing pad station\n" +
+          "• **Planetary Outpost (L)** - Large Surface-based port\n" +
+          "• **Planetary Outpost (M)** - Medium mobile station\n" +
+          "• **Asteroid Base** - Hollowed asteroid\n" +
+          "• **Installation** - Installation structure\n\n" +
+          "• Add Rest of the detail in `notes` field when adding a project.",
+      });
+
+    await this.interaction.reply({
+      embeds: [
+        mainEmbed,
+        commandsEmbed,
+        moreCommandsEmbed,
+        tipsEmbed,
+        starportEmbed,
+      ],
+      ephemeral: true,
+    });
   }
 
   async updateProgress() {
@@ -547,6 +700,7 @@ export class Colonization {
 
     try {
       const userNickname = await this.getUserNickname();
+      const userId = this.interaction.user.id; // Use Discord user ID for participant check
 
       // Check if user is a participant in this project or the creator
       const participantIds = await getParticipantsByColonizationId(
@@ -555,12 +709,19 @@ export class Colonization {
       const participantNicknames =
         await this.getParticipantNicknames(participantIds);
 
-      const isParticipant = participantNicknames.includes(userNickname);
+      // Check both user ID (new format) and nickname (legacy format) for participation
+      const isParticipant =
+        participantIds.includes(userId) ||
+        participantIds.includes(userNickname);
       const isCreator = colonizationData.addedBy === userNickname;
 
       if (!isParticipant && !isCreator) {
         await this.interaction.editReply({
-          content: `You cannot update progress for this project. Only participants or the project creator can update progress.\nProject Creator: ${colonizationData.addedBy}\nCurrent participants: ${participantNicknames.join(", ") || "None"}`,
+          content: `You cannot update progress for this project. Only participants or the project creator can update progress.\nProject Creator: ${
+            colonizationData.addedBy
+          }\nCurrent participants: ${
+            participantNicknames.join(", ") || "None"
+          }`,
         });
         return;
       }
@@ -715,17 +876,27 @@ export class Colonization {
     const nicknames: string[] = [];
     for (const participantId of participantIds) {
       try {
-        const userMember =
-          await this.interaction.guild?.members.fetch(participantId);
-        const nickname =
-          userMember?.nickname || userMember?.user.username || participantId;
-        nicknames.push(nickname);
+        // Check if the participantId is a Discord snowflake (numeric string)
+        const isSnowflake = /^\d+$/.test(participantId);
+
+        if (isSnowflake) {
+          // It's a proper Discord user ID, fetch the member
+          const userMember =
+            await this.interaction.guild?.members.fetch(participantId);
+          const nickname =
+            userMember?.nickname || userMember?.user.username || participantId;
+          nicknames.push(nickname);
+        } else {
+          // It's likely an old entry with nickname/username, use it directly
+          // console.warn(`Found non-snowflake participant ID: ${participantId} - treating as legacy nickname`);
+          nicknames.push(participantId);
+        }
       } catch (error) {
         console.error(
           `Error fetching nickname for user ${participantId}:`,
           error,
         );
-        nicknames.push(participantId); // Fallback to user ID
+        nicknames.push(participantId); // Fallback to the ID/nickname as-is
       }
     }
     return nicknames;

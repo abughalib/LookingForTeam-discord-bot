@@ -16,7 +16,7 @@ async function deleteMessage(message: Message | null | undefined) {
       // This is a known error
       console.error("Failed to delete message 50027 error");
     } else {
-      console.log("Unknown Error: ", error);
+      console.error("Unknown Error: ", error);
     }
   });
 }

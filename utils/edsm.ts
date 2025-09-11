@@ -6,6 +6,7 @@ import {
   SystemInfo,
   SystemTrafficInfo,
 } from "./models";
+import { getSystemInfoFromCache, cacheSystemInfo } from "./database";
 
 /*
   EDSM API Queries here.
@@ -116,6 +117,20 @@ class EDSM {
   }
 
   static async getSystemInfo(systemName: string): Promise<SystemInfo | null> {
+    // First, try to get from cache
+    try {
+      const cachedSystemInfo = await getSystemInfoFromCache(systemName);
+      if (cachedSystemInfo) {
+        return cachedSystemInfo;
+      }
+    } catch (error) {
+      console.error(
+        "Error retrieving from cache, proceeding with API call:",
+        error,
+      );
+    }
+
+    // If not in cache, fetch from API
     const systemInfo = await fetch(
       AppSettings.BOT_SYSTEM_INFO_FETCH_URL +
         `?systemName=${encodeURIComponent(systemName)}&showCoordinates=1`,
@@ -130,7 +145,19 @@ class EDSM {
       return null;
     }
 
-    return systemInfo.json();
+    const systemInfoData: SystemInfo = await systemInfo.json();
+
+    // Cache the result if it's valid
+    if (systemInfoData && systemInfoData.coords) {
+      try {
+        await cacheSystemInfo(systemInfoData);
+      } catch (error) {
+        console.error("Error caching system info:", error);
+        // Don't throw here, just log the error since we still have the data
+      }
+    }
+
+    return systemInfoData;
   }
 }
 
