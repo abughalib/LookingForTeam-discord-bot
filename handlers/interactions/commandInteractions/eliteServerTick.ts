@@ -37,7 +37,7 @@ async function eliteServerTickInfo(interaction: CommandInteraction) {
       .catch((error) => {
         console.error("Cannot find Tick Info: " + error);
       });
-    deleteInteraction(interaction, AppSettings.ERROR_MESSAGE_DIMISS_TIMEOUT);
+    await deleteInteraction(interaction, AppSettings.ERROR_MESSAGE_DIMISS_TIMEOUT);
     return;
   }
 
@@ -70,7 +70,7 @@ async function eliteServerTickInfo(interaction: CommandInteraction) {
     .catch((error) => {
       console.error(`Error in Elite Server Tick Info: ${error}`);
     });
-  deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
+  await deleteInteraction(interaction, AppSettings.HELP_MESSAGE_DISMISS_TIMEOUT);
 }
 
 export default eliteServerTickInfo;

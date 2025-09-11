@@ -106,16 +106,16 @@ async function interactionCommandHandler(
       await colonization.updateProgress();
       break;
     case AppSettings.BOT_ELITE_SERVER_TICK_INFO:
-      eliteServerTickInfo(interaction);
+      await eliteServerTickInfo(interaction);
       break;
     case AppSettings.BOT_HELP_COMMAND_NAME:
-      helpReply(interaction);
+      await helpReply(interaction);
       break;
     case AppSettings.BOT_PING_COMMAND_NAME:
-      pingReply(interaction);
+      await pingReply(interaction);
       break;
     default:
-      defaultReply(interaction);
+      await defaultReply(interaction);
       break;
   }
 }
