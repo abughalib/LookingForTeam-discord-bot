@@ -4,7 +4,7 @@ import { Position } from "./models";
 const prisma = new PrismaClient();
 
 export async function addColonizationData(
-  colonization_data: ColonizationData
+  colonization_data: ColonizationData,
 ): Promise<number> {
   try {
     const result = await prisma.colonizationData.create({
@@ -18,7 +18,7 @@ export async function addColonizationData(
 }
 
 export async function getColonizationDataById(
-  id: number
+  id: number,
 ): Promise<ColonizationData | null> {
   try {
     return await prisma.colonizationData.findUnique({
@@ -31,7 +31,7 @@ export async function getColonizationDataById(
 }
 
 export async function getColonizationDataByProjectName(
-  projectName: string
+  projectName: string,
 ): Promise<ColonizationData | null> {
   try {
     return await prisma.colonizationData.findFirst({
@@ -48,7 +48,7 @@ export async function getAllColonizationData(
   pageSize: number = 5,
   projectName?: string,
   architect?: string,
-  position?: Position
+  position?: Position,
 ): Promise<ColonizationData[]> {
   try {
     const skip = (page - 1) * pageSize;
@@ -91,7 +91,7 @@ export async function getAllColonizationData(
           const euclideanDistance = Math.sqrt(
             Math.pow(item.positionX! - position.x, 2) +
               Math.pow(item.positionY! - position.y, 2) +
-              Math.pow(item.positionZ! - position.z, 2)
+              Math.pow(item.positionZ! - position.z, 2),
           );
 
           return {
@@ -124,7 +124,7 @@ export async function getAllColonizationData(
 }
 
 export async function getParticipantsByColonizationId(
-  colonizationId: number
+  colonizationId: number,
 ): Promise<string[]> {
   try {
     const participants = await prisma.participants.findMany({
@@ -151,7 +151,7 @@ export async function countColonizationActiveProjects(): Promise<number> {
 
 export async function participateInColonizationData(
   colonizationId: number,
-  userId: string
+  userId: string,
 ): Promise<any> {
   try {
     return await prisma.participants.create({
@@ -164,7 +164,7 @@ export async function participateInColonizationData(
 }
 
 export async function markColonizationDataAsCompleted(
-  id: number
+  id: number,
 ): Promise<void> {
   try {
     await prisma.colonizationData.update({
@@ -179,7 +179,7 @@ export async function markColonizationDataAsCompleted(
 
 export async function updateColonizationData(
   id: number,
-  updates: Partial<ColonizationData>
+  updates: Partial<ColonizationData>,
 ): Promise<void> {
   try {
     await prisma.colonizationData.update({
@@ -204,7 +204,7 @@ export async function removeColonizationDataById(id: number): Promise<void> {
 }
 
 export async function removeColonizationDataByProjectName(
-  projectName: string
+  projectName: string,
 ): Promise<void> {
   try {
     await prisma.colonizationData.deleteMany({
