@@ -11,13 +11,14 @@ class CreateButtons {
   */
   createDismissButton(
     customId: string = AppSettings.BUTTON_DISMISS_ID,
-    customLabel: string = AppSettings.BUTTON_DISMISS_LABEL,
+    customLabel: string = AppSettings.BUTTON_DELETE_LABEL,
+    customButtonStyle: ButtonStyle = ButtonStyle.Danger,
   ): ActionRowBuilder<ButtonBuilder> {
     return new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId(customId)
         .setLabel(customLabel)
-        .setStyle(ButtonStyle.Danger),
+        .setStyle(customButtonStyle),
     );
   }
 
@@ -30,7 +31,7 @@ class CreateButtons {
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId(AppSettings.BUTTON_DISMISS_ID)
-        .setLabel(AppSettings.BUTTON_DISMISS_LABEL)
+        .setLabel(AppSettings.BUTTON_DELETE_LABEL)
         .setStyle(ButtonStyle.Danger),
       new ButtonBuilder()
         .setCustomId(AppSettings.BUTTON_LEAVE_TEAM_ID)

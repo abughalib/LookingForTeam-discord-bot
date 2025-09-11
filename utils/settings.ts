@@ -339,7 +339,8 @@ export class AppSettings {
 
   // Button Labels corresponding to CustomIDs.
   static readonly BUTTON_JOIN_LABEL = "Request Team Invite";
-  static readonly BUTTON_DISMISS_LABEL = "Delete";
+  static readonly BUTTON_DELETE_LABEL = "Delete";
+  static readonly BUTTON_DISMISS_LABEL = "Dismiss";
   static readonly BUTTON_LEAVE_TEAM_LABEL = "Leave Team";
   static readonly BUTTON_ACCEPT_REQUEST_LABEL = "Accept Request";
   static readonly BUTTON_REQUEST_REQUEST_LABEL = "Decline/Cancel Request";

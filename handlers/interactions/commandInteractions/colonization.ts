@@ -43,6 +43,10 @@ export class Colonization {
       AppSettings.INTERACTION_COLONIZATION_SYSTEM_NAME_ID,
       true,
     );
+    const dismissButton = this.dismissButton.createDismissButton(
+      AppSettings.BUTTON_DISMISS_ID,
+      AppSettings.BUTTON_DISMISS_LABEL,
+    );
     const rawProjectName =
       options.getString(
         AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
@@ -114,6 +118,7 @@ export class Colonization {
       if (existingProject) {
         await this.interaction.editReply({
           content: `A colonization project with the name **${projectName}** already exists. Please choose a different project name.`,
+          components: [dismissButton],
         });
         return;
       }
@@ -141,11 +146,13 @@ export class Colonization {
       await participateInColonizationData(colonization_id, userId);
       await this.interaction.editReply({
         content: `Colonization project Name: **${projectName}** Added successfully.`,
+        components: [dismissButton],
       });
     } catch (error) {
       console.error("Error adding colonization data:", error);
       await this.interaction.followUp({
         content: `Failed to add colonization project: **${projectName}**. Please try again or contact an administrator.`,
+        components: [dismissButton],
       });
     }
   }
@@ -338,7 +345,9 @@ export class Colonization {
     if (currentPage < totalPages) {
       const nextButton = new ButtonBuilder()
         .setCustomId(
-          `${AppSettings.BUTTON_NEXT_COLONIZATION_LIST_ID}_${currentPage + 1}_${JSON.stringify({ projectName, architectName, referenceSystem })}`,
+          `${AppSettings.BUTTON_NEXT_COLONIZATION_LIST_ID}_${
+            currentPage + 1
+          }_${JSON.stringify({ projectName, architectName, referenceSystem })}`,
         )
         .setLabel(AppSettings.BUTTON_NEXT_COLONIZATION_LIST_LABEL)
         .setStyle(ButtonStyle.Primary);
@@ -667,7 +676,7 @@ export class Colonization {
         tipsEmbed,
         starportEmbed,
       ],
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   }
 

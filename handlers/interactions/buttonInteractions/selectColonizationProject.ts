@@ -1,4 +1,4 @@
-import { ButtonInteraction } from "discord.js";
+import { ButtonInteraction, MessageFlags } from "discord.js";
 import {
   getColonizationDataByProjectName,
   getParticipantsByColonizationId,
@@ -110,7 +110,7 @@ async function selectColonizationProject(interaction: ButtonInteraction) {
         .reply({
           content:
             "An error occurred while selecting the project. Please try again.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         })
         .catch(() => {
           console.error("Failed to send reply:", error);

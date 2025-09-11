@@ -4,6 +4,7 @@ import {
   ButtonInteraction,
   ButtonStyle,
   EmbedBuilder,
+  MessageFlags,
 } from "discord.js";
 import { AppSettings } from "../../../utils/settings";
 import {
@@ -157,9 +158,13 @@ async function nextColonizationList(interaction: ButtonInteraction) {
 
       embed.addFields({
         name: `Project Name: ${project.projectName}\nSystem Name: ${project.systemName}`,
-        value: `Architect: ${project.architect}\nProgress: ${project.progress}%\nPrimary Port: ${
+        value: `Architect: ${project.architect}\nProgress: ${
+          project.progress
+        }%\nPrimary Port: ${
           project.isPrimaryPort ? "Yes" : "No"
-        }\nStarport Type: ${project.starPortType}\nTime Left: ${timeLeftFormatted}${distanceText}${participantsText}\n${
+        }\nStarport Type: ${
+          project.starPortType
+        }\nTime Left: ${timeLeftFormatted}${distanceText}${participantsText}\n${
           project.srv_survey_link
             ? `[SRV Survey Link](${project.srv_survey_link})\n`
             : ""
@@ -192,7 +197,9 @@ async function nextColonizationList(interaction: ButtonInteraction) {
     if (page < totalPages) {
       const nextButton = new ButtonBuilder()
         .setCustomId(
-          `${AppSettings.BUTTON_NEXT_COLONIZATION_LIST_ID}_${page + 1}_${JSON.stringify(filters)}`,
+          `${AppSettings.BUTTON_NEXT_COLONIZATION_LIST_ID}_${
+            page + 1
+          }_${JSON.stringify(filters)}`,
         )
         .setLabel(AppSettings.BUTTON_NEXT_COLONIZATION_LIST_LABEL)
         .setStyle(ButtonStyle.Primary);
@@ -262,7 +269,7 @@ async function nextColonizationList(interaction: ButtonInteraction) {
       await interaction
         .reply({
           content: "An error occurred while navigating to the next page.",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         })
         .catch(() => {
           console.error("Failed to send reply:", error);
