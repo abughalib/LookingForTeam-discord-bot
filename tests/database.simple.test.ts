@@ -81,6 +81,14 @@ describe("Database Functions Unit Tests", () => {
     jest.clearAllMocks();
 
     // Set up default mock return values
+    mockPrisma.colonizationData.create.mockResolvedValue({
+      id: 1,
+      projectName: "Test Project",
+      systemName: "Test System",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
     mockPrisma.colonizationData.findUnique.mockResolvedValue({
       id: 1,
       projectName: "Test Project",
@@ -111,7 +119,12 @@ describe("Database Functions Unit Tests", () => {
     it("should successfully add colonization data", async () => {
       const testData = mockColonizationData[0] as ColonizationData;
 
-      await expect(addColonizationData(testData)).resolves.not.toThrow();
+      const result = await addColonizationData(testData);
+      expect(result).toBeDefined();
+      expect(typeof result).toBe("number");
+      expect(mockPrisma.colonizationData.create).toHaveBeenCalledWith({
+        data: testData,
+      });
     });
   });
 
