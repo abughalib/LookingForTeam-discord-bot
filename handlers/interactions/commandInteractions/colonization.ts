@@ -220,7 +220,7 @@ export class Colonization {
     );
 
     if (activeProjects.length === 0) {
-      await this.interaction.reply({
+      await this.interaction.editReply({
         content: "No active colonization projects found.",
         components: [dismissButton],
       });
@@ -294,7 +294,7 @@ export class Colonization {
       text: `Page 1 of ${Math.ceil(totalProjects / 5)}`,
     });
 
-    await this.interaction.reply({ embeds: [embed], components: [row] });
+    await this.interaction.editReply({ embeds: [embed], components: [row] });
   }
 
   async progress() {

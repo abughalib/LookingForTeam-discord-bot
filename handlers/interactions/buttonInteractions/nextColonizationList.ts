@@ -15,12 +15,25 @@ async function nextColonizationList(interaction: ButtonInteraction) {
     });
   } catch (error) {
     console.error("Error handling next colonization list:", error);
-    await interaction
-      .reply({
-        content: "An error occurred while navigating to the next page.",
-        ephemeral: true,
-      })
-      .catch(() => {});
+    // Use editReply if already replied/deferred, otherwise use reply
+    if (interaction.replied || interaction.deferred) {
+      await interaction
+        .editReply({
+          content: "An error occurred while navigating to the next page.",
+        })
+        .catch(() => {
+          console.error("Failed to edit reply:", error);
+        });
+    } else {
+      await interaction
+        .reply({
+          content: "An error occurred while navigating to the next page.",
+          ephemeral: true,
+        })
+        .catch(() => {
+          console.error("Failed to send reply:", error);
+        });
+    }
   }
 }
 

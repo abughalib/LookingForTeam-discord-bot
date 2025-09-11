@@ -113,7 +113,7 @@ async function wingInteraction(
     !(await isValidDuration(interaction, when)) ||
     !(await isValidDuration(interaction, duration + when))
   ) {
-    await interaction.reply({
+    await interaction.editReply({
       content: AppSettings.INVALID_DURATION_MESSAGE,
     });
     return;

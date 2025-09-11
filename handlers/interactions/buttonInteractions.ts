@@ -1,4 +1,4 @@
-import { ButtonInteraction } from "discord.js";
+import { ButtonInteraction, MessageFlags } from "discord.js";
 import { AppSettings } from "../../utils/settings";
 import acceptOrReject from "./buttonInteractions/acceptReject";
 import dismissButton from "./buttonInteractions/dismissButton";
@@ -46,13 +46,24 @@ async function interactionButtonHandler(interaction: ButtonInteraction) {
 
       // If More features are required
       // Would be Implemented later...
-      await interaction
-        .reply({
-          content: "This feature is not implemented yet",
-        })
-        .catch((err) => {
-          console.error("When button interaction is not implemented: " + err);
-        });
+      if (interaction.replied || interaction.deferred) {
+        await interaction
+          .editReply({
+            content: "This feature is not implemented yet",
+          })
+          .catch((err) => {
+            console.error("When button interaction is not implemented: " + err);
+          });
+      } else {
+        await interaction
+          .reply({
+            content: "This feature is not implemented yet",
+            flags: MessageFlags.Ephemeral,
+          })
+          .catch((err) => {
+            console.error("When button interaction is not implemented: " + err);
+          });
+      }
       break;
   }
 }

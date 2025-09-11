@@ -63,12 +63,27 @@ async function selectColonizationProject(interaction: ButtonInteraction) {
     }
   } catch (error) {
     console.error("Error handling colonization project selection:", error);
-    await interaction
-      .editReply({
-        content:
-          "An error occurred while selecting the project. Please try again.",
-      })
-      .catch(() => {});
+    // Use editReply if already deferred, otherwise use reply
+    if (interaction.replied || interaction.deferred) {
+      await interaction
+        .editReply({
+          content:
+            "An error occurred while selecting the project. Please try again.",
+        })
+        .catch(() => {
+          console.error("Failed to edit reply:", error);
+        });
+    } else {
+      await interaction
+        .reply({
+          content:
+            "An error occurred while selecting the project. Please try again.",
+          ephemeral: true,
+        })
+        .catch(() => {
+          console.error("Failed to send reply:", error);
+        });
+    }
   }
 }
 
