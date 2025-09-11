@@ -40,7 +40,7 @@ const mockColonizationData: Partial<ColonizationData>[] = [
     id: 1,
     projectName: "Sol Gateway Station",
     systemName: "Sol",
-    timeLeft: BigInt(86400), // 1 day
+    timeLeft: 86400, // 1 day
     positionX: 0,
     positionY: 0,
     positionZ: 0,
@@ -59,7 +59,7 @@ const mockColonizationData: Partial<ColonizationData>[] = [
     id: 2,
     projectName: "Sirius Industrial Complex",
     systemName: "Sirius",
-    timeLeft: BigInt(172800), // 2 days
+    timeLeft: 172800, // 2 days
     positionX: -1.48,
     positionY: -1.48,
     positionZ: 8.59,
@@ -161,7 +161,6 @@ describe("Database Functions Unit Tests", () => {
         undefined,
         undefined,
         undefined,
-        "sirius",
       );
       expect(result).toBeDefined();
     });
@@ -179,13 +178,7 @@ describe("Database Functions Unit Tests", () => {
       ]);
 
       const solPosition: Position = { x: 0, y: 0, z: 0 };
-      const result = await getAllColonizationData(
-        1,
-        5,
-        undefined,
-        solPosition,
-        5,
-      );
+      const result = await getAllColonizationData(1, 5, undefined);
       expect(result).toBeDefined();
       expect(result.length).toBeGreaterThanOrEqual(0);
     });

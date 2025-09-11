@@ -1,6 +1,11 @@
 import { AppSettings } from "./settings";
 import { SystemFactionInfo, Factions } from "./systemInfoModel";
-import { ServerStatusModel, SystemDeath, SystemTrafficInfo } from "./models";
+import {
+  ServerStatusModel,
+  SystemDeath,
+  SystemInfo,
+  SystemTrafficInfo,
+} from "./models";
 
 /*
   EDSM API Queries here.
@@ -18,7 +23,7 @@ class EDSM {
       Fetches system Factions from EDSM
   */
   async fetchSystemFactionInfo(systemName: string, showHistory: number = 0) {
-    let resp = await fetch(AppSettings.BOT_SYSTEM_INFO_FETCH_URL, {
+    let resp = await fetch(AppSettings.BOT_SYSTEM_FACTION_FETCH_URL, {
       method: "POST",
       body: JSON.stringify({
         systemName: systemName,
@@ -108,6 +113,24 @@ class EDSM {
       controllingFaction: json_data.controllingFaction,
       factions: json_data.factions,
     };
+  }
+
+  static async getSystemInfo(systemName: string): Promise<SystemInfo | null> {
+    const systemInfo = await fetch(
+      AppSettings.BOT_SYSTEM_INFO_FETCH_URL +
+        `?systemName=${encodeURIComponent(systemName)}&showCoordinates=1`,
+      {
+        method: "GET",
+        headers: AppSettings.BOT_HEADER,
+      },
+    );
+
+    if (!systemInfo.ok) {
+      console.error("EDSM not responding: ", systemInfo.statusText);
+      return null;
+    }
+
+    return systemInfo.json();
   }
 }
 

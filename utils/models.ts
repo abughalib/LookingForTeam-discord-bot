@@ -22,6 +22,16 @@ interface SystemTrafficInfo {
   breakdown: Breakdown | null;
 }
 
+interface SystemInfo {
+  name: string;
+  coords: {
+    x: number;
+    y: number;
+    z: number;
+  };
+  coordsLocked: boolean;
+}
+
 interface Discovery {
   commander: string;
   date: string;
@@ -84,4 +94,5 @@ export {
   SystemDeath,
   TickInfo,
   Position,
+  SystemInfo,
 };

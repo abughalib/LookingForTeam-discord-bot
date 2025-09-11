@@ -11,7 +11,7 @@ model ColonizationData {
     id              Int            @id @default(autoincrement())
     projectName     String
     systemName      String
-    timeLeft        BigInt? // Time in seconds
+    timeLeft        Int? // Time in seconds
     positionX       Float?
     positionY       Float?
     positionZ       Float?

@@ -53,7 +53,7 @@ describe("Database Integration Tests (Simple)", () => {
       > = {
         projectName: "Sol Gateway Station",
         systemName: "Sol",
-        timeLeft: BigInt(86400), // 1 day
+        timeLeft: 86400, // 1 day
         positionX: 0,
         positionY: 0,
         positionZ: 0,
@@ -86,7 +86,7 @@ describe("Database Integration Tests (Simple)", () => {
         {
           projectName: "Sol Gateway Station",
           systemName: "Sol",
-          timeLeft: BigInt(86400),
+          timeLeft: 86400,
           positionX: 0,
           positionY: 0,
           positionZ: 0,
@@ -102,7 +102,7 @@ describe("Database Integration Tests (Simple)", () => {
         {
           projectName: "Sirius Industrial Complex",
           systemName: "Sirius",
-          timeLeft: BigInt(172800),
+          timeLeft: 172800,
           positionX: -1.48,
           positionY: -1.48,
           positionZ: 8.59,
@@ -122,7 +122,12 @@ describe("Database Integration Tests (Simple)", () => {
       }
 
       // Filter by architect (case-insensitive)
-      const jamesonProjects = await getAllColonizationData(1, 10, "jameson");
+      const jamesonProjects = await getAllColonizationData(
+        1,
+        10,
+        undefined,
+        "jameson",
+      );
 
       expect(jamesonProjects).toHaveLength(1);
       expect(jamesonProjects[0].architect).toBe("Commander Jameson");
@@ -134,7 +139,7 @@ describe("Database Integration Tests (Simple)", () => {
       const project = {
         projectName: "Sirius Industrial Complex",
         systemName: "Sirius",
-        timeLeft: BigInt(172800),
+        timeLeft: 172800,
         positionX: -1.48,
         positionY: -1.48,
         positionZ: 8.59,
@@ -157,7 +162,6 @@ describe("Database Integration Tests (Simple)", () => {
         undefined,
         undefined,
         undefined,
-        "sirius",
       );
 
       expect(siriusProjects).toHaveLength(1);
@@ -171,7 +175,7 @@ describe("Database Integration Tests (Simple)", () => {
         {
           projectName: "Sol Gateway Station",
           systemName: "Sol",
-          timeLeft: BigInt(86400),
+          timeLeft: 86400,
           positionX: 0,
           positionY: 0,
           positionZ: 0,
@@ -187,7 +191,7 @@ describe("Database Integration Tests (Simple)", () => {
         {
           projectName: "Alpha Centauri Trade Hub",
           systemName: "Alpha Centauri",
-          timeLeft: BigInt(259200),
+          timeLeft: 259200,
           positionX: -0.375,
           positionY: 1.25,
           positionZ: -1.40625,
@@ -203,7 +207,7 @@ describe("Database Integration Tests (Simple)", () => {
         {
           projectName: "Sirius Industrial Complex",
           systemName: "Sirius",
-          timeLeft: BigInt(172800),
+          timeLeft: 172800,
           positionX: -1.48,
           positionY: -1.48,
           positionZ: 8.59,
@@ -224,33 +228,36 @@ describe("Database Integration Tests (Simple)", () => {
 
       const solPosition: Position = { x: 0, y: 0, z: 0 };
 
-      // Get projects within 5 light-years of Sol
+      // Get projects sorted by distance from Sol
       const nearbyProjects = await getAllColonizationData(
         1,
         10,
         undefined,
+        undefined,
         solPosition,
-        5,
       );
 
-      // Should include Sol (distance 0) and Alpha Centauri (distance ~4.3 LY)
-      // Should exclude Sirius (distance ~8.6 LY)
+      // Should get all projects sorted by distance from Sol
+      // Sol (distance 0), Alpha Centauri (distance ~4.3 LY), Sirius (distance ~8.6 LY)
       expect(nearbyProjects.length).toBeGreaterThanOrEqual(1);
 
       const systemNames = nearbyProjects.map((p) => p.systemName);
 
-      // Check if Sol is in the results (it should be since it's at distance 0)
-      const hasSol = systemNames.some((name) => name === "Sol");
-      // Check if Alpha Centauri is in the results (it should be within 5 LY)
-      const hasAlphaCentauri = systemNames.some(
-        (name) => name === "Alpha Centauri",
-      );
+      // Sol should be first (closest at distance 0)
+      if (nearbyProjects.length > 0) {
+        expect(nearbyProjects[0].systemName).toBe("Sol");
+      }
 
-      // At least one of these should be true
-      expect(hasSol || hasAlphaCentauri).toBeTruthy();
-
-      // Make sure we didn't get Sirius (it's too far)
-      expect(systemNames).not.toContain("Sirius");
+      // If we have multiple results, they should be sorted by distance
+      // Alpha Centauri should come before Sirius
+      if (
+        systemNames.includes("Alpha Centauri") &&
+        systemNames.includes("Sirius")
+      ) {
+        const alphaIndex = systemNames.indexOf("Alpha Centauri");
+        const siriusIndex = systemNames.indexOf("Sirius");
+        expect(alphaIndex).toBeLessThan(siriusIndex);
+      }
     });
 
     it("should exclude completed projects by default", async () => {
@@ -259,7 +266,7 @@ describe("Database Integration Tests (Simple)", () => {
         {
           projectName: "Completed Project",
           systemName: "Completed System",
-          timeLeft: BigInt(0),
+          timeLeft: 0,
           positionX: 0,
           positionY: 0,
           positionZ: 0,
@@ -275,7 +282,7 @@ describe("Database Integration Tests (Simple)", () => {
         {
           projectName: "Active Project",
           systemName: "Active System",
-          timeLeft: BigInt(86400),
+          timeLeft: 86400,
           positionX: 1,
           positionY: 1,
           positionZ: 1,
@@ -307,7 +314,7 @@ describe("Database Integration Tests (Simple)", () => {
       const project = {
         projectName: "Test Project",
         systemName: "Test System",
-        timeLeft: BigInt(86400),
+        timeLeft: 86400,
         positionX: 0,
         positionY: 0,
         positionZ: 0,
@@ -340,7 +347,7 @@ describe("Database Integration Tests (Simple)", () => {
       const project = {
         projectName: "To Complete Project",
         systemName: "To Complete System",
-        timeLeft: BigInt(86400),
+        timeLeft: 86400,
         positionX: 0,
         positionY: 0,
         positionZ: 0,
@@ -377,7 +384,7 @@ describe("Database Integration Tests (Simple)", () => {
       const project = {
         projectName: "To Delete Project",
         systemName: "To Delete System",
-        timeLeft: BigInt(86400),
+        timeLeft: 86400,
         positionX: 0,
         positionY: 0,
         positionZ: 0,

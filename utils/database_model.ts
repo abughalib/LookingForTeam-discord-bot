@@ -2,12 +2,12 @@ export interface ColonizationData {
   id: number;
   projectName: string;
   systemName: string;
-  timeLeft: number;
-  positionX: number;
-  positionY: number;
-  positionZ: number;
+  timeLeft?: number; // Time in seconds
+  positionX?: number;
+  positionY?: number;
+  positionZ?: number;
   architect: string;
-  progress: number;
+  progress?: number;
   starPortType: string;
   isPrimaryPort: boolean;
   srv_survey_link: string;
@@ -19,10 +19,9 @@ export interface ColonizationData {
   participants: Participants[];
 }
 
-interface Participants {
+export interface Participants {
   id: number;
-  colonizationDataId: number;
-  username: string;
-  role: string;
   joinedAt: Date;
+  userId: string;
+  colonizationDataId: number;
 }

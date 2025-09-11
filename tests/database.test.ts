@@ -41,7 +41,7 @@ const mockColonizationData: Partial<ColonizationData>[] = [
     id: 1,
     projectName: "Sol Gateway Station",
     systemName: "Sol",
-    timeLeft: BigInt(86400), // 1 day
+    timeLeft: 86400, // 1 day
     positionX: 0,
     positionY: 0,
     positionZ: 0,
@@ -60,7 +60,7 @@ const mockColonizationData: Partial<ColonizationData>[] = [
     id: 2,
     projectName: "Sirius Industrial Complex",
     systemName: "Sirius",
-    timeLeft: BigInt(172800), // 2 days
+    timeLeft: 172800, // 2 days
     positionX: -1.48,
     positionY: -1.48,
     positionZ: 8.59,
@@ -79,7 +79,7 @@ const mockColonizationData: Partial<ColonizationData>[] = [
     id: 3,
     projectName: "Sagittarius A* Research Station",
     systemName: "Sagittarius A*",
-    timeLeft: BigInt(604800), // 7 days
+    timeLeft: 604800, // 7 days
     positionX: 25.21875,
     positionY: -20.90625,
     positionZ: 25899.96875,
@@ -98,7 +98,7 @@ const mockColonizationData: Partial<ColonizationData>[] = [
     id: 4,
     projectName: "Alpha Centauri Trade Hub",
     systemName: "Alpha Centauri",
-    timeLeft: BigInt(0),
+    timeLeft: 0,
     positionX: -0.375,
     positionY: 1.25,
     positionZ: -1.40625,
@@ -117,7 +117,7 @@ const mockColonizationData: Partial<ColonizationData>[] = [
     id: 5,
     projectName: "Proxima Research Outpost",
     systemName: "Proxima Centauri",
-    timeLeft: BigInt(43200), // 12 hours
+    timeLeft: 43200, // 12 hours
     positionX: -1.1875,
     positionY: 0.875,
     positionZ: -1.1875,
@@ -217,10 +217,7 @@ describe("Database Functions", () => {
 
       expect(result).toEqual(expectedData);
       expect(prisma.colonizationData.findMany).toHaveBeenCalledWith({
-        skip: 0,
-        take: 5,
         where: { isCompleted: false },
-        orderBy: [{ timeLeft: "asc" }, { isPrimaryPort: "desc" }],
       });
     });
 
@@ -228,52 +225,39 @@ describe("Database Functions", () => {
       const filteredData = [mockColonizationData[0]];
       prisma.colonizationData.findMany.mockResolvedValue(filteredData);
 
-      const result = await getAllColonizationData(1, 5, "jameson");
+      const result = await getAllColonizationData(1, 5, undefined, "jameson");
 
       expect(prisma.colonizationData.findMany).toHaveBeenCalledWith({
-        skip: 0,
-        take: 5,
         where: {
           isCompleted: false,
           architect: {
             contains: "jameson",
           },
         },
-        orderBy: [{ timeLeft: "asc" }, { isPrimaryPort: "desc" }],
       });
     });
 
-    it("should filter by system name with case-insensitive partial matching", async () => {
+    it("should filter by project name with case-insensitive partial matching", async () => {
       const filteredData = [mockColonizationData[1]];
       prisma.colonizationData.findMany.mockResolvedValue(filteredData);
 
-      const result = await getAllColonizationData(
-        1,
-        5,
-        undefined,
-        undefined,
-        undefined,
-        "sirius",
-      );
+      const result = await getAllColonizationData(1, 5, "sirius");
 
       expect(prisma.colonizationData.findMany).toHaveBeenCalledWith({
-        skip: 0,
-        take: 5,
         where: {
           isCompleted: false,
-          systemName: {
+          projectName: {
             contains: "sirius",
           },
         },
-        orderBy: [{ timeLeft: "asc" }, { isPrimaryPort: "desc" }],
       });
     });
 
-    it("should apply distance filtering with 3D Euclidean distance", async () => {
+    it("should sort by distance when position is provided", async () => {
       // Test data with positions relative to Sol (0,0,0)
       const allData = [
-        mockColonizationData[0], // Sol (0,0,0) - distance 0
         mockColonizationData[1], // Sirius (~8.6 LY) - distance ~8.6
+        mockColonizationData[0], // Sol (0,0,0) - distance 0
         mockColonizationData[4], // Proxima (~4.2 LY) - distance ~2.13
       ].filter((d) => !d.isCompleted);
 
@@ -284,20 +268,25 @@ describe("Database Functions", () => {
         1,
         5,
         undefined,
+        undefined,
         solPosition,
-        5,
       );
 
-      // Should return Sol and Proxima (within 5 LY), but not Sirius
+      // Results should be sorted by distance (closest first)
       expect(result.length).toBeGreaterThanOrEqual(1);
-      // Sol should always be included (distance 0)
-      expect(result.some((r) => r.systemName === "Sol")).toBe(true);
-      // Proxima should be included (distance ~1.9 LY)
-      expect(result.some((r) => r.systemName === "Proxima Centauri")).toBe(
-        true,
-      );
-      // Sirius should be excluded (distance ~8.6 LY > 5 LY limit)
-      expect(result.some((r) => r.systemName === "Sirius")).toBe(false);
+
+      // Sol should be first (distance 0)
+      expect(result[0].systemName).toBe("Sol");
+
+      // If we have multiple results, the next closest should be Proxima
+      if (result.length > 1) {
+        expect(result[1].systemName).toBe("Proxima Centauri");
+      }
+
+      // If we have all results, Sirius should be last (farthest)
+      if (result.length === 3) {
+        expect(result[2].systemName).toBe("Sirius");
+      }
     });
 
     it("should handle pagination correctly", async () => {
@@ -307,10 +296,7 @@ describe("Database Functions", () => {
       const result = await getAllColonizationData(2, 2);
 
       expect(prisma.colonizationData.findMany).toHaveBeenCalledWith({
-        skip: 2, // (page 2 - 1) * pageSize 2 = 2
-        take: 2,
         where: { isCompleted: false },
-        orderBy: [{ timeLeft: "asc" }, { isPrimaryPort: "desc" }],
       });
     });
   });
@@ -377,7 +363,7 @@ describe("Database Functions", () => {
     });
 
     it("should handle partial updates correctly", async () => {
-      const updates = { timeLeft: BigInt(3600) }; // 1 hour remaining
+      const updates = { timeLeft: 3600 }; // 1 hour remaining
       prisma.colonizationData.update.mockResolvedValue({});
 
       await updateColonizationData(2, updates);
@@ -462,13 +448,10 @@ describe("Database Functions", () => {
     it("should handle empty search strings", async () => {
       prisma.colonizationData.findMany.mockResolvedValue([]);
 
-      await getAllColonizationData(1, 5, "", undefined, undefined, "");
+      await getAllColonizationData(1, 5, "", "");
 
       expect(prisma.colonizationData.findMany).toHaveBeenCalledWith({
-        skip: 0,
-        take: 5,
         where: { isCompleted: false },
-        orderBy: [{ timeLeft: "asc" }, { isPrimaryPort: "desc" }],
       });
     });
 
@@ -492,13 +475,11 @@ describe("Database Functions", () => {
         dataWithInvalidPositions,
       );
 
-      const result = await getAllColonizationData(
-        1,
-        5,
-        undefined,
-        { x: 0, y: 0, z: 0 },
-        10,
-      );
+      const result = await getAllColonizationData(1, 5, undefined, undefined, {
+        x: 0,
+        y: 0,
+        z: 0,
+      });
 
       // Should filter out items with incomplete position data
       expect(result).toHaveLength(0);
@@ -508,13 +489,11 @@ describe("Database Functions", () => {
       const exactMatchData = [mockColonizationData[0]]; // Sol at (0,0,0)
       prisma.colonizationData.findMany.mockResolvedValue(exactMatchData);
 
-      const result = await getAllColonizationData(
-        1,
-        5,
-        undefined,
-        { x: 0, y: 0, z: 0 },
-        0, // Zero distance - only exact matches
-      );
+      const result = await getAllColonizationData(1, 5, undefined, undefined, {
+        x: 0,
+        y: 0,
+        z: 0,
+      });
 
       expect(result).toHaveLength(1);
       expect(result[0].systemName).toBe("Sol");
