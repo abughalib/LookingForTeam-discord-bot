@@ -55,7 +55,7 @@ export class Colonization {
       (options.getString(
         AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
         false,
-      ) as string) ?? this.interaction.user.username;
+      ) as string) ?? (await this.getUserNickname());
     const notes =
       (options.getString(
         AppSettings.INTERACTION_COLONIZATION_NOTES_ID,
@@ -110,6 +110,7 @@ export class Colonization {
     console.log(systemInfo);
 
     try {
+      const userNickname = await this.getUserNickname();
       const colonization_id = await addColonizationData({
         id: 0,
         projectName,
@@ -127,12 +128,9 @@ export class Colonization {
         starPortType: starPortType,
         createdAt: nowTime,
         updatedAt: nowTime,
-        addedBy: this.interaction.user.username,
+        addedBy: userNickname,
       });
-      await participateInColonizationData(
-        colonization_id,
-        this.interaction.user.username,
-      );
+      await participateInColonizationData(colonization_id, userNickname);
       await this.interaction.editReply({
         content: `Colonization project Name: **${projectName}** Added successfully.`,
       });
@@ -158,6 +156,27 @@ export class Colonization {
     });
 
     try {
+      const userNickname = await this.getUserNickname();
+
+      // Check if the colonization project exists and get its data
+      const colonizationData =
+        await getColonizationDataByProjectName(projectName);
+
+      if (!colonizationData) {
+        await this.interaction.editReply({
+          content: `No colonization project found with the name **${projectName}**.`,
+        });
+        return;
+      }
+
+      // Check if the user trying to remove is the one who added it
+      if (colonizationData.addedBy !== userNickname) {
+        await this.interaction.editReply({
+          content: `You cannot remove this colonization project. Only **${colonizationData.addedBy}** (who created it) can remove it.`,
+        });
+        return;
+      }
+
       await removeColonizationDataByProjectName(projectName);
 
       await this.interaction.editReply({
@@ -229,8 +248,13 @@ export class Colonization {
 
     const participantNames = await Promise.all(
       activeProjects.map(async (project) => {
+        const participantIds = await getParticipantsByColonizationId(
+          project.id,
+        );
+        const participantNicknames =
+          await this.getParticipantNicknames(participantIds);
         return {
-          [project.id]: await getParticipantsByColonizationId(project.id),
+          [project.id]: participantNicknames,
         };
       }),
     );
@@ -255,15 +279,33 @@ export class Colonization {
           ? `\nParticipants: ${projectParticipants.join(", ")}`
           : "";
 
+      // Calculate distance if reference system is provided
+      let distanceText = "";
+      if (
+        position &&
+        project.positionX !== null &&
+        project.positionY !== null &&
+        project.positionZ !== null
+      ) {
+        const distance = this.calculateDistance(position, {
+          x: project.positionX,
+          y: project.positionY,
+          z: project.positionZ,
+        });
+        distanceText = `\nDistance: ${distance.toFixed(2)} Ly`;
+      } else if (position) {
+        distanceText = `\nDistance: ∞ Ly (coordinates unavailable)`;
+      }
+
       embed.addFields({
-        name: `${project.projectName} - ${project.systemName}`,
+        name: `Project Name: ${project.projectName}\nSystem Name: ${project.systemName}`,
         value: `Architect: ${project.architect}\nProgress: ${
           project.progress
         }%\nPrimary Port: ${
           project.isPrimaryPort ? "Yes" : "No"
         }\nStarport Type: ${
           project.starPortType
-        }\nTime Left: ${timeLeftFormatted}${participantsText}\n${
+        }\nTime Left: ${timeLeftFormatted}${distanceText}${participantsText}\n${
           project.srv_survey_link
             ? `[SRV Survey Link](${project.srv_survey_link})\n`
             : ""
@@ -325,9 +367,10 @@ export class Colonization {
       colonizationData.timeLeft || Infinity,
     );
 
-    const participantNames = await getParticipantsByColonizationId(
+    const participantIds = await getParticipantsByColonizationId(
       colonizationData.id,
     );
+    const participantNames = await this.getParticipantNicknames(participantIds);
 
     const embed = new EmbedBuilder()
       .setTitle(`Colonization Project: ${colonizationData.projectName}`)
@@ -399,10 +442,21 @@ export class Colonization {
     }
 
     try {
-      await participateInColonizationData(
+      const userNickname = await this.getUserNickname();
+
+      // Check if user is already participating
+      const participants = await getParticipantsByColonizationId(
         colonizationData.id,
-        this.interaction.user.username,
       );
+      if (participants.includes(userNickname)) {
+        await this.interaction.editReply({
+          content: `You already joined the colonization project **${projectName}**.`,
+          components: [dismissButton],
+        });
+        return;
+      }
+
+      await participateInColonizationData(colonizationData.id, userNickname);
       await this.interaction.editReply({
         content: `You have successfully joined the colonization project **${projectName}**.`,
         components: [dismissButton],
@@ -477,8 +531,6 @@ export class Colonization {
       true,
     ) as number;
 
-    const dismissButton = this.dismissButton.createDismissButton();
-
     await this.interaction.deferReply({
       flags: MessageFlags.Ephemeral,
     });
@@ -494,6 +546,24 @@ export class Colonization {
     }
 
     try {
+      const userNickname = await this.getUserNickname();
+
+      // Check if user is a participant in this project or the creator
+      const participantIds = await getParticipantsByColonizationId(
+        colonizationData.id,
+      );
+      const participantNicknames =
+        await this.getParticipantNicknames(participantIds);
+
+      const isParticipant = participantNicknames.includes(userNickname);
+      const isCreator = colonizationData.addedBy === userNickname;
+
+      if (!isParticipant && !isCreator) {
+        await this.interaction.editReply({
+          content: `You cannot update progress for this project. Only participants or the project creator can update progress.\nProject Creator: ${colonizationData.addedBy}\nCurrent participants: ${participantNicknames.join(", ") || "None"}`,
+        });
+        return;
+      }
       // Update the progress and updatedAt fields
       colonizationData.progress = progress;
       colonizationData.updatedAt = new Date();
@@ -602,5 +672,62 @@ export class Colonization {
       .setTimestamp(Date.now());
 
     return embeded_message;
+  }
+
+  /**
+   * Calculate Euclidean distance between two 3D points in light years
+   * @param pos1 First position (reference system)
+   * @param pos2 Second position (target system)
+   * @returns Distance in light years
+   */
+  private calculateDistance(pos1: Position, pos2: Position): number {
+    const dx = pos1.x - pos2.x;
+    const dy = pos1.y - pos2.y;
+    const dz = pos1.z - pos2.z;
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  }
+
+  /**
+   * Get the user's nickname or username if nickname is not available
+   * @param userId User ID to fetch nickname for
+   * @returns User's server nickname or username
+   */
+  private async getUserNickname(userId?: string): Promise<string> {
+    try {
+      const targetUserId = userId || this.interaction.user.id;
+      const userInteracted =
+        await this.interaction.guild?.members.fetch(targetUserId);
+      return userInteracted?.nickname || this.interaction.user.username;
+    } catch (error) {
+      console.error("Error fetching user nickname:", error);
+      return this.interaction.user.username;
+    }
+  }
+
+  /**
+   * Convert participant IDs to nicknames
+   * @param participantIds Array of participant user IDs
+   * @returns Array of participant nicknames
+   */
+  private async getParticipantNicknames(
+    participantIds: string[],
+  ): Promise<string[]> {
+    const nicknames: string[] = [];
+    for (const participantId of participantIds) {
+      try {
+        const userMember =
+          await this.interaction.guild?.members.fetch(participantId);
+        const nickname =
+          userMember?.nickname || userMember?.user.username || participantId;
+        nicknames.push(nickname);
+      } catch (error) {
+        console.error(
+          `Error fetching nickname for user ${participantId}:`,
+          error,
+        );
+        nicknames.push(participantId); // Fallback to user ID
+      }
+    }
+    return nicknames;
   }
 }

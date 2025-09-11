@@ -1,8 +1,29 @@
 import { ButtonInteraction } from "discord.js";
 import {
   getColonizationDataByProjectName,
+  getParticipantsByColonizationId,
   participateInColonizationData,
 } from "../../../utils/database";
+
+/**
+ * Get the user's nickname or username if nickname is not available
+ * @param interaction Button interaction
+ * @param userId User ID to fetch nickname for
+ * @returns User's server nickname or username
+ */
+async function getUserNickname(
+  interaction: ButtonInteraction,
+  userId?: string,
+): Promise<string> {
+  try {
+    const targetUserId = userId || interaction.user.id;
+    const userInteracted = await interaction.guild?.members.fetch(targetUserId);
+    return userInteracted?.nickname || interaction.user.username;
+  } catch (error) {
+    console.error("Error fetching user nickname:", error);
+    return interaction.user.username;
+  }
+}
 
 /**
  * Handles colonization project selection buttons (1, 2, 3, etc.)
@@ -29,10 +50,21 @@ async function selectColonizationProject(interaction: ButtonInteraction) {
       return;
     }
 
-    const username = interaction.user.username;
+    const userNickname = await getUserNickname(interaction);
 
     try {
-      await participateInColonizationData(selectedProject.id, username);
+      // Check if user is already participating
+      const participants = await getParticipantsByColonizationId(
+        selectedProject.id,
+      );
+      if (participants.includes(userNickname)) {
+        await interaction.editReply({
+          content: `You are already participating in the colonization project **${selectedProject.projectName}**.`,
+        });
+        return;
+      }
+
+      await participateInColonizationData(selectedProject.id, userNickname);
 
       await interaction.editReply({
         content: `You have successfully joined the colonization project **${selectedProject.projectName}** in **${selectedProject.systemName}**!`,
