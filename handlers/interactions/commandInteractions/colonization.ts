@@ -67,11 +67,11 @@ export class Colonization {
         false,
       ) as string) ?? "";
 
-    const timeLeft =
+    let timeLeft =
       (options.getString(
         AppSettings.INTERACTION_COLONIZATION_TIMELEFT_ID,
         false,
-      ) as string) ?? "0";
+      ) as string) ?? "4w";
     const isPrimaryPort =
       (options.getBoolean(
         AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
@@ -245,6 +245,16 @@ export class Colonization {
       false,
     ) as string | null;
 
+    const isPrimaryPort = this.chatInputInteraction.options.getBoolean(
+      AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
+      false,
+    ) as boolean | null;
+
+    const starPortType = this.chatInputInteraction.options.getString(
+      AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_ID,
+      false,
+    ) as string | null;
+
     const referenceSystem = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_REFERENCE_SYSTEM_ID,
       false,
@@ -260,12 +270,17 @@ export class Colonization {
       const systemInfo: SystemInfo | null =
         await EDSM.getSystemInfo(referenceSystem);
 
-      if (systemInfo) {
+      if (systemInfo && systemInfo.coords) {
         position = {
           x: systemInfo.coords.x,
           y: systemInfo.coords.y,
           z: systemInfo.coords.z,
         };
+      } else {
+        await this.interaction.editReply({
+          content: `Could not find system info for reference system **${referenceSystem}**. Distance calculations will be skipped.`,
+          components: [dismissButton],
+        });
       }
     }
 
@@ -275,6 +290,8 @@ export class Colonization {
       projectName || undefined,
       architectName || undefined,
       position || undefined,
+      isPrimaryPort || undefined,
+      starPortType || undefined,
     );
 
     if (activeProjects.length === 0) {
@@ -651,11 +668,11 @@ export class Colonization {
         {
           name: "📋 `/colonization_list`",
           value:
-            "**List all active projects with filtering options**\n" +
-            "• **Optional filters:** `project_name`, `architect_name`, `reference_system`\n" +
-            "• **Distance sorting:** Use `reference_system` to sort by distance from your location\n" +
+            "**List all active projects with smart sorting**\n" +
+            "• **Optional filters:** `project_name`, `architect_name`, `reference_system`, `is_primary_port`, `starport_type`\n" +
+            "• **Smart sorting priority:** 1) Distance (if reference system), 2) Time left, 3) Primary ports, 4) Progress\n" +
             "• **Interactive:** Use numbered buttons to select projects\n" +
-            '• **Example:** `/colonization list reference_system:"Sol"`',
+            '• **Example:** `/colonization list reference_system:"Sol" is_primary_port:true`',
         },
         {
           name: "👥 `/colonization_participate`",
@@ -738,6 +755,24 @@ export class Colonization {
             "• **Participants + creators** can update project progress\n" +
             "• **Anyone** can view project details and join projects\n" +
             "• **Discord nicknames** are used for all user identification",
+        },
+        {
+          name: "📊 Smart Sorting Algorithm",
+          value:
+            "**Priority order for listing projects:**\n" +
+            "1. **Distance** - Closer systems first (when reference system provided)\n" +
+            "2. **Time Left** - Less time remaining first (dynamic calculation)\n" +
+            "3. **Primary Ports** - Primary starports listed before secondary\n" +
+            "4. **Progress** - Less completed projects first (more work needed)",
+        },
+        {
+          name: "⏰ Dynamic Time Tracking",
+          value:
+            "**Time left is calculated in real-time:**\n" +
+            "• **Remaining time** = Original duration - Time elapsed since creation\n" +
+            "• **'No deadline'** = Projects with unlimited time\n" +
+            "• **'EXPIRED'** = Projects past their deadline (shown in direct queries only)\n" +
+            "• **List filtering** = Only active (non-expired) projects shown in lists",
         },
       );
 
@@ -886,7 +921,11 @@ export class Colonization {
   }
 
   formatTimeFromSeconds(totalSeconds: number): string {
-    if (totalSeconds === 0) return "0m";
+    // Handle expired projects (negative time)
+    if (totalSeconds < 0) return "EXPIRED";
+
+    // Handle infinite time (0 means no deadline)
+    if (totalSeconds === 0) return "No deadline";
 
     const weeks = Math.floor(totalSeconds / (7 * 24 * 60 * 60));
     const days = Math.floor(
@@ -902,7 +941,7 @@ export class Colonization {
     if (hours > 0) parts.push(`${hours}h`);
     if (minutes > 0) parts.push(`${minutes}m`);
 
-    return parts.join(" ");
+    return parts.length > 0 ? parts.join(" ") : "0m";
   }
 
   getFields(

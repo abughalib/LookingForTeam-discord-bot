@@ -7,6 +7,47 @@ import { Position, SystemInfo } from "./models";
 
 const prisma = new PrismaClient();
 
+/**
+ * Calculate dynamic time left for a colonization project
+ * @param project ColonizationData object
+ * @returns Remaining time in seconds (0 for infinite, negative for expired)
+ */
+export function calculateDynamicTimeLeft(project: ColonizationData): number {
+  // If original timeLeft was 0 (infinite), keep it as 0
+  if (project.timeLeft === 0 || project.timeLeft === null) return 0;
+
+  const now = new Date();
+  const createdAt = new Date(project.createdAt);
+  const timeElapsed = Math.floor((now.getTime() - createdAt.getTime()) / 1000);
+
+  return project.timeLeft - timeElapsed;
+}
+
+/**
+ * Apply dynamic timeLeft calculation to a single project
+ * @param project ColonizationData object
+ * @returns Project with updated timeLeft
+ */
+export function applyDynamicTimeLeft(
+  project: ColonizationData,
+): ColonizationData {
+  return {
+    ...project,
+    timeLeft: calculateDynamicTimeLeft(project),
+  };
+}
+
+/**
+ * Apply dynamic timeLeft calculation to multiple projects
+ * @param projects Array of ColonizationData objects
+ * @returns Projects with updated timeLeft
+ */
+export function applyDynamicTimeLeftToArray(
+  projects: ColonizationData[],
+): ColonizationData[] {
+  return projects.map(applyDynamicTimeLeft);
+}
+
 export async function addColonizationData(
   colonization_data: Omit<ColonizationData, "id">,
 ): Promise<number> {
@@ -25,9 +66,13 @@ export async function getColonizationDataById(
   id: number,
 ): Promise<ColonizationData | null> {
   try {
-    return await prisma.colonizationData.findUnique({
+    const result = await prisma.colonizationData.findUnique({
       where: { id },
     });
+
+    if (!result) return null;
+
+    return applyDynamicTimeLeft(result);
   } catch (error) {
     console.error("Error fetching colonization data by ID:", error);
     throw error;
@@ -38,9 +83,13 @@ export async function getColonizationDataByProjectName(
   projectName: string,
 ): Promise<ColonizationData | null> {
   try {
-    return await prisma.colonizationData.findFirst({
+    const result = await prisma.colonizationData.findFirst({
       where: { projectName },
     });
+
+    if (!result) return null;
+
+    return applyDynamicTimeLeft(result);
   } catch (error) {
     console.error("Error fetching colonization data by project name:", error);
     throw error;
@@ -53,6 +102,8 @@ export async function getAllColonizationData(
   projectName?: string,
   architect?: string,
   position?: Position,
+  isPrimaryPort?: boolean,
+  starPortType?: string,
 ): Promise<ColonizationData[]> {
   try {
     const skip = (page - 1) * pageSize;
@@ -73,13 +124,70 @@ export async function getAllColonizationData(
       };
     }
 
+    if (isPrimaryPort !== undefined) {
+      whereClause.isPrimaryPort = isPrimaryPort;
+    }
+
+    if (starPortType && starPortType.trim() !== "") {
+      whereClause.starPortType = starPortType;
+    }
+
     const allData = await prisma.colonizationData.findMany({
       where: whereClause,
     });
 
-    // If position is provided, calculate distances and sort by distance
+    // Apply dynamic timeLeft calculation to all projects
+    const dataWithDynamicTime = applyDynamicTimeLeftToArray(allData);
+
+    // Filter out expired projects (timeLeft <= 0, but keep infinite projects with timeLeft = 0)
+    const activeProjects = dataWithDynamicTime.filter((project) => {
+      // Keep projects with timeLeft = 0 (infinite) or timeLeft > 0 (still has time)
+      const timeLeft = project.timeLeft ?? 0;
+      return timeLeft === 0 || timeLeft > 0;
+    });
+
+    // Helper function to create multi-level sort comparison
+    const createSortComparator = (withDistance: boolean = false) => {
+      return (a: any, b: any) => {
+        // 1. Distance (if position provided) - closer first
+        if (withDistance && a.distance !== b.distance) {
+          return a.distance - b.distance;
+        }
+
+        // 2. Time Left - less time first, but 0 is treated as infinite (last)
+        const aTimeLeft = a.timeLeft ?? 0;
+        const bTimeLeft = b.timeLeft ?? 0;
+
+        // Handle 0 as infinite - move to end
+        const aTimeLeftSortValue =
+          aTimeLeft === 0 ? Number.MAX_SAFE_INTEGER : aTimeLeft;
+        const bTimeLeftSortValue =
+          bTimeLeft === 0 ? Number.MAX_SAFE_INTEGER : bTimeLeft;
+
+        if (aTimeLeftSortValue !== bTimeLeftSortValue) {
+          return aTimeLeftSortValue - bTimeLeftSortValue;
+        }
+
+        // 3. Is Primary Port - primary ports first (descending)
+        if (a.isPrimaryPort !== b.isPrimaryPort) {
+          return b.isPrimaryPort ? 1 : -1;
+        }
+
+        // 4. Progress - less progress first (ascending)
+        const aProgress = a.progress ?? 0;
+        const bProgress = b.progress ?? 0;
+        if (aProgress !== bProgress) {
+          return aProgress - bProgress;
+        }
+
+        // If all criteria are equal, maintain original order
+        return 0;
+      };
+    };
+
+    // If position is provided, calculate distances and apply full sorting
     if (position) {
-      const dataWithDistance = allData
+      const dataWithDistance = activeProjects
         .filter((item) => {
           // Filter out items with incomplete position data
           return (
@@ -103,22 +211,13 @@ export async function getAllColonizationData(
             distance: euclideanDistance,
           };
         })
-        .sort((a, b) => a.distance - b.distance); // Sort by distance ascending
+        .sort(createSortComparator(true)); // Sort with distance priority
 
       return dataWithDistance.slice(skip, skip + pageSize);
     }
 
-    // If no position provided, use default sorting (timeLeft ASC, isPrimaryPort DESC)
-    const sortedData = allData.sort((a, b) => {
-      // First sort by timeLeft (ascending) - handle null values
-      const aTimeLeft = a.timeLeft ?? 0;
-      const bTimeLeft = b.timeLeft ?? 0;
-      if (aTimeLeft !== bTimeLeft) {
-        return aTimeLeft - bTimeLeft;
-      }
-      // Then sort by isPrimaryPort (descending - primary ports first)
-      return b.isPrimaryPort === a.isPrimaryPort ? 0 : b.isPrimaryPort ? 1 : -1;
-    });
+    // If no position provided, use sorting without distance
+    const sortedData = activeProjects.sort(createSortComparator(false));
 
     return sortedData.slice(skip, skip + pageSize);
   } catch (error) {
@@ -144,9 +243,19 @@ export async function getParticipantsByColonizationId(
 
 export async function countColonizationActiveProjects(): Promise<number> {
   try {
-    return await prisma.colonizationData.count({
+    // Get all non-completed projects
+    const allProjects = await prisma.colonizationData.findMany({
       where: { isCompleted: false },
     });
+
+    // Apply dynamic timeLeft calculation and filter out expired projects
+    const dataWithDynamicTime = applyDynamicTimeLeftToArray(allProjects);
+    const activeProjects = dataWithDynamicTime.filter((project) => {
+      const timeLeft = project.timeLeft ?? 0;
+      return timeLeft === 0 || timeLeft > 0;
+    });
+
+    return activeProjects.length;
   } catch (error) {
     console.error("Error counting active colonization projects:", error);
     throw error;

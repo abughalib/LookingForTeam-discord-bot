@@ -265,6 +265,19 @@ function setCommands(client: Client) {
         type: ApplicationCommandOptionType.String,
       },
       {
+        name: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
+        description: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_DESC,
+        required: false,
+        type: ApplicationCommandOptionType.Boolean,
+      },
+      {
+        name: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_ID,
+        description: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_DESC,
+        required: false,
+        type: ApplicationCommandOptionType.String,
+        choices: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_CHOICES,
+      },
+      {
         name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
         description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
         required: false,
