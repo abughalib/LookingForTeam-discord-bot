@@ -75,7 +75,7 @@ export class AppSettings {
   static readonly INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID =
     "is_primary_port";
   static readonly INTERACTION_COLONIZATION_SRV_SURVEY_LINK_ID =
-    "srv_survey_link";
+    "ravencolonial_link";
   static readonly INTERACTION_COLONIZATION_PROJECT_NAME_ID = "project_name";
   static readonly INTERACTION_COLONIZATION_PROGRESS_ID = "progress";
   static readonly INTERACTION_COLONIZATION_NOTES_ID = "notes";
@@ -87,8 +87,8 @@ export class AppSettings {
     "colonization_progress";
   static readonly INTERACTION_COLONIZATION_HELP_COMMAND_NAME =
     "colonization_help";
-  static readonly INTERACTION_COLONIZATION_UPDATE_PROGRESS_COMMAND_NAME =
-    "colonization_update_progress";
+  static readonly INTERACTION_COLONIZATION_UPDATE_COMMAND_NAME =
+    "colonization_update";
 
   // Interaction field description
   static readonly INTERACTION_GAME_VERSION_DESCRIPTION =
@@ -115,6 +115,8 @@ export class AppSettings {
     "Progress of the colonization (in %)";
   static readonly INTERACTION_NOTES_DESC =
     "Additional notes about the colonization";
+  static readonly INTERACTION_COLONIZATION_SRV_SURVEY_LINK_DESC =
+    "Link to the Reven Colonial or any Link (if any)";
 
   static readonly INTERACTION_COLONIZATION_TIMELEFT_DESC =
     "Time left to complete the colonization (week, days, hours), i.e 3w, 2d, 5h, default 3weeks";
@@ -359,6 +361,7 @@ export class AppSettings {
     "https://www.edsm.net/api-status-v1/elite-server";
   static readonly BOT_SYSTEM_INFO_FETCH_URL =
     "https://www.edsm.net/api-v1/system";
+  static readonly REVENCOLONIAL_DEFAULT_URL = "https://ravencolonial.com/#sys=";
 
   // Headers for API Request to Other Websites.
   static readonly BOT_HEADER = {

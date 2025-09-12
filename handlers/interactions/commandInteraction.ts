@@ -105,8 +105,8 @@ async function interactionCommandHandler(
     case AppSettings.BOT_COLONIZATION_LEAVE_COMMAND_NAME:
       await colonization.leave();
       break;
-    case AppSettings.BOT_COLONIZATION_UPDATE_PROGRESS_COMMAND_NAME:
-      await colonization.updateProgress();
+    case AppSettings.INTERACTION_COLONIZATION_UPDATE_COMMAND_NAME:
+      await colonization.update();
       break;
     case AppSettings.BOT_ELITE_SERVER_TICK_INFO:
       await eliteServerTickInfo(interaction);

@@ -183,6 +183,13 @@ function setCommands(client: Client) {
           choices: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_CHOICES,
         },
         {
+          name: AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_ID,
+          description:
+            AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
           name: AppSettings.INTERACTION_COLONIZATION_TIMELEFT_ID,
           description: AppSettings.INTERACTION_COLONIZATION_TIMELEFT_DESC,
           required: false,
@@ -331,13 +338,11 @@ function setCommands(client: Client) {
   });
 
   commands.create({
-    name: AppSettings.INTERACTION_COLONIZATION_UPDATE_PROGRESS_COMMAND_NAME,
+    name: AppSettings.INTERACTION_COLONIZATION_UPDATE_COMMAND_NAME,
     description:
-      CommandLocalizations.COLONIZATION_UPDATE_PROGRESS_BOT_DESCRIPTION[
-        "en-US"
-      ],
+      CommandLocalizations.COLONIZATION_UPDATE_BOT_DESCRIPTION["en-US"],
     description_localizations:
-      CommandLocalizations.COLONIZATION_UPDATE_PROGRESS_BOT_DESCRIPTION,
+      CommandLocalizations.COLONIZATION_UPDATE_BOT_DESCRIPTION,
     options: [
       {
         name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
@@ -346,10 +351,53 @@ function setCommands(client: Client) {
         type: ApplicationCommandOptionType.String,
       },
       {
+        name: AppSettings.INTERACTION_COLONIZATION_SYSTEM_NAME_ID,
+        description: AppSettings.INTERACTION_SYSTEM_NAME_DESC,
+        required: false,
+        type: ApplicationCommandOptionType.String,
+      },
+      {
+        name: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_ID,
+        description: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_DESC,
+        required: false,
+        type: ApplicationCommandOptionType.String,
+        choices: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_CHOICES,
+      },
+      {
+        name: AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_ID,
+        description: AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_DESC,
+        required: false,
+        type: ApplicationCommandOptionType.String,
+      },
+      {
+        name: AppSettings.INTERACTION_COLONIZATION_TIMELEFT_ID,
+        description: AppSettings.INTERACTION_COLONIZATION_TIMELEFT_DESC,
+        required: false,
+        type: ApplicationCommandOptionType.String,
+      },
+      {
+        name: AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
+        description: AppSettings.INTERACTION_COLONIZATION_ARCHITECT_DESC,
+        required: false,
+        type: ApplicationCommandOptionType.String,
+      },
+      {
+        name: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
+        description: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_DESC,
+        required: false,
+        type: ApplicationCommandOptionType.Boolean,
+      },
+      {
         name: AppSettings.INTERACTION_COLONIZATION_PROGRESS_ID,
         description: AppSettings.INTERACTION_COLONIZATION_PROGRESS_DESC,
         required: false,
         type: ApplicationCommandOptionType.Number,
+      },
+      {
+        name: AppSettings.INTERACTION_COLONIZATION_NOTES_ID,
+        description: AppSettings.INTERACTION_COLONIZATION_NOTES_DESC,
+        required: false,
+        type: ApplicationCommandOptionType.String,
       },
     ],
   });

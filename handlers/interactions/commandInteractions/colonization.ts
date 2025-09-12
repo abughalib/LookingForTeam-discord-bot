@@ -89,12 +89,6 @@ export class Colonization {
       true,
     );
 
-    const srv_survey_link =
-      options.getString(
-        AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_ID,
-        false,
-      ) ?? "";
-
     const systemInfo: SystemInfo | null = await EDSM.getSystemInfo(
       colonizationSystemName,
     );
@@ -106,6 +100,14 @@ export class Colonization {
       });
       return;
     }
+
+    const srv_survey_link =
+      options.getString(
+        AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_ID,
+        false,
+      ) ??
+      AppSettings.REVENCOLONIAL_DEFAULT_URL +
+        encodeURIComponent(colonizationSystemName!);
 
     const nowTime = new Date();
 
@@ -164,7 +166,7 @@ export class Colonization {
         value: `Architect: ${architect}\nProgress: ${progress}%\nPrimary Port: ${
           isPrimaryPort ? "Yes" : "No"
         }\nStarport Type: ${starPortType}\nTime Left: ${timeLeftFormatted}\n${
-          srv_survey_link ? `[SRV Survey Link](${srv_survey_link})\n` : ""
+          srv_survey_link ? `[Link](${srv_survey_link})\n` : ""
         }${notes ? `\nNotes: ${notes}` : ""}`,
       });
 
@@ -322,7 +324,7 @@ export class Colonization {
       .setColor(0x00ff00)
       .setTimestamp();
 
-    activeProjects.forEach((project) => {
+    activeProjects.forEach((project, index) => {
       const timeLeftFormatted = this.formatTimeFromSeconds(
         project.timeLeft || Infinity,
       );
@@ -332,7 +334,7 @@ export class Colonization {
         participantNames.find((p) => p[project.id])?.[project.id] || [];
       const participantsText =
         projectParticipants.length > 0
-          ? `\nParticipants: ${projectParticipants.join(", ")}`
+          ? `\nParticipants: ${projectParticipants.join("\n")}`
           : "";
 
       // Calculate distance if reference system is provided
@@ -354,7 +356,7 @@ export class Colonization {
       }
 
       embed.addFields({
-        name: `Project Name: ${project.projectName}\nSystem Name: ${project.systemName}`,
+        name: `**${index + 1}.** Project Name: ${project.projectName}\nSystem Name: ${project.systemName}`,
         value: `Architect: ${project.architect}\nProgress: ${
           project.progress
         }%\nPrimary Port: ${
@@ -362,9 +364,7 @@ export class Colonization {
         }\nStarport Type: ${
           project.starPortType
         }\nTime Left: ${timeLeftFormatted}${distanceText}${participantsText}\n${
-          project.srv_survey_link
-            ? `[SRV Survey Link](${project.srv_survey_link})\n`
-            : ""
+          project.srv_survey_link ? `[Link](${project.srv_survey_link})\n` : ""
         }${project.notes ? `\nNotes: ${project.notes}` : ""}`,
       });
     });
@@ -806,7 +806,7 @@ export class Colonization {
     });
   }
 
-  async updateProgress() {
+  async update() {
     const options = this.chatInputInteraction.options;
     const rawProjectName = options.getString(
       AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
@@ -814,10 +814,8 @@ export class Colonization {
     ) as string;
     // Replace spaces with underscores to match stored project name format and ensure lowercase
     const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
-    const progress = options.getNumber(
-      AppSettings.INTERACTION_COLONIZATION_PROGRESS_ID,
-      true,
-    ) as number;
+
+    const dismissButton = this.dismissButton.createDismissButton();
 
     await this.interaction.deferReply({
       flags: MessageFlags.Ephemeral,
@@ -829,6 +827,7 @@ export class Colonization {
     if (!colonizationData) {
       await this.interaction.editReply({
         content: `No colonization project found with the name **${projectName}**.`,
+        components: [dismissButton],
       });
       return;
     }
@@ -852,38 +851,156 @@ export class Colonization {
 
       if (!isParticipant && !isCreator) {
         await this.interaction.editReply({
-          content: `You cannot update progress for this project. Only participants or the project creator can update progress.\nProject Creator: ${
+          content: `You cannot update this project. Only participants or the project creator can update it.\nProject Creator: ${
             colonizationData.addedBy
           }\nCurrent participants: ${
-            participantNicknames.join(", ") || "None"
+            participantNicknames.join("\n") || "None"
           }`,
+          components: [dismissButton],
         });
         return;
       }
-      // Update the progress and updatedAt fields
-      colonizationData.progress = progress;
-      colonizationData.updatedAt = new Date();
 
-      // If progress is 100%, mark as completed
-      if (progress >= 100) {
-        colonizationData.isCompleted = true;
-        colonizationData.timeLeft = Infinity; // Set timeLeft to Infinity if completed
+      // Collect optional updates
+      const updates: Partial<ColonizationData> = {
+        updatedAt: new Date(),
+      };
+
+      const updatedFields: string[] = [];
+
+      // Handle system name update (requires validation)
+      const newSystemName = options.getString(
+        AppSettings.INTERACTION_COLONIZATION_SYSTEM_NAME_ID,
+        false,
+      );
+      if (newSystemName && newSystemName.trim() !== "") {
+        const systemInfo: SystemInfo | null = await EDSM.getSystemInfo(
+          newSystemName.trim(),
+        );
+
+        if (!systemInfo || !systemInfo.coords) {
+          await this.interaction.editReply({
+            content: `Could not find system info for **${newSystemName}**. Please check the system name and try again.`,
+            components: [dismissButton],
+          });
+          return;
+        }
+
+        updates.systemName = systemInfo.name;
+        updates.positionX = systemInfo.coords.x;
+        updates.positionY = systemInfo.coords.y;
+        updates.positionZ = systemInfo.coords.z;
+        updatedFields.push(`System: ${systemInfo.name}`);
+      }
+
+      // Handle starport type update
+      const newStarPortType = options.getString(
+        AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_ID,
+        false,
+      );
+      if (newStarPortType && newStarPortType.trim() !== "") {
+        updates.starPortType = newStarPortType;
+        updatedFields.push(`Starport Type: ${newStarPortType}`);
+      }
+
+      // Handle Link update
+      const newSrvSurveyLink = options.getString(
+        AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_ID,
+        false,
+      );
+      if (newSrvSurveyLink !== null && newSrvSurveyLink.trim() !== "") {
+        updates.srv_survey_link = newSrvSurveyLink.trim();
+        updatedFields.push(`Link: ${newSrvSurveyLink.trim()}`);
+      }
+
+      // Handle time left update
+      const newTimeLeft = options.getString(
+        AppSettings.INTERACTION_COLONIZATION_TIMELEFT_ID,
+        false,
+      );
+      if (newTimeLeft && newTimeLeft.trim() !== "") {
+        const parsedTimeLeft = this.parseTimeLeft(newTimeLeft.trim());
+        updates.timeLeft = parsedTimeLeft;
+        const timeLeftFormatted = this.formatTimeFromSeconds(parsedTimeLeft);
+        updatedFields.push(`Time Left: ${timeLeftFormatted}`);
+      }
+
+      // Handle architect update
+      const newArchitect = options.getString(
+        AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
+        false,
+      );
+      if (newArchitect && newArchitect.trim() !== "") {
+        updates.architect = newArchitect.trim();
+        updatedFields.push(`Architect: ${newArchitect.trim()}`);
+      }
+
+      // Handle primary port update
+      const newIsPrimaryPort = options.getBoolean(
+        AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
+        false,
+      );
+      if (newIsPrimaryPort !== null) {
+        updates.isPrimaryPort = newIsPrimaryPort;
+        updatedFields.push(`Primary Port: ${newIsPrimaryPort ? "Yes" : "No"}`);
+      }
+
+      // Handle progress update
+      const newProgress = options.getNumber(
+        AppSettings.INTERACTION_COLONIZATION_PROGRESS_ID,
+        false,
+      );
+      if (newProgress !== null) {
+        updates.progress = newProgress;
+        updatedFields.push(`Progress: ${newProgress}%`);
+
+        // If progress is 100%, mark as completed
+        if (newProgress >= 100) {
+          updates.isCompleted = true;
+          updates.timeLeft = 0; // Set timeLeft to 0 (infinite) if completed
+          updatedFields.push("Status: Completed");
+        }
+      }
+
+      // Handle notes update
+      const newNotes = options.getString(
+        AppSettings.INTERACTION_COLONIZATION_NOTES_ID,
+        false,
+      );
+      if (newNotes !== null) {
+        updates.notes = newNotes.trim() || null;
+        updatedFields.push(`Notes: ${newNotes.trim() || "Removed"}`);
+      }
+
+      // Check if any updates were provided
+      if (updatedFields.length === 0) {
+        await this.interaction.editReply({
+          content: `No valid updates provided for colonization project **${projectName}**. Please specify at least one field to update.`,
+          components: [dismissButton],
+        });
+        return;
       }
 
       // Save the updated data back to the database
-      await updateColonizationData(colonizationData.id, {
-        progress: colonizationData.progress,
-        isCompleted: colonizationData.isCompleted,
-        timeLeft: colonizationData.timeLeft,
-        updatedAt: colonizationData.updatedAt,
-      });
+      await updateColonizationData(colonizationData.id, updates);
+
+      const embed = new EmbedBuilder()
+        .setTitle(`Updated Colonization Project: ${projectName}`)
+        .setColor(0x00ff00)
+        .setDescription(
+          `Successfully updated the following fields:\n\n${updatedFields.join("\n")}`,
+        )
+        .setTimestamp();
+
       await this.interaction.editReply({
-        content: `Colonization project **${projectName}** progress updated to ${progress}%.`,
+        embeds: [embed],
+        components: [dismissButton],
       });
     } catch (error) {
-      console.error("Error updating colonization progress:", error);
+      console.error("Error updating colonization project:", error);
       await this.interaction.editReply({
-        content: `Failed to update progress for colonization project: **${projectName}**`,
+        content: `Failed to update colonization project: **${projectName}**`,
+        components: [dismissButton],
       });
     }
   }

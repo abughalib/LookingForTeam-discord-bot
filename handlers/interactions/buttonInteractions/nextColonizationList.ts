@@ -125,7 +125,7 @@ async function nextColonizationList(interaction: ButtonInteraction) {
       .setColor(0x00ff00)
       .setTimestamp();
 
-    activeProjects.forEach((project) => {
+    activeProjects.forEach((project, index) => {
       const timeLeftFormatted = formatTimeFromSeconds(
         project.timeLeft || Infinity,
       );
@@ -135,7 +135,7 @@ async function nextColonizationList(interaction: ButtonInteraction) {
         participantNames.find((p) => p[project.id])?.[project.id] || [];
       const participantsText =
         projectParticipants.length > 0
-          ? `\nParticipants: ${projectParticipants.join(", ")}`
+          ? `\nParticipants: ${projectParticipants.join("\n")}`
           : "";
 
       // Calculate distance if reference system is provided
@@ -156,8 +156,11 @@ async function nextColonizationList(interaction: ButtonInteraction) {
         distanceText = `\nDistance: ∞ Ly (coordinates unavailable)`;
       }
 
+      // Calculate the actual project number across all pages
+      const projectNumber = (page - 1) * 5 + index + 1;
+
       embed.addFields({
-        name: `Project Name: ${project.projectName}\nSystem Name: ${project.systemName}`,
+        name: `**${projectNumber}.** Project Name: ${project.projectName}\nSystem Name: ${project.systemName}`,
         value: `Architect: ${project.architect}\nProgress: ${
           project.progress
         }%\nPrimary Port: ${
@@ -165,9 +168,7 @@ async function nextColonizationList(interaction: ButtonInteraction) {
         }\nStarport Type: ${
           project.starPortType
         }\nTime Left: ${timeLeftFormatted}${distanceText}${participantsText}\n${
-          project.srv_survey_link
-            ? `[SRV Survey Link](${project.srv_survey_link})\n`
-            : ""
+          project.srv_survey_link ? `[Link](${project.srv_survey_link})\n` : ""
         }${project.notes ? `\nNotes: ${project.notes}` : ""}`,
       });
     });
@@ -213,9 +214,10 @@ async function nextColonizationList(interaction: ButtonInteraction) {
     );
     for (let i = 0; i < maxProjectButtonsInFirstRow; i++) {
       const project = activeProjects[i];
+      const projectNumber = (page - 1) * 5 + i + 1;
       const projectButton = new ButtonBuilder()
         .setCustomId(`colonization_list_select_${project.projectName}`)
-        .setLabel(`${i + 1}`)
+        .setLabel(`${projectNumber}`)
         .setStyle(ButtonStyle.Secondary);
       firstRow.addComponents(projectButton);
     }
@@ -235,9 +237,10 @@ async function nextColonizationList(interaction: ButtonInteraction) {
         i++
       ) {
         const project = activeProjects[i];
+        const projectNumber = (page - 1) * 5 + i + 1;
         const projectButton = new ButtonBuilder()
           .setCustomId(`colonization_list_select_${project.projectName}`)
-          .setLabel(`${i + 1}`)
+          .setLabel(`${projectNumber}`)
           .setStyle(ButtonStyle.Secondary);
         secondRow.addComponents(projectButton);
       }
