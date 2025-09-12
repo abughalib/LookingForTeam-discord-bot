@@ -290,7 +290,7 @@ export class Colonization {
       projectName || undefined,
       architectName || undefined,
       position || undefined,
-      isPrimaryPort || undefined,
+      isPrimaryPort ?? undefined,
       starPortType || undefined,
     );
 
