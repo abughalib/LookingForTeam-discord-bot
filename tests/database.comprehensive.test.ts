@@ -24,7 +24,8 @@ describe("Elite Dangerous Colonization Database Tests", () => {
   afterAll(async () => {
     try {
       await prisma.$transaction([
-        prisma.participants.deleteMany({}),
+        prisma.participantOnProject.deleteMany({}),
+        prisma.participant.deleteMany({}),
         prisma.colonizationData.deleteMany({}),
       ]);
     } catch (error) {
@@ -36,7 +37,8 @@ describe("Elite Dangerous Colonization Database Tests", () => {
   beforeEach(async () => {
     try {
       await prisma.$transaction([
-        prisma.participants.deleteMany({}),
+        prisma.participantOnProject.deleteMany({}),
+        prisma.participant.deleteMany({}),
         prisma.colonizationData.deleteMany({}),
       ]);
     } catch (error) {

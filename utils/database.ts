@@ -131,11 +131,11 @@ export async function getParticipantsByColonizationId(
   colonizationId: number,
 ): Promise<string[]> {
   try {
-    const participants = await prisma.participants.findMany({
+    const participantProjects = await prisma.participantOnProject.findMany({
       where: { colonizationDataId: colonizationId },
-      select: { userId: true },
+      include: { participant: true },
     });
-    return participants.map((p) => p.userId);
+    return participantProjects.map((pp) => pp.participant.userId);
   } catch (error) {
     console.error("Error fetching participants by colonization ID:", error);
     throw error;
@@ -158,8 +158,21 @@ export async function participateInColonizationData(
   userId: string,
 ): Promise<any> {
   try {
-    return await prisma.participants.create({
-      data: { colonizationDataId: colonizationId, userId: userId },
+    return await prisma.$transaction(async (tx) => {
+      // First, get or create the participant
+      const participant = await tx.participant.upsert({
+        where: { userId },
+        create: { userId },
+        update: {},
+      });
+
+      // Then create the relationship in ParticipantOnProject
+      return await tx.participantOnProject.create({
+        data: {
+          participantId: participant.id,
+          colonizationDataId: colonizationId,
+        },
+      });
     });
   } catch (error) {
     console.error("Error creating participant:", error);
@@ -312,6 +325,33 @@ export async function clearSystemInfoCache(): Promise<void> {
     await prisma.systemInfoCache.deleteMany({});
   } catch (error) {
     console.error("Error clearing system info cache:", error);
+    throw error;
+  }
+}
+
+export async function removeParticipantFromProject(
+  colonizationId: number,
+  userId: string,
+): Promise<void> {
+  try {
+    const participant = await prisma.participant.findUnique({
+      where: { userId },
+    });
+
+    if (!participant) {
+      throw new Error("Participant not found");
+    }
+
+    await prisma.participantOnProject.delete({
+      where: {
+        participantId_colonizationDataId: {
+          participantId: participant.id,
+          colonizationDataId: colonizationId,
+        },
+      },
+    });
+  } catch (error) {
+    console.error("Error removing participant from project:", error);
     throw error;
   }
 }

@@ -54,6 +54,7 @@ export class AppSettings {
   static readonly BOT_COLONIZATION_HELP_COMMAND_NAME = "colonization_help";
   static readonly BOT_COLONIZATION_UPDATE_PROGRESS_COMMAND_NAME =
     "colonization_update_progress";
+  static readonly BOT_COLONIZATION_LEAVE_COMMAND_NAME = "colonization_leave";
 
   // Interaction field IDs
   static readonly INTERACTION_GAME_VERSION_ID = "game_version";

@@ -577,6 +577,38 @@ export default class CommandLocalizations {
     uk: "Видалити проект колонізації",
   };
 
+  static readonly COLONIZATION_LEAVE_BOT_DESCRIPTION = {
+    "en-US": "Leave Colonization Project",
+    "en-GB": "Leave Colonization Project",
+    bg: "Напуснете проект за колонизация",
+    "zh-CN": "离开殖民化项目",
+    "zh-TW": "離開殖民化項目",
+    hr: "Napusti projekt kolonizacije",
+    cs: "Opustit projekt kolonizace",
+    da: "Forlad koloniseringsprojekt",
+    nl: "Kolonisatieproject verlaten",
+    fi: "Jätä kolonisaatiohanke",
+    fr: "Quitter le projet de colonisation",
+    de: "Kolonisierungsprojekt verlassen",
+    el: "Αφήστε το έργο αποικισμού",
+    hi: "उपनिवेश परियोजना छोड़ें",
+    hu: "Kolonizációs projekt elhagyása",
+    it: "Lascia progetto di colonizzazione",
+    ja: "植民地化プロジェクトを離れる",
+    ko: "식민지화 프로젝트 떠나기",
+    lt: "Palikti kolonizacijos projektą",
+    no: "Forlat koloniseringsprosjekt",
+    pl: "Opuść projekt kolonizacji",
+    "pt-BR": "Sair do projeto de colonização",
+    ro: "Părăsiți proiectul de colonizare",
+    ru: "Покинуть проект колонизации",
+    "es-ES": "Abandonar proyecto de colonización",
+    "sv-SE": "Lämna koloniseringsprojekt",
+    th: "ออกจากโครงการตั้งถิ่นฐาน",
+    tr: "Sömürgeleştirme Projesinden Ayrıl",
+    uk: "Покинути проект колонізації",
+  };
+
   static readonly COLONIZATION_LIST_BOT_DESCRIPTION = {
     "en-US": "List Colonization Projects",
     "en-GB": "List Colonization Projects",

@@ -8,8 +8,8 @@ datasource db {
 }
 
 model ColonizationData {
-    id              Int            @id @default(autoincrement())
-    projectName     String         @unique
+    id              Int                     @id @default(autoincrement())
+    projectName     String                  @unique
     systemName      String
     timeLeft        Int? // Time in seconds
     positionX       Float?
@@ -21,19 +21,27 @@ model ColonizationData {
     isPrimaryPort   Boolean
     srv_survey_link String
     isCompleted     Boolean
-    createdAt       DateTime       @default(now())
-    updatedAt       DateTime       @updatedAt
+    createdAt       DateTime               @default(now())
+    updatedAt       DateTime               @updatedAt
     addedBy         String
     notes           String?
-    participants    Participants[]
+    participants    ParticipantOnProject[]
 }
 
-model Participants {
-    id                 Int              @id @default(autoincrement())
-    joinedAt           DateTime         @default(now())
-    userId             String
+model Participant {
+    id              Int                     @id @default(autoincrement())
+    userId          String                  @unique
+    projects        ParticipantOnProject[]
+}
+
+model ParticipantOnProject {
+    participant        Participant      @relation(fields: [participantId], references: [id], onDelete: Cascade)
+    participantId      Int
+    colonizationData   ColonizationData @relation(fields: [colonizationDataId], references: [id], onDelete: Cascade)
     colonizationDataId Int
-    colonizationData   ColonizationData @relation(fields: [colonizationDataId], references: [id])
+    joinedAt          DateTime         @default(now())
+
+    @@id([participantId, colonizationDataId])
 }
 
 model SystemInfoCache {

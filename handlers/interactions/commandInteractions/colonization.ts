@@ -19,6 +19,7 @@ import {
   getParticipantsByColonizationId,
   participateInColonizationData,
   removeColonizationDataByProjectName,
+  removeParticipantFromProject,
   updateColonizationData,
 } from "../../../utils/database";
 import { Position, SystemInfo } from "../../../utils/models";
@@ -125,6 +126,8 @@ export class Colonization {
 
       const userNickname = await this.getUserNickname();
       const userId = this.interaction.user.id;
+
+      // Create the colonization project and get the ID
       const colonization_id = await addColonizationData({
         projectName,
         systemName: systemInfo.name,
@@ -143,15 +146,36 @@ export class Colonization {
         updatedAt: nowTime,
         addedBy: userNickname,
       });
+
+      // Automatically add the creator as a participant
       await participateInColonizationData(colonization_id, userId);
+
+      const timeLeftFormatted = this.formatTimeFromSeconds(
+        this.parseTimeLeft(timeLeft),
+      );
+
+      const embed = new EmbedBuilder()
+        .setTitle("Added Colonization")
+        .setColor(0x00ff00)
+        .setTimestamp();
+
+      embed.addFields({
+        name: `Project Name: ${projectName}\nSystem Name: ${systemInfo.name}`,
+        value: `Architect: ${architect}\nProgress: ${progress}%\nPrimary Port: ${
+          isPrimaryPort ? "Yes" : "No"
+        }\nStarport Type: ${starPortType}\nTime Left: ${timeLeftFormatted}\n${
+          srv_survey_link ? `[SRV Survey Link](${srv_survey_link})\n` : ""
+        }${notes ? `\nNotes: ${notes}` : ""}`,
+      });
+
       await this.interaction.editReply({
-        content: `Colonization project Name: **${projectName}** Added successfully.`,
+        embeds: [embed],
         components: [dismissButton],
       });
     } catch (error) {
       console.error("Error adding colonization data:", error);
       await this.interaction.followUp({
-        content: `Failed to add colonization project: **${projectName}**. Please try again or contact an administrator.`,
+        content: `Failed to add colonization project: **${projectName}**.`,
         components: [dismissButton],
       });
     }
@@ -540,6 +564,65 @@ export class Colonization {
     }
   }
 
+  async leave() {
+    const rawProjectName = this.chatInputInteraction.options.getString(
+      AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
+      true,
+    ) as string;
+
+    // Replace spaces with underscores to match stored project name format and ensure lowercase
+    const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
+
+    const dismissButton = this.dismissButton.createDismissButton();
+
+    await this.interaction.deferReply({
+      flags: MessageFlags.Ephemeral,
+    });
+
+    const colonizationData: ColonizationData | null =
+      await getColonizationDataByProjectName(projectName);
+
+    if (!colonizationData) {
+      await this.interaction.editReply({
+        content: `No colonization project found with the name **${projectName}**.`,
+        components: [dismissButton],
+      });
+      return;
+    }
+
+    try {
+      const userNickname = await this.getUserNickname();
+      const userId = this.interaction.user.id; // Use Discord user ID instead of nickname
+
+      // Check if user is participating (check both ID and nickname for legacy data)
+      const participants = await getParticipantsByColonizationId(
+        colonizationData.id,
+      );
+      if (
+        !participants.includes(userId) &&
+        !participants.includes(userNickname)
+      ) {
+        await this.interaction.editReply({
+          content: `You are not participating in the colonization project **${projectName}**.`,
+          components: [dismissButton],
+        });
+        return;
+      }
+
+      await removeParticipantFromProject(colonizationData.id, userId);
+      await this.interaction.editReply({
+        content: `You have successfully left the colonization project **${projectName}**.`,
+        components: [dismissButton],
+      });
+    } catch (error) {
+      console.error("Error leaving colonization project:", error);
+      await this.interaction.editReply({
+        content: `Failed to leave the colonization project: **${projectName}**`,
+        components: [dismissButton],
+      });
+    }
+  }
+
   async help() {
     // Create main help embed
     const mainEmbed = new EmbedBuilder()
@@ -581,6 +664,14 @@ export class Colonization {
             "• **Required:** `project_name`\n" +
             "• **Note:** You'll be automatically added as a participant\n" +
             '• **Example:** `/colonization participate project_name:"my_station"`',
+        },
+        {
+          name: "🚪 `/colonization_leave`",
+          value:
+            "**Leave an existing colonization project**\n" +
+            "• **Required:** `project_name`\n" +
+            "• **Note:** You can only leave projects you're participating in\n" +
+            '• **Example:** `/colonization_leave project_name:"my_station"`',
         },
       );
 

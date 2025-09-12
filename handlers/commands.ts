@@ -236,6 +236,22 @@ function setCommands(client: Client) {
   });
 
   commands.create({
+    name: AppSettings.BOT_COLONIZATION_LEAVE_COMMAND_NAME,
+    description:
+      CommandLocalizations.COLONIZATION_LEAVE_BOT_DESCRIPTION["en-US"],
+    description_localizations:
+      CommandLocalizations.COLONIZATION_LEAVE_BOT_DESCRIPTION,
+    options: [
+      {
+        name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
+        description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
+        required: true,
+        type: ApplicationCommandOptionType.String,
+      },
+    ],
+  });
+
+  commands.create({
     name: AppSettings.INTERACTION_COLONIZATION_LIST_COMMAND_NAME,
     description:
       CommandLocalizations.COLONIZATION_LIST_BOT_DESCRIPTION["en-US"],

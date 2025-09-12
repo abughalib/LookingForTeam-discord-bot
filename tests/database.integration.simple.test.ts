@@ -23,7 +23,8 @@ describe("Database Integration Tests (Simple)", () => {
     // Clean up all test data
     try {
       await prisma.$transaction([
-        prisma.participants.deleteMany({}),
+        prisma.participantOnProject.deleteMany({}),
+        prisma.participant.deleteMany({}),
         prisma.colonizationData.deleteMany({}),
       ]);
     } catch (error) {
@@ -36,7 +37,8 @@ describe("Database Integration Tests (Simple)", () => {
     // Clean data before each test - ensure complete cleanup
     try {
       await prisma.$transaction([
-        prisma.participants.deleteMany({}),
+        prisma.participantOnProject.deleteMany({}),
+        prisma.participant.deleteMany({}),
         prisma.colonizationData.deleteMany({}),
       ]);
     } catch (error) {
