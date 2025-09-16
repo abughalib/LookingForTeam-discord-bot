@@ -90,11 +90,14 @@ async function systemfactionHistory(interaction: CommandInteraction) {
 
   // Get the faction history chart
   let chartUrl = await createInfluenceChart(faction, days);
+  let inaraSystemUrl = `${
+    AppSettings.BOT_INARA_SYSTEM_SEARCH_URL
+  }${encodeURIComponent(systemName)}`;
 
   // Create the embed message
   let embeded_message = systemEmbedMessage(systemFactioninfo);
   embeded_message.setTitle(`Faction History for ${systemName}`);
-  embeded_message.setURL(chartUrl).setImage(chartUrl);
+  embeded_message.setURL(inaraSystemUrl).setImage(chartUrl);
 
   // Send embed message
   await interaction

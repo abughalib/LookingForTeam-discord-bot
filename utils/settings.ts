@@ -361,6 +361,8 @@ export class AppSettings {
     "https://www.edsm.net/api-status-v1/elite-server";
   static readonly BOT_SYSTEM_INFO_FETCH_URL =
     "https://www.edsm.net/api-v1/system";
+  static readonly BOT_INARA_SYSTEM_SEARCH_URL =
+    "https://inara.cz/elite/starsystems/?search=";
   static readonly REVENCOLONIAL_DEFAULT_URL = "https://ravencolonial.com/#sys=";
 
   // Headers for API Request to Other Websites.
