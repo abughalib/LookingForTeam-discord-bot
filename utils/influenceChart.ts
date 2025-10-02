@@ -21,7 +21,7 @@ interface InfluenceData {
 
 async function createInfluenceChart(
   factions: Factions[],
-  days: number
+  days: number,
 ): Promise<string | null> {
   // Factions Present in that system.
   let factionsName = [];
@@ -89,7 +89,7 @@ async function createInfluenceChart(
  */
 function lastDays(
   influenceHistory: Map<string, number>,
-  days: number
+  days: number,
 ): Array<number> {
   let influence: Array<number> = [];
 

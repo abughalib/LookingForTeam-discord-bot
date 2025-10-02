@@ -1,0 +1,64 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
+}
+
+model ColonizationData {
+    id              Int                    @id @default(autoincrement())
+    projectName     String                 @unique
+    systemName      String
+    timeLeft        Int? // Time in seconds
+    positionX       Float?
+    positionY       Float?
+    positionZ       Float?
+    architect       String
+    progress        Int?
+    starPortType    String
+    isPrimaryPort   Boolean
+    srv_survey_link String
+    isCompleted     Boolean
+    createdAt       DateTime               @default(now())
+    updatedAt       DateTime               @updatedAt
+    addedBy         String
+    notes           String?
+    participants    ParticipantOnProject[]
+}
+
+model Participant {
+    id       Int                    @id @default(autoincrement())
+    userId   String                 @unique
+    projects ParticipantOnProject[]
+}
+
+model ParticipantOnProject {
+    participant        Participant      @relation(fields: [participantId], references: [id], onDelete: Cascade)
+    participantId      Int
+    colonizationData   ColonizationData @relation(fields: [colonizationDataId], references: [id], onDelete: Cascade)
+    colonizationDataId Int
+    joinedAt           DateTime         @default(now())
+
+    @@id([participantId, colonizationDataId])
+}
+
+model SystemInfoCache {
+    id           Int      @id @default(autoincrement())
+    systemName   String   @unique
+    positionX    Float
+    positionY    Float
+    positionZ    Float
+    coordsLocked Boolean
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+}
+
+model RavenColonialCache {
+    id        Int      @id @default(autoincrement())
+    buildId   String   @unique
+    data      String
+    cachedAt  DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}

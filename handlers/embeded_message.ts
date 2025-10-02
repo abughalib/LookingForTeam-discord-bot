@@ -11,13 +11,13 @@ import { AppSettings } from "../utils/settings";
 function getFields(
   options: string[],
   values: (string | number | boolean)[],
-  inline: boolean = false
+  inline: boolean = false,
 ): RestOrArray<APIEmbedField> {
   const fields: RestOrArray<APIEmbedField> = Array.from(
     Array(Math.max(options.length, values.length)),
     (_, i): APIEmbedField => {
       return { name: options[i], value: `${values[i]}`, inline: inline };
-    }
+    },
   );
 
   return fields;
@@ -56,7 +56,7 @@ function embedMessage(
   values: (string | number | boolean)[],
   nickName: string,
   inline: boolean = false,
-  platform: string = "none"
+  platform: string = "none",
 ): EmbedBuilder {
   // Creating the embeded message
   const embeded_message = new EmbedBuilder()

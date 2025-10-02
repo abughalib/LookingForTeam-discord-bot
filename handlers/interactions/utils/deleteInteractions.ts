@@ -11,7 +11,7 @@ import deleteMessage from "./deleteMessage";
 
 async function deleteInteraction(
   interaction: ButtonInteraction<CacheType> | CommandInteraction<CacheType>,
-  timeout: number
+  timeout: number,
 ) {
   const message = await interaction.fetchReply();
   setTimeout(async () => {

@@ -1,6 +1,12 @@
 import { AppSettings } from "./settings";
 import { SystemFactionInfo, Factions } from "./systemInfoModel";
-import { ServerStatusModel, SystemDeath, SystemTrafficInfo } from "./models";
+import {
+  ServerStatusModel,
+  SystemDeath,
+  SystemInfo,
+  SystemTrafficInfo,
+} from "./models";
+import { getSystemInfoFromCache, cacheSystemInfo } from "./database";
 
 /*
   EDSM API Queries here.
@@ -18,7 +24,7 @@ class EDSM {
       Fetches system Factions from EDSM
   */
   async fetchSystemFactionInfo(systemName: string, showHistory: number = 0) {
-    let resp = await fetch(AppSettings.BOT_SYSTEM_INFO_FETCH_URL, {
+    let resp = await fetch(AppSettings.BOT_SYSTEM_FACTION_FETCH_URL, {
       method: "POST",
       body: JSON.stringify({
         systemName: systemName,
@@ -43,7 +49,7 @@ class EDSM {
 
   // Elite Dangerous system Traffic info with Breakdown by ships
   async getSystemTrafficInfo(
-    systemName: string
+    systemName: string,
   ): Promise<SystemTrafficInfo | null> {
     let resp = await fetch(AppSettings.BOT_SYSTEM_TRAFFIC_FETCH_URL, {
       method: "POST",
@@ -91,7 +97,7 @@ class EDSM {
 
   async getSystemFactionInfo(
     systemName: string,
-    showHistory: number = 0
+    showHistory: number = 0,
   ): Promise<SystemFactionInfo | null> {
     let json_data = await this.fetchSystemFactionInfo(systemName, showHistory);
 
@@ -108,6 +114,50 @@ class EDSM {
       controllingFaction: json_data.controllingFaction,
       factions: json_data.factions,
     };
+  }
+
+  static async getSystemInfo(systemName: string): Promise<SystemInfo | null> {
+    // First, try to get from cache
+    try {
+      const cachedSystemInfo = await getSystemInfoFromCache(systemName);
+      if (cachedSystemInfo) {
+        return cachedSystemInfo;
+      }
+    } catch (error) {
+      console.error(
+        "Error retrieving from cache, proceeding with API call:",
+        error,
+      );
+    }
+
+    // If not in cache, fetch from API
+    const systemInfo = await fetch(
+      AppSettings.BOT_SYSTEM_INFO_FETCH_URL +
+        `?systemName=${encodeURIComponent(systemName)}&showCoordinates=1`,
+      {
+        method: "GET",
+        headers: AppSettings.BOT_HEADER,
+      },
+    );
+
+    if (!systemInfo.ok) {
+      console.error("EDSM not responding: ", systemInfo.statusText);
+      return null;
+    }
+
+    const systemInfoData: SystemInfo = await systemInfo.json();
+
+    // Cache the result if it's valid
+    if (systemInfoData && systemInfoData.coords) {
+      try {
+        await cacheSystemInfo(systemInfoData);
+      } catch (error) {
+        console.error("Error caching system info:", error);
+        // Don't throw here, just log the error since we still have the data
+      }
+    }
+
+    return systemInfoData;
   }
 }
 

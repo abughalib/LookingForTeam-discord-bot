@@ -10,7 +10,7 @@ import { SystemFactionInfo } from "../utils/systemInfoModel";
 
 function getFields(
   options: string[],
-  values: string[]
+  values: string[],
 ): RestOrArray<APIEmbedField> {
   /*
     Example:
@@ -23,7 +23,7 @@ function getFields(
     Array(Math.max(options.length, values.length)),
     (_, i): APIEmbedField => {
       return { name: options[i], value: `${values[i]}` };
-    }
+    },
   );
 
   return fields;
@@ -49,14 +49,14 @@ function systemEmbedMessage(systemInfo: SystemFactionInfo): EmbedBuilder {
       continue;
     }
     options.push(
-      `${systemInfo.factions[i].name} (${systemInfo.factions[i].allegiance}-${systemInfo.factions[i].government})`
+      `${systemInfo.factions[i].name} (${systemInfo.factions[i].allegiance}-${systemInfo.factions[i].government})`,
     );
 
     // Add faction influence in percentage
     values.push(
       `${(systemInfo.factions[i].influence * 100).toPrecision(4)} (${
         systemInfo.factions[i].state
-      })`
+      })`,
     );
     // global LastUpdate should be least of all the factions
     lastUpdated = Math.max(lastUpdated, systemInfo.factions[i].lastUpdate);

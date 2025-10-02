@@ -6,6 +6,7 @@ export class AppSettings {
   static readonly HELP_MESSAGE_DISMISS_TIMEOUT = 180 * 1000; // 3 Minutes
   static readonly ERROR_MESSAGE_DIMISS_TIMEOUT = 60 * 1000; // 1 Minute
   static readonly DEFAULT_REQUEST_TEAM_TIMEOUT = 10 * 60 * 1000; // 10 Minutes
+  static readonly DAFAULT_RAVENCOLONIAL_TIMEOUT_AGE = 6 * 60 * 60 * 1000; // 6 Hours
   static readonly DEFAULT_WHEN_VALUE = "Now";
   static readonly MAXIMUM_TEAM_SPOT = 40;
   static readonly MAXIMUM_HOURS_TEAM = 10;
@@ -45,6 +46,16 @@ export class AppSettings {
   static readonly BOT_SYSTEM_DEATH_COMMAND_NAME = "systemdeath";
   static readonly BOT_HELP_COMMAND_NAME = "winghelp";
   static readonly BOT_PING_COMMAND_NAME = "ping";
+  static readonly BOT_COLONIZATION_ADD_COMMAND_NAME = "colonization_add";
+  static readonly BOT_COLONIZATION_REMOVE_COMMAND_NAME = "colonization_remove";
+  static readonly INTERACTION_COLONIZATION_LIST_COMMAND_NAME =
+    "colonization_list";
+  static readonly BOT_COLONIZATION_PROGRESS_COMMAND_NAME =
+    "colonization_progress";
+  static readonly BOT_COLONIZATION_HELP_COMMAND_NAME = "colonization_help";
+  static readonly BOT_COLONIZATION_UPDATE_PROGRESS_COMMAND_NAME =
+    "colonization_update_progress";
+  static readonly BOT_COLONIZATION_LEAVE_COMMAND_NAME = "colonization_leave";
 
   // Interaction field IDs
   static readonly INTERACTION_GAME_VERSION_ID = "game_version";
@@ -59,6 +70,26 @@ export class AppSettings {
   static readonly INTERACTION_SYSTEM_NAME_ID = "system_name";
   static readonly INTERACTION_DISMISS_ID = "command_dismiss";
   static readonly INTERACTION_EXTRA_ID = "extra";
+  static readonly INTERACTION_COLONIZATION_SYSTEM_NAME_ID = "system_name";
+  static readonly INTERACTION_COLONIZATION_ARCHITECT_ID = "architect";
+  static readonly INTERACTION_COLONIZATION_STARPORT_TYPE_ID = "starport_type";
+  static readonly INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID =
+    "is_primary_port";
+  static readonly INTERACTION_COLONIZATION_SRV_SURVEY_LINK_ID =
+    "ravencolonial_link";
+  static readonly INTERACTION_COLONIZATION_PROJECT_NAME_ID = "project_name";
+  static readonly INTERACTION_COLONIZATION_PROGRESS_ID = "progress";
+  static readonly INTERACTION_COLONIZATION_NOTES_ID = "notes";
+  static readonly INTERACTION_COLONIZATION_TIMELEFT_ID = "timeleft";
+  static readonly INTERACTION_COLONIZATION_REFERENCE_SYSTEM_ID = "ref_sys";
+  static readonly INTERACTION_COLONIZATION_PARTICIPATE_COMMAND_NAME =
+    "colonization_join";
+  static readonly INTERACTION_COLONIZATION_PROGRESS_COMMAND_NAME =
+    "colonization_progress";
+  static readonly INTERACTION_COLONIZATION_HELP_COMMAND_NAME =
+    "colonization_help";
+  static readonly INTERACTION_COLONIZATION_UPDATE_COMMAND_NAME =
+    "colonization_update";
 
   // Interaction field description
   static readonly INTERACTION_GAME_VERSION_DESCRIPTION =
@@ -72,6 +103,40 @@ export class AppSettings {
   static readonly INTERACTION_PING_DESC = "Check if the Bot is up and Running";
   static readonly INTERACTION_DAY_DESC =
     "The day to get the faction history for";
+  static readonly INTERACTION_ARCHITECT_DESC = "Name of the System Architect";
+  static readonly INTERACTION_STARPORT_TYPE_DESC =
+    "Starport type (Coriolis, Ocellus, ...)";
+  static readonly INTERACTION_IS_PRIMARY_PORT_DESC =
+    "Is it the primary starport of the system?";
+  static readonly INTERACTION_SRV_SURVEY_LINK_DESC =
+    "Link to the SRV Survey (if any)";
+  static readonly INTERACTION_PROJECT_NAME_DESC =
+    "Name of the colonization project";
+  static readonly INTERACTION_PROGRESS_DESC =
+    "Progress of the colonization (in %)";
+  static readonly INTERACTION_NOTES_DESC =
+    "Additional notes about the colonization";
+  static readonly INTERACTION_COLONIZATION_SRV_SURVEY_LINK_DESC =
+    "Link to the Reven Colonial or any Link (if any)";
+
+  static readonly INTERACTION_COLONIZATION_TIMELEFT_DESC =
+    "Time left to complete the colonization (week, days, hours), i.e 3w, 2d, 5h, default 3weeks";
+  static readonly INTERACTION_COLONIZATION_PROJECT_NAME_DESC =
+    "Name of the colonization project (give it anyname you want, no spaces)";
+  static readonly INTERACTION_COLONIZATION_ARCHITECT_DESC =
+    "Name of the System Architect (in-game name)";
+  static readonly INTERACTION_COLONIZATION_IS_PRIMARY_PORT_DESC =
+    "Is it the primary starport of the system?";
+  static readonly INTERACTION_COLONIZATION_PROGRESS_DESC =
+    "Progress of the colonization (in %)";
+  static readonly INTERACTION_COLONIZATION_NOTES_DESC =
+    "Additional notes about the colonization (optional)";
+  static readonly INTERACTION_COLONIZATION_REFERENCE_SYSTEM_NAME_DESC =
+    "Reference System Name to filter the colonization projects";
+  static readonly INTERACTION_COLONIZATION_STARPORT_TYPE_DESC =
+    "Starport type (Coriolis, Ocellus, ...)";
+  static readonly INTERACTION_COLONIZATION_REFERENCE_SYSTEM_DESC =
+    "Reference System Name to filter the colonization projects";
 
   // Embed colors
   static readonly DEFAULT_EMBED_COLOR = 0xb3b3b3; // Grey
@@ -83,6 +148,10 @@ export class AppSettings {
   static readonly DEFAULT_PLATFORM = "pc";
   static readonly XBOX_PLATFORM = "xbox";
   static readonly PS_PLATFORM = "ps";
+
+  // Validation Regex
+  static readonly RAVEN_COLONIZATION_URL_REGEX =
+    /https:\/\/ravencolonial\.com\/#(build|sys)=.+/i;
 
   static readonly INTERACTION_PLATFORM_CHOICES: Array<
     InteractionChoices<string>
@@ -257,6 +326,16 @@ export class AppSettings {
       },
     ];
 
+  static readonly INTERACTION_COLONIZATION_STARPORT_TYPE_CHOICES = [
+    { name: "Coriolis", value: "Coriolis" },
+    { name: "Ocellus", value: "Ocellus" },
+    { name: "Orbis", value: "Orbis" },
+    { name: "Outpost", value: "Outpost" },
+    { name: "Planetary Port", value: "Planetary Port" },
+    { name: "Asteroid Base", value: "Asteroid Base" },
+    { name: "Installation", value: "Installation" },
+  ];
+
   // Buttons customIDs
   static readonly BUTTON_JOIN_ID = "button_join";
   static readonly BUTTON_DISMISS_ID = "button_dismiss";
@@ -264,16 +343,20 @@ export class AppSettings {
   static readonly BUTTON_ACCEPT_REQUEST_ID = "accept_request";
   static readonly BUTTON_REJECT_REQUEST_ID = "reject_request";
   static readonly BUTTON_DELETE_ACCEPT_MESSAGE = "delete_accept_message";
+  static readonly BUTTON_NEXT_COLONIZATION_LIST_ID = "next_colonization_list";
 
   // Button Labels corresponding to CustomIDs.
   static readonly BUTTON_JOIN_LABEL = "Request Team Invite";
-  static readonly BUTTON_DISMISS_LABEL = "Delete";
+  static readonly BUTTON_DELETE_LABEL = "Delete";
+  static readonly BUTTON_DISMISS_LABEL = "Dismiss";
   static readonly BUTTON_LEAVE_TEAM_LABEL = "Leave Team";
   static readonly BUTTON_ACCEPT_REQUEST_LABEL = "Accept Request";
   static readonly BUTTON_REQUEST_REQUEST_LABEL = "Decline/Cancel Request";
+  static readonly BUTTON_DELETE_ACCEPT_MESSAGE_LABEL = "Delete Message";
+  static readonly BUTTON_NEXT_COLONIZATION_LIST_LABEL = "Next";
 
   // API Urls
-  static readonly BOT_SYSTEM_INFO_FETCH_URL =
+  static readonly BOT_SYSTEM_FACTION_FETCH_URL =
     "https://www.edsm.net/api-system-v1/factions";
   static readonly BOT_SYSTEM_DEATHS_INFO_FETCH_URL =
     "https://www.edsm.net/api-system-v1/deaths";
@@ -281,11 +364,23 @@ export class AppSettings {
     "https://www.edsm.net/api-system-v1/traffic";
   static readonly BOT_ELITE_SERVER_FETCH_URL =
     "https://www.edsm.net/api-status-v1/elite-server";
+  static readonly BOT_SYSTEM_INFO_FETCH_URL =
+    "https://www.edsm.net/api-v1/system";
+  static readonly BOT_INARA_SYSTEM_SEARCH_URL =
+    "https://inara.cz/elite/starsystems/?search=";
+  static readonly BOT_RAVENCOLONIAL_DETAIL_FETCH_URL =
+    "https://ravencolonial100-awcbdvabgze4c5cq.canadacentral-01.azurewebsites.net/api/project/";
+  static readonly REVENCOLONIAL_DEFAULT_URL = "https://ravencolonial.com/#sys=";
 
   // Headers for API Request to Other Websites.
   static readonly BOT_HEADER = {
     "Content-Type": "application/json",
     "User-Agent": "Looking-For-Team-Bot/1.8 (Linux)",
+  };
+  static readonly BOT_REAL_BROWSER_HEADERS = {
+    "Content-Type": "application/json",
+    "User-Agent":
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
   };
   static readonly SYSTEM_TIMELINE = ["Today", "This Week", "All Time"];
 

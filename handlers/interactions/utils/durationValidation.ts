@@ -13,7 +13,7 @@ import {
  */
 async function isValidDuration(
   interaction: CommandInteraction,
-  timer: number
+  timer: number,
 ): Promise<boolean> {
   // Check if the timer is valid
 
@@ -42,7 +42,7 @@ async function isValidDuration(
         })
         .catch((err) => {
           console.error(
-            `Error If Duration/Timer is more then 10 hours dismiss it: ${err}`
+            `Error If Duration/Timer is more then 10 hours dismiss it: ${err}`,
           );
         });
       return false;

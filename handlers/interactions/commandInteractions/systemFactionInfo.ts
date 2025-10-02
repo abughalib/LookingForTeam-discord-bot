@@ -87,7 +87,14 @@ async function systemFactionInfo(interaction: CommandInteraction) {
     // Create embed message for the system faction info
     // Reply embed message
     // With dismiss button
+
+    let inaraSystemUrl = `${
+      AppSettings.BOT_INARA_SYSTEM_SEARCH_URL
+    }${encodeURIComponent(systemName)}`;
+
     let embeded_message = systemEmbedMessage(systemFactionInfo);
+    embeded_message.setURL(inaraSystemUrl);
+
     await interaction
       .editReply({
         embeds: [embeded_message],

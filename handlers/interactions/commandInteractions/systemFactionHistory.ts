@@ -1,4 +1,8 @@
-import { ChatInputCommandInteraction, CommandInteraction, MessageFlags } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  CommandInteraction,
+  MessageFlags,
+} from "discord.js";
 import EDSM from "../../../utils/edsm";
 import createInfluenceChart from "../../../utils/influenceChart";
 import { AppSettings } from "../../../utils/settings";
@@ -16,7 +20,7 @@ import CreateButtons from "../utils/createButtons";
 async function systemfactionHistory(interaction: CommandInteraction) {
   // CommandName and options
 
-  const chatInputInteraction = (interaction as ChatInputCommandInteraction);
+  const chatInputInteraction = interaction as ChatInputCommandInteraction;
 
   const options = chatInputInteraction.options;
 
@@ -86,11 +90,14 @@ async function systemfactionHistory(interaction: CommandInteraction) {
 
   // Get the faction history chart
   let chartUrl = await createInfluenceChart(faction, days);
+  let inaraSystemUrl = `${
+    AppSettings.BOT_INARA_SYSTEM_SEARCH_URL
+  }${encodeURIComponent(systemName)}`;
 
   // Create the embed message
   let embeded_message = systemEmbedMessage(systemFactioninfo);
   embeded_message.setTitle(`Faction History for ${systemName}`);
-  embeded_message.setURL(chartUrl).setImage(chartUrl);
+  embeded_message.setURL(inaraSystemUrl).setImage(chartUrl);
 
   // Send embed message
   await interaction

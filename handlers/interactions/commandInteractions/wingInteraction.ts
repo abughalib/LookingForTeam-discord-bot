@@ -23,7 +23,7 @@ async function wingInteraction(
   interaction: CommandInteraction,
   listFieldheading: string[],
   nickName: string,
-  buttons: ActionRowBuilder<ButtonBuilder>
+  buttons: ActionRowBuilder<ButtonBuilder>,
 ) {
   // Defer interaction reply
   await interaction.deferReply().catch((err) => {
@@ -67,7 +67,7 @@ async function wingInteraction(
   // Get the number of spots in the team
   let spots = Number(
     options.get(AppSettings.INTERACTION_SPOTS_ID)?.value ||
-      AppSettings.MAXIMUM_TEAM_SPOT
+      AppSettings.MAXIMUM_TEAM_SPOT,
   );
 
   // Get the game mode of the user
@@ -86,7 +86,7 @@ async function wingInteraction(
 
   let gameVersionName: string = getGameVersionName(
     platformValue,
-    gameVersionValue
+    gameVersionValue,
   );
 
   // How long the team will be active
@@ -94,13 +94,13 @@ async function wingInteraction(
     (
       (options.get(AppSettings.INTERACTION_DURATION_ID)?.value as number) ||
       AppSettings.DEFAULT_TEAM_DURATION
-    ).toFixed(2)
+    ).toFixed(2),
   );
   // When the Team creator is looking for Team
   let when: number = Number(
     (
       (options.get(AppSettings.INTERACTION_WHEN_ID)?.value as number) || 0
-    ).toFixed(2)
+    ).toFixed(2),
   );
 
   // Additional Infomation if provided
@@ -113,7 +113,7 @@ async function wingInteraction(
     !(await isValidDuration(interaction, when)) ||
     !(await isValidDuration(interaction, duration + when))
   ) {
-    await interaction.reply({
+    await interaction.editReply({
       content: AppSettings.INVALID_DURATION_MESSAGE,
     });
     return;
@@ -181,7 +181,7 @@ async function wingInteraction(
     listFieldValue,
     nickName,
     false,
-    platformValue
+    platformValue,
   );
 
   // Adding time
@@ -207,7 +207,7 @@ async function wingInteraction(
   // Auto Delete message after certain time.
   deleteInteraction(
     interaction,
-    AppSettings.HOURS_TO_MILISEC * (duration + when)
+    AppSettings.HOURS_TO_MILISEC * (duration + when),
   );
 }
 
@@ -224,7 +224,7 @@ function getActivityName(platform: string, activityValue: string): string {
     (platform === AppSettings.XBOX_PLATFORM ||
       platform === AppSettings.PS_PLATFORM) &&
     AppSettings.ODYSSEY_SPECIFIC_ACTIVITY.find(
-      (activity) => activity === activityValue
+      (activity) => activity === activityValue,
     )
   ) {
     return AppSettings.DEFAULT_TEAM_ACTIVITY;

@@ -52,7 +52,7 @@ async function leaveTeam(interaction: ButtonInteraction) {
     // Log the error and interaction.message.references.
     console.error(
       "Interaction Reference MessageId undefined: " +
-        interaction.message.reference
+        interaction.message.reference,
     );
     // Send ephemeral message to the interaction user.
     await interaction
@@ -179,7 +179,7 @@ async function leaveTeam(interaction: ButtonInteraction) {
       })
       .catch((error) => {
         console.error(
-          "When interaction user is the one who created the Team: " + error
+          "When interaction user is the one who created the Team: " + error,
         );
       });
     return;
@@ -196,7 +196,7 @@ async function leaveTeam(interaction: ButtonInteraction) {
       })
       .catch((error) => {
         console.error(
-          "When interaction user is not in the team_players: " + error
+          "When interaction user is not in the team_players: " + error,
         );
       });
     return;
