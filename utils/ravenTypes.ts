@@ -1,0 +1,32 @@
+export interface RavenColonialProgress {
+  timestamp: string;
+  eTag: string;
+  buildId: string;
+  sumNeed: number;
+  maxNeed: number;
+  complete: boolean;
+  commodities: Map<string, number>;
+  ready: string[];
+  linkedFC: any[];
+  buildType: string;
+  buildName: string;
+  marketId: number;
+  systemAddress: number;
+  systemName: string;
+  starPos: [number, number, number];
+  bodyNum: number | null;
+  bodyName: string | null;
+  factionName: string;
+  architectName: string;
+  discordLink: string | null;
+  timeDue: string | null;
+  timeCompleted: string | null;
+  timestarted: string | null;
+  isPrimaryPort: boolean;
+  commanders: Map<string, Array<any>>;
+  notes: string;
+  bodyType: string | null;
+  bodyFeatures: string | null;
+  systemFeatures: string | null;
+  reserveLevel: string | null;
+}

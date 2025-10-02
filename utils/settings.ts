@@ -6,6 +6,7 @@ export class AppSettings {
   static readonly HELP_MESSAGE_DISMISS_TIMEOUT = 180 * 1000; // 3 Minutes
   static readonly ERROR_MESSAGE_DIMISS_TIMEOUT = 60 * 1000; // 1 Minute
   static readonly DEFAULT_REQUEST_TEAM_TIMEOUT = 10 * 60 * 1000; // 10 Minutes
+  static readonly DAFAULT_RAVENCOLONIAL_TIMEOUT_AGE = 6 * 60 * 60 * 1000; // 6 Hours
   static readonly DEFAULT_WHEN_VALUE = "Now";
   static readonly MAXIMUM_TEAM_SPOT = 40;
   static readonly MAXIMUM_HOURS_TEAM = 10;
@@ -147,6 +148,10 @@ export class AppSettings {
   static readonly DEFAULT_PLATFORM = "pc";
   static readonly XBOX_PLATFORM = "xbox";
   static readonly PS_PLATFORM = "ps";
+
+  // Validation Regex
+  static readonly RAVEN_COLONIZATION_URL_REGEX =
+    /https:\/\/ravencolonial\.com\/#(build|sys)=.+/i;
 
   static readonly INTERACTION_PLATFORM_CHOICES: Array<
     InteractionChoices<string>
@@ -363,12 +368,19 @@ export class AppSettings {
     "https://www.edsm.net/api-v1/system";
   static readonly BOT_INARA_SYSTEM_SEARCH_URL =
     "https://inara.cz/elite/starsystems/?search=";
+  static readonly BOT_RAVENCOLONIAL_DETAIL_FETCH_URL =
+    "https://ravencolonial100-awcbdvabgze4c5cq.canadacentral-01.azurewebsites.net/api/project/";
   static readonly REVENCOLONIAL_DEFAULT_URL = "https://ravencolonial.com/#sys=";
 
   // Headers for API Request to Other Websites.
   static readonly BOT_HEADER = {
     "Content-Type": "application/json",
     "User-Agent": "Looking-For-Team-Bot/1.8 (Linux)",
+  };
+  static readonly BOT_REAL_BROWSER_HEADERS = {
+    "Content-Type": "application/json",
+    "User-Agent":
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
   };
   static readonly SYSTEM_TIMELINE = ["Today", "This Week", "All Time"];
 

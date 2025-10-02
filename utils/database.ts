@@ -1,9 +1,10 @@
 import {
   ColonizationData,
   PrismaClient,
-  SystemInfoCache,
 } from "@prisma/client";
 import { Position, SystemInfo } from "./models";
+import { AppSettings } from "./settings";
+import { RavenColonialProgress } from "./ravenTypes";
 
 const prisma = new PrismaClient();
 
@@ -486,6 +487,52 @@ export async function getSystemInfoCacheStats(): Promise<{
     console.error("Error fetching cache stats:", error);
     throw error;
   }
+}
+
+export async function cacheColonizationProgress(
+  buildId: string,
+  data: RavenColonialProgress,
+): Promise<void> {
+  try {
+    await prisma.ravenColonialCache.upsert({
+      where: { buildId },
+      update: {
+        data: JSON.stringify(data),
+        updatedAt: new Date(),
+      },
+      create: {
+        buildId,
+        data: JSON.stringify(data),
+      },
+    });
+  } catch (error) {
+    console.error("Error caching RavenColonial progress:", error);
+    throw error;
+  }
+}
+
+export async function getColonizationProgressCache(
+  buildId: string,
+): Promise<RavenColonialProgress | null> {
+  try {
+    const cached = await prisma.ravenColonialCache.findUnique({
+      where: { buildId: buildId },
+    });
+
+    if (cached) {
+      const now = new Date();
+      const cacheAge = now.getTime() - cached.updatedAt.getTime();
+      const maxAge = AppSettings.DAFAULT_RAVENCOLONIAL_TIMEOUT_AGE; // 6 hours in milliseconds
+
+      if (cacheAge <= maxAge) {
+        return JSON.parse(cached.data) as RavenColonialProgress;
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching RavenColonial progress:", error);
+    throw error;
+  }
+  return null;
 }
 
 export default prisma;

@@ -8,8 +8,8 @@ datasource db {
 }
 
 model ColonizationData {
-    id              Int                     @id @default(autoincrement())
-    projectName     String                  @unique
+    id              Int                    @id @default(autoincrement())
+    projectName     String                 @unique
     systemName      String
     timeLeft        Int? // Time in seconds
     positionX       Float?
@@ -29,9 +29,9 @@ model ColonizationData {
 }
 
 model Participant {
-    id              Int                     @id @default(autoincrement())
-    userId          String                  @unique
-    projects        ParticipantOnProject[]
+    id       Int                    @id @default(autoincrement())
+    userId   String                 @unique
+    projects ParticipantOnProject[]
 }
 
 model ParticipantOnProject {
@@ -39,18 +39,26 @@ model ParticipantOnProject {
     participantId      Int
     colonizationData   ColonizationData @relation(fields: [colonizationDataId], references: [id], onDelete: Cascade)
     colonizationDataId Int
-    joinedAt          DateTime         @default(now())
+    joinedAt           DateTime         @default(now())
 
     @@id([participantId, colonizationDataId])
 }
 
 model SystemInfoCache {
-    id            Int      @id @default(autoincrement())
-    systemName    String   @unique
-    positionX     Float
-    positionY     Float
-    positionZ     Float
-    coordsLocked  Boolean
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+    id           Int      @id @default(autoincrement())
+    systemName   String   @unique
+    positionX    Float
+    positionY    Float
+    positionZ    Float
+    coordsLocked Boolean
+    createdAt    DateTime @default(now())
+    updatedAt    DateTime @updatedAt
+}
+
+model RavenColonialCache {
+    id        Int      @id @default(autoincrement())
+    buildId   String   @unique
+    data      String
+    cachedAt  DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

@@ -26,6 +26,8 @@ import { Position, SystemInfo } from "../../../utils/models";
 import EDSM from "../../../utils/edsm";
 import { ColonizationData } from "@prisma/client";
 import CreateButtons from "../utils/createButtons";
+import { RavenColonial } from "../../../utils/ravenColonial";
+import { RavenColonialProgress } from "../../../utils/ravenTypes";
 
 export class Colonization {
   constructor(
@@ -324,50 +326,74 @@ export class Colonization {
       .setColor(0x00ff00)
       .setTimestamp();
 
-    activeProjects.forEach((project, index) => {
-      const timeLeftFormatted = this.formatTimeFromSeconds(
-        project.timeLeft || Infinity,
-      );
+    const projectFields = await Promise.all(
+      activeProjects.map(async (project, index) => {
+        // Update the colonization Project progress
+        const updatedData = await this.updateProgressFromRavenColonial(
+          project.srv_survey_link,
+          project.id,
+        );
 
-      // Find participants for this project
-      const projectParticipants =
-        participantNames.find((p) => p[project.id])?.[project.id] || [];
-      const participantsText =
-        projectParticipants.length > 0
-          ? `\nParticipants: ${projectParticipants.join("\n")}`
-          : "";
+        // Wait for the cache operation to complete before calculating progress
+        let updatedProgress: string | null = null;
+        if (updatedData) {
+          updatedProgress = (
+            ((updatedData.maxNeed - updatedData.sumNeed) /
+              updatedData.maxNeed) *
+            100
+          ).toFixed(2);
+        }
 
-      // Calculate distance if reference system is provided
-      let distanceText = "";
-      if (
-        position &&
-        project.positionX !== null &&
-        project.positionY !== null &&
-        project.positionZ !== null
-      ) {
-        const distance = this.calculateDistance(position, {
-          x: project.positionX,
-          y: project.positionY,
-          z: project.positionZ,
-        });
-        distanceText = `\nDistance: ${distance.toFixed(2)} Ly`;
-      } else if (position) {
-        distanceText = `\nDistance: ∞ Ly (coordinates unavailable)`;
-      }
+        const timeLeftFormatted = this.formatTimeFromSeconds(
+          project.timeLeft || Infinity,
+        );
 
-      embed.addFields({
-        name: `**${index + 1}.** Project Name: ${project.projectName}\nSystem Name: ${project.systemName}`,
-        value: `Architect: ${project.architect}\nProgress: ${
-          project.progress
-        }%\nPrimary Port: ${
-          project.isPrimaryPort ? "Yes" : "No"
-        }\nStarport Type: ${
-          project.starPortType
-        }\nTime Left: ${timeLeftFormatted}${distanceText}${participantsText}\n${
-          project.srv_survey_link ? `[Link](${project.srv_survey_link})\n` : ""
-        }${project.notes ? `\nNotes: ${project.notes}` : ""}`,
-      });
-    });
+        // Find participants for this project
+        const projectParticipants =
+          participantNames.find((p) => p[project.id])?.[project.id] || [];
+        const participantsText =
+          projectParticipants.length > 0
+            ? `\nParticipants:\n${projectParticipants.join("\n")}`
+            : "";
+
+        // Calculate distance if reference system is provided
+        let distanceText = "";
+        if (
+          position &&
+          project.positionX !== null &&
+          project.positionY !== null &&
+          project.positionZ !== null
+        ) {
+          const distance = this.calculateDistance(position, {
+            x: project.positionX,
+            y: project.positionY,
+            z: project.positionZ,
+          });
+          distanceText = `\nDistance: ${distance.toFixed(2)} Ly`;
+        } else if (position) {
+          distanceText = `\nDistance: ∞ Ly (coordinates unavailable)`;
+        }
+
+        return {
+          name: `**${index + 1}.** Project Name: ${
+            project.projectName
+          }\nSystem Name: ${project.systemName}`,
+          value: `Architect: ${project.architect}\nProgress: ${
+            updatedProgress ?? project.progress
+          }%\nPrimary Port: ${
+            project.isPrimaryPort ? "Yes" : "No"
+          }\nStarport Type: ${
+            project.starPortType
+          }\nTime Left: ${timeLeftFormatted}${distanceText}${participantsText}\n${
+            project.srv_survey_link
+              ? `[Link](${project.srv_survey_link})\n`
+              : ""
+          }${project.notes ? `\nNotes: ${project.notes}` : ""}`,
+        };
+      }),
+    );
+
+    embed.addFields(...projectFields);
 
     if (referenceSystem) {
       embed.setDescription(`Reference System: **${referenceSystem}**`);
@@ -988,7 +1014,9 @@ export class Colonization {
         .setTitle(`Updated Colonization Project: ${projectName}`)
         .setColor(0x00ff00)
         .setDescription(
-          `Successfully updated the following fields:\n\n${updatedFields.join("\n")}`,
+          `Successfully updated the following fields:\n\n${updatedFields.join(
+            "\n",
+          )}`,
         )
         .setTimestamp();
 
@@ -1003,6 +1031,59 @@ export class Colonization {
         components: [dismissButton],
       });
     }
+  }
+
+  async updateProgressFromRavenColonial(
+    url: string,
+    colonizationId: number,
+  ): Promise<RavenColonialProgress | null> {
+    // Build URL: https://ravencolonial.com/#build=220b4ba8-ad69-427e-99b8-39da23d270c3
+    // System URL: https://ravencolonial.com/#sys=Parrot's%20Head%20Sector%20EL-Y%20d83
+
+    if (AppSettings.RAVEN_COLONIZATION_URL_REGEX.test(url)) {
+      // Build URL
+      if (url.includes("#build=")) {
+        const buildId = url.split("#build=")[1];
+        if (!buildId || buildId.trim() === "") {
+          return null;
+        }
+
+        const ravenColonial: RavenColonial = new RavenColonial();
+
+        try {
+          // Await the remote fetch (or cached value) so that callers get the data
+          const progressData =
+            await ravenColonial.checkProgressFromRevColonial(buildId);
+
+          if (progressData) {
+            // Persist the derived progress to our DB and wait for completion
+            await updateColonizationData(colonizationId, {
+              isCompleted: progressData.complete,
+              progress:
+                ((progressData.maxNeed - progressData.sumNeed) /
+                  progressData.maxNeed) *
+                100,
+            });
+
+            return progressData;
+          }
+        } catch (error) {
+          console.error(
+            `Error fetching progress from Raven Colonial for build ID ${buildId}:`,
+            error,
+          );
+        }
+
+        return null;
+      }
+
+      // System URL
+      if (url.includes("#sys=")) {
+        // TODO - Implement system-based updates if needed
+      }
+    }
+
+    return null;
   }
 
   parseTimeLeft(timeLeft: string): number {
