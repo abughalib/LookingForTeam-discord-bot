@@ -1,7 +1,4 @@
-import {
-  ColonizationData,
-  PrismaClient,
-} from "@prisma/client";
+import { ColonizationData, PrismaClient } from "@prisma/client";
 import { Position, SystemInfo } from "./models";
 import { AppSettings } from "./settings";
 import { RavenColonialProgress } from "./ravenTypes";
