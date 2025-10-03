@@ -6,7 +6,8 @@ export class AppSettings {
   static readonly HELP_MESSAGE_DISMISS_TIMEOUT = 180 * 1000; // 3 Minutes
   static readonly ERROR_MESSAGE_DIMISS_TIMEOUT = 60 * 1000; // 1 Minute
   static readonly DEFAULT_REQUEST_TEAM_TIMEOUT = 10 * 60 * 1000; // 10 Minutes
-  static readonly DAFAULT_RAVENCOLONIAL_TIMEOUT_AGE = 6 * 60 * 60 * 1000; // 6 Hours
+  static readonly DEFAULT_RAVENCOLONIAL_TIMEOUT = 6 * 60 * 60 * 1000; // 6 Hours
+  static readonly DEFAULT_EDSM_TRAFFIC_TIMEOUT = 60 * 60 * 1000; // 1 Hour
   static readonly DEFAULT_WHEN_VALUE = "Now";
   static readonly MAXIMUM_TEAM_SPOT = 40;
   static readonly MAXIMUM_HOURS_TEAM = 10;

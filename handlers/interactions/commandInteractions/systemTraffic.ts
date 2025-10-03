@@ -2,12 +2,16 @@ import {
   ChatInputCommandInteraction,
   CommandInteraction,
   GuildMember,
-  MessageFlags,
 } from "discord.js";
 import EDSM from "../../../utils/edsm";
 import { getEliteShipAndCount } from "../../../utils/helpers";
 import { AppSettings } from "../../../utils/settings";
 import embedMessage from "../../embeded_message";
+import {
+  cacheSystemTraffic,
+  getSystemTrafficFromCache,
+} from "../../../utils/database";
+import { SystemTrafficInfo } from "../../../utils/models";
 
 /**
  * No of ships passed through the system, breakdown by ships.
@@ -39,11 +43,9 @@ async function systemTraffic(
   await interaction.deferReply().catch((err) => {
     console.error(`Error in System Traffic Info: ${err}`);
   });
-  // Initialize the EDSM
-  const edsm = new EDSM();
 
-  // Get the system Traffic info from EDSM API
-  const systemTrafficInfo = await edsm.getSystemTrafficInfo(systemName);
+  // Get the system Traffic info
+  const systemTrafficInfo = await getSystemTrafficInfo(systemName);
 
   // If API call returns null
   // That means the system is not found
@@ -101,7 +103,6 @@ async function systemTraffic(
     listFieldheading,
     listFieldValue,
     nickName,
-    true,
   );
 
   // Reply embed message
@@ -112,6 +113,35 @@ async function systemTraffic(
     .catch((error) => {
       console.error(`Error in System Traffic Info: ${error}`);
     });
+}
+
+async function getSystemTrafficInfo(
+  systemName: string,
+): Promise<SystemTrafficInfo | null> {
+  const edsm = new EDSM();
+
+  const systemTrafficInfoCache = await getSystemTrafficFromCache(systemName);
+
+  if (!systemTrafficInfoCache) {
+    // Fetch from EDSM API
+    const systemTrafficInfo = await edsm.getSystemTrafficInfo(systemName);
+
+    if (!systemTrafficInfo) {
+      console.error("EDSM not responding: ", systemTrafficInfo);
+      return null;
+    }
+
+    // Cache the system info
+    await cacheSystemTraffic(systemName, systemTrafficInfo);
+
+    return systemTrafficInfo;
+  }
+
+  if (systemTrafficInfoCache) {
+    return JSON.parse(systemTrafficInfoCache.data) as SystemTrafficInfo;
+  }
+
+  return null;
 }
 
 export default systemTraffic;

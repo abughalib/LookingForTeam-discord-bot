@@ -55,6 +55,14 @@ model SystemInfoCache {
     updatedAt    DateTime @updatedAt
 }
 
+model SystemTrafficCache {
+    id         Int      @id @default(autoincrement())
+    systemName String   @unique
+    data       String
+    cachedAt   DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+}
+
 model RavenColonialCache {
     id        Int      @id @default(autoincrement())
     buildId   String   @unique
