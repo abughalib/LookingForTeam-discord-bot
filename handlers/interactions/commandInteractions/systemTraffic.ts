@@ -12,6 +12,7 @@ import {
   getSystemTrafficFromCache,
 } from "../../../utils/database";
 import { SystemTrafficInfo } from "../../../utils/models";
+import CreateButtons from "../utils/createButtons";
 
 /**
  * No of ships passed through the system, breakdown by ships.
@@ -38,6 +39,9 @@ async function systemTraffic(
   // Get NickName for that specific server
   const nickName = userInterected?.nickname || interaction.user.username;
 
+  // Create Dismiss button
+  const dismissButton = new CreateButtons().createDismissButton();
+
   // Defer message reply
   // Ephermal true so that only the user can see the message
   await interaction.deferReply().catch((err) => {
@@ -53,6 +57,7 @@ async function systemTraffic(
     await interaction
       .editReply({
         content: "Cannot find Traffic Info",
+        components: [dismissButton],
       })
       .catch((err) => {
         console.error(
@@ -68,6 +73,7 @@ async function systemTraffic(
     await interaction
       .editReply({
         content: "No ship info is in EDSM for this system",
+        components: [dismissButton],
       })
       .catch((err) => {
         console.error(
@@ -109,6 +115,7 @@ async function systemTraffic(
   interaction
     .editReply({
       embeds: [embeded_message],
+      components: [dismissButton],
     })
     .catch((error) => {
       console.error(`Error in System Traffic Info: ${error}`);
