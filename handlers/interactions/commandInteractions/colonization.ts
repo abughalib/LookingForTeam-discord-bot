@@ -1229,7 +1229,7 @@ export class Colonization {
           nicknames.push(participantId);
         }
       } catch (error) {
-        console.error(
+        console.warn(
           `Error fetching nickname for user ${participantId}:`,
           error,
         );
