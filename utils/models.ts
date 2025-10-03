@@ -19,7 +19,7 @@ interface SystemTrafficInfo {
   url: string;
   discovery: Discovery | null;
   traffic: Traffic | null;
-  breakdown: Breakdown | null;
+  breakdown: { [key: string]: number } | null;
 }
 
 interface SystemInfo {
@@ -41,30 +41,6 @@ interface Traffic {
   total: number;
   week: number;
   day: number;
-}
-
-interface Breakdown {
-  Addar: number | null;
-  Anaconda: number | null;
-  "Asp Explorer": number | null;
-  "Beluga Liner": number | null;
-  "Cobra MkIII": number | null;
-  "Diamondback Explorer": number | null;
-  Dolphin: number | null;
-  "Federal Assault Ship": number | null;
-  "Federal Corvette": number | null;
-  "Federal Gunship": number | null;
-  "Fer-de-Lance": number | null;
-  Hauler: number | null;
-  "Imperial Clipper": number | null;
-  "Imperial Courier": number | null;
-  "Imperial Cutter": number | null;
-  Orca: number | null;
-  Python: number | null;
-  "Type-9 Heavy": number | null;
-  "Viper MkIII": number | null;
-  "Viper MkIV": number | null;
-  Vulture: number | null;
 }
 
 interface TickHistory {

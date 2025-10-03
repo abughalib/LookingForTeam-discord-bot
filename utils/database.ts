@@ -1,5 +1,9 @@
-import { ColonizationData, PrismaClient } from "@prisma/client";
-import { Position, SystemInfo } from "./models";
+import {
+  ColonizationData,
+  PrismaClient,
+  SystemTrafficCache,
+} from "@prisma/client";
+import { Position, SystemDeath, SystemInfo } from "./models";
 import { AppSettings } from "./settings";
 import { RavenColonialProgress } from "./ravenTypes";
 
@@ -519,7 +523,7 @@ export async function getColonizationProgressCache(
     if (cached) {
       const now = new Date();
       const cacheAge = now.getTime() - cached.updatedAt.getTime();
-      const maxAge = AppSettings.DAFAULT_RAVENCOLONIAL_TIMEOUT_AGE; // 6 hours in milliseconds
+      const maxAge = AppSettings.DEFAULT_RAVENCOLONIAL_TIMEOUT; // 6 hours in milliseconds
 
       if (cacheAge <= maxAge) {
         return JSON.parse(cached.data) as RavenColonialProgress;
@@ -530,6 +534,52 @@ export async function getColonizationProgressCache(
     throw error;
   }
   return null;
+}
+
+export async function getSystemTrafficFromCache(
+  systemName: string,
+): Promise<SystemTrafficCache | null> {
+  try {
+    const cached = await prisma.systemTrafficCache.findUnique({
+      where: { systemName: systemName.toLowerCase() },
+    });
+
+    if (cached) {
+      const now = new Date();
+      const cacheAge = now.getTime() - cached.updatedAt.getTime();
+      const maxAge = AppSettings.DEFAULT_EDSM_TRAFFIC_TIMEOUT; // 1 Hour in milliseconds
+      if (cacheAge <= maxAge) {
+        return cached;
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching system traffic from cache: ", error);
+    throw error;
+  }
+
+  return null;
+}
+
+export async function cacheSystemTraffic(
+  systemName: string,
+  data: any,
+): Promise<void> {
+  try {
+    await prisma.systemTrafficCache.upsert({
+      where: { systemName: systemName.toLowerCase() },
+      update: {
+        data: JSON.stringify(data),
+        updatedAt: new Date(),
+      },
+      create: {
+        systemName: systemName.toLowerCase(),
+        data: JSON.stringify(data),
+      },
+    });
+  } catch (error) {
+    console.error("Error caching system death data: ", error);
+    throw error;
+  }
 }
 
 export default prisma;
