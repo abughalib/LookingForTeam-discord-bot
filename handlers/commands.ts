@@ -346,7 +346,8 @@ function setCommands(client: Client) {
     options: [
       {
         name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
+        description:
+          AppSettings.INTERACTION_COLONIZATION_UPDATE_PROJECT_NAME_DESC,
         required: true,
         type: ApplicationCommandOptionType.String,
       },

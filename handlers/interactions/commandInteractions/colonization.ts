@@ -33,7 +33,6 @@ export class Colonization {
   constructor(
     private interaction: CommandInteraction,
     private chatInputInteraction: ChatInputCommandInteraction,
-    private dismissButton: CreateButtons = new CreateButtons()
   ) {
     this.interaction = interaction;
     this.chatInputInteraction = interaction as ChatInputCommandInteraction;
@@ -44,16 +43,12 @@ export class Colonization {
 
     const colonizationSystemName = options.getString(
       AppSettings.INTERACTION_COLONIZATION_SYSTEM_NAME_ID,
-      true
-    );
-    const dismissButton = this.dismissButton.createDismissButton(
-      AppSettings.BUTTON_DISMISS_ID,
-      AppSettings.BUTTON_DISMISS_LABEL
+      true,
     );
     const rawProjectName =
       options.getString(
         AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-        true
+        true,
       ) ?? randomUUID().toLowerCase().slice(0, 8);
 
     // Replace spaces with underscores to avoid issues in button customIds and ensure lowercase
@@ -61,38 +56,38 @@ export class Colonization {
     const architect =
       (options.getString(
         AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
-        false
+        false,
       ) as string) ?? (await this.getUserNickname());
     const notes =
       (options.getString(
         AppSettings.INTERACTION_COLONIZATION_NOTES_ID,
-        false
+        false,
       ) as string) ?? "";
 
     let timeLeft =
       (options.getString(
         AppSettings.INTERACTION_COLONIZATION_TIMELEFT_ID,
-        false
+        false,
       ) as string) ?? "4w";
     const isPrimaryPort =
       (options.getBoolean(
         AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
-        false
+        false,
       ) as boolean) ?? true;
 
     const progress =
       (options.getNumber(
         AppSettings.INTERACTION_COLONIZATION_PROGRESS_ID,
-        false
+        false,
       ) as number) ?? 0;
 
     const starPortType = options.getString(
       AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_ID,
-      true
+      true,
     );
 
     const systemInfo: SystemInfo | null = await EDSM.getSystemInfo(
-      colonizationSystemName
+      colonizationSystemName,
     );
 
     if (!systemInfo || !systemInfo.coords) {
@@ -106,7 +101,7 @@ export class Colonization {
     const srv_survey_link =
       options.getString(
         AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_ID,
-        false
+        false,
       ) ??
       AppSettings.REVENCOLONIAL_DEFAULT_URL +
         encodeURIComponent(colonizationSystemName!);
@@ -114,17 +109,17 @@ export class Colonization {
     const nowTime = new Date();
 
     // Implementation for adding colonization
-    await this.interaction.deferReply();
+    await this.interaction.deferReply({
+      flags: MessageFlags.Ephemeral,
+    });
 
     try {
       // Check if a project with the same name already exists
-      const existingProject = await getColonizationDataByProjectName(
-        projectName
-      );
+      const existingProject =
+        await getColonizationDataByProjectName(projectName);
       if (existingProject) {
         await this.interaction.editReply({
           content: `A colonization project with the name **${projectName}** already exists. Please choose a different project name.`,
-          components: [dismissButton],
         });
         return;
       }
@@ -156,7 +151,7 @@ export class Colonization {
       await participateInColonizationData(colonization_id, userId);
 
       const timeLeftFormatted = this.formatTimeFromSeconds(
-        this.parseTimeLeft(timeLeft)
+        this.parseTimeLeft(timeLeft),
       );
 
       const embed = new EmbedBuilder()
@@ -175,13 +170,11 @@ export class Colonization {
 
       await this.interaction.editReply({
         embeds: [embed],
-        components: [dismissButton],
       });
     } catch (error) {
       console.error("Error adding colonization data:", error);
       await this.interaction.followUp({
         content: `Failed to add colonization project: **${projectName}**.`,
-        components: [dismissButton],
       });
     }
   }
@@ -189,7 +182,7 @@ export class Colonization {
   async remove() {
     const rawProjectName = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-      true
+      true,
     ) as string;
 
     // Replace spaces with underscores to match stored project name format and ensure lowercase
@@ -203,9 +196,8 @@ export class Colonization {
       const userNickname = await this.getUserNickname();
 
       // Check if the colonization project exists and get its data
-      const colonizationData = await getColonizationDataByProjectName(
-        projectName
-      );
+      const colonizationData =
+        await getColonizationDataByProjectName(projectName);
 
       if (!colonizationData) {
         await this.interaction.editReply({
@@ -238,7 +230,7 @@ export class Colonization {
   async list() {
     const rawProjectName = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-      false
+      false,
     ) as string | null;
 
     // Replace spaces with underscores to match stored project name format (if provided) and ensure lowercase
@@ -248,36 +240,33 @@ export class Colonization {
 
     const architectName = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
-      false
+      false,
     ) as string | null;
 
     const isPrimaryPort = this.chatInputInteraction.options.getBoolean(
       AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
-      false
+      false,
     ) as boolean | null;
 
     const starPortType = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_ID,
-      false
+      false,
     ) as string | null;
 
     const referenceSystem = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_REFERENCE_SYSTEM_ID,
-      false
+      false,
     ) as string | null;
 
     await this.interaction.deferReply({
       flags: MessageFlags.Ephemeral,
     });
 
-    const dismissButton = this.dismissButton.createDismissButton();
-
     let position: Position | null = null;
 
     if (referenceSystem) {
-      const systemInfo: SystemInfo | null = await EDSM.getSystemInfo(
-        referenceSystem
-      );
+      const systemInfo: SystemInfo | null =
+        await EDSM.getSystemInfo(referenceSystem);
 
       if (systemInfo && systemInfo.coords) {
         position = {
@@ -288,7 +277,6 @@ export class Colonization {
       } else {
         await this.interaction.editReply({
           content: `Could not find system info for reference system **${referenceSystem}**. Distance calculations will be skipped.`,
-          components: [dismissButton],
         });
       }
     }
@@ -300,13 +288,12 @@ export class Colonization {
       architectName || undefined,
       position || undefined,
       isPrimaryPort ?? undefined,
-      starPortType || undefined
+      starPortType || undefined,
     );
 
     if (activeProjects.length === 0) {
       await this.interaction.editReply({
         content: "No active colonization projects found.",
-        components: [dismissButton],
       });
       return;
     }
@@ -314,15 +301,14 @@ export class Colonization {
     const participantNames = await Promise.all(
       activeProjects.map(async (project) => {
         const participantIds = await getParticipantsByColonizationId(
-          project.id
+          project.id,
         );
-        const participantNicknames = await this.getParticipantNicknames(
-          participantIds
-        );
+        const participantNicknames =
+          await this.getParticipantNicknames(participantIds);
         return {
           [project.id]: participantNicknames,
         };
-      })
+      }),
     );
 
     const totalProjects = await countColonizationActiveProjects();
@@ -337,7 +323,7 @@ export class Colonization {
         // Update the colonization Project progress
         const updatedData = await this.updateProgressFromRavenColonial(
           project.srv_survey_link,
-          project.id
+          project.id,
         );
 
         // Wait for the cache operation to complete before calculating progress
@@ -351,7 +337,7 @@ export class Colonization {
         }
 
         const timeLeftFormatted = this.formatTimeFromSeconds(
-          project.timeLeft || Infinity
+          project.timeLeft || Infinity,
         );
 
         // Find participants for this project
@@ -396,7 +382,7 @@ export class Colonization {
               : ""
           }${project.notes ? `\nNotes: ${project.notes}` : ""}`,
         };
-      })
+      }),
     );
 
     embed.addFields(...projectFields);
@@ -420,7 +406,7 @@ export class Colonization {
         .setCustomId(
           `${AppSettings.BUTTON_NEXT_COLONIZATION_LIST_ID}_${
             currentPage + 1
-          }_${JSON.stringify({ projectName, architectName, referenceSystem })}`
+          }_${JSON.stringify({ projectName, architectName, referenceSystem })}`,
         )
         .setLabel(AppSettings.BUTTON_NEXT_COLONIZATION_LIST_LABEL)
         .setStyle(ButtonStyle.Primary);
@@ -430,7 +416,7 @@ export class Colonization {
     // Add up to remaining slots for project selection buttons (account for next button)
     const maxProjectButtonsInFirstRow = Math.min(
       5 - firstRow.components.length,
-      activeProjects.length
+      activeProjects.length,
     );
     for (let i = 0; i < maxProjectButtonsInFirstRow; i++) {
       const project = activeProjects[i];
@@ -443,10 +429,7 @@ export class Colonization {
     components.push(firstRow);
 
     // Second row: Remaining project buttons (if any) and dismiss button
-    if (
-      activeProjects.length > maxProjectButtonsInFirstRow ||
-      dismissButton.components[0]
-    ) {
+    if (activeProjects.length > maxProjectButtonsInFirstRow) {
       const secondRow = new ActionRowBuilder<ButtonBuilder>();
 
       // Add remaining project buttons
@@ -463,8 +446,6 @@ export class Colonization {
         secondRow.addComponents(projectButton);
       }
 
-      // Add dismiss button
-      secondRow.addComponents(dismissButton.components[0]);
       components.push(secondRow);
     }
 
@@ -478,15 +459,15 @@ export class Colonization {
   async progress() {
     const rawProjectName = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-      true
+      true,
     ) as string;
 
     // Replace spaces with underscores to match stored project name format and ensure lowercase
     const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
 
-    await this.interaction.deferReply();
-
-    const dismissButton = this.dismissButton.createDismissButton();
+    await this.interaction.deferReply({
+      flags: MessageFlags.Ephemeral,
+    });
 
     const colonizationData: ColonizationData | null =
       await getColonizationDataByProjectName(projectName);
@@ -494,17 +475,16 @@ export class Colonization {
     if (!colonizationData) {
       await this.interaction.editReply({
         content: `No colonization project found with the name **${projectName}**.`,
-        components: [dismissButton],
       });
       return;
     }
 
     const timeLeftFormatted = this.formatTimeFromSeconds(
-      colonizationData.timeLeft || Infinity
+      colonizationData.timeLeft || Infinity,
     );
 
     const participantIds = await getParticipantsByColonizationId(
-      colonizationData.id
+      colonizationData.id,
     );
     const participantNames = await this.getParticipantNicknames(participantIds);
 
@@ -540,7 +520,7 @@ export class Colonization {
           name: "Participants",
           value:
             participantNames.length > 0 ? participantNames.join(", ") : "None",
-        }
+        },
       )
       .setAuthor({ name: "Added By: " + colonizationData.addedBy })
       .setFooter({ text: `Created At: ${colonizationData.createdAt}` })
@@ -552,77 +532,17 @@ export class Colonization {
 
     await this.interaction.editReply({
       embeds: [embed],
-      components: [dismissButton],
     });
   }
 
   async participate() {
     const rawProjectName = this.chatInputInteraction.options.getString(
       AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-      true
+      true,
     ) as string;
 
     // Replace spaces with underscores to match stored project name format and ensure lowercase
     const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
-
-    const dismissButton = this.dismissButton.createDismissButton();
-
-    await this.interaction.deferReply();
-
-    const colonizationData: ColonizationData | null =
-      await getColonizationDataByProjectName(projectName);
-
-    if (!colonizationData) {
-      await this.interaction.editReply({
-        content: `No colonization project found with the name **${projectName}**.`,
-        components: [dismissButton],
-      });
-      return;
-    }
-
-    try {
-      const userNickname = await this.getUserNickname();
-      const userId = this.interaction.user.id; // Use Discord user ID instead of nickname
-
-      // Check if user is already participating (check both ID and nickname for legacy data)
-      const participants = await getParticipantsByColonizationId(
-        colonizationData.id
-      );
-      if (
-        participants.includes(userId) ||
-        participants.includes(userNickname)
-      ) {
-        await this.interaction.editReply({
-          content: `You already joined the colonization project **${projectName}**.`,
-          components: [dismissButton],
-        });
-        return;
-      }
-
-      await participateInColonizationData(colonizationData.id, userId);
-      await this.interaction.editReply({
-        content: `You have successfully joined the colonization project **${projectName}**.`,
-        components: [dismissButton],
-      });
-    } catch (error) {
-      console.error("Error participating in colonization project:", error);
-      await this.interaction.editReply({
-        content: `Failed to join the colonization project: **${projectName}**`,
-        components: [dismissButton],
-      });
-    }
-  }
-
-  async leave() {
-    const rawProjectName = this.chatInputInteraction.options.getString(
-      AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-      true
-    ) as string;
-
-    // Replace spaces with underscores to match stored project name format and ensure lowercase
-    const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
-
-    const dismissButton = this.dismissButton.createDismissButton();
 
     await this.interaction.deferReply({
       flags: MessageFlags.Ephemeral,
@@ -634,7 +554,59 @@ export class Colonization {
     if (!colonizationData) {
       await this.interaction.editReply({
         content: `No colonization project found with the name **${projectName}**.`,
-        components: [dismissButton],
+      });
+      return;
+    }
+
+    try {
+      const userNickname = await this.getUserNickname();
+      const userId = this.interaction.user.id; // Use Discord user ID instead of nickname
+
+      // Check if user is already participating (check both ID and nickname for legacy data)
+      const participants = await getParticipantsByColonizationId(
+        colonizationData.id,
+      );
+      if (
+        participants.includes(userId) ||
+        participants.includes(userNickname)
+      ) {
+        await this.interaction.editReply({
+          content: `You already joined the colonization project **${projectName}**.`,
+        });
+        return;
+      }
+
+      await participateInColonizationData(colonizationData.id, userId);
+      await this.interaction.editReply({
+        content: `You have successfully joined the colonization project **${projectName}**.`,
+      });
+    } catch (error) {
+      console.error("Error participating in colonization project:", error);
+      await this.interaction.editReply({
+        content: `Failed to join the colonization project: **${projectName}**`,
+      });
+    }
+  }
+
+  async leave() {
+    const rawProjectName = this.chatInputInteraction.options.getString(
+      AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
+      true,
+    ) as string;
+
+    // Replace spaces with underscores to match stored project name format and ensure lowercase
+    const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
+
+    await this.interaction.deferReply({
+      flags: MessageFlags.Ephemeral,
+    });
+
+    const colonizationData: ColonizationData | null =
+      await getColonizationDataByProjectName(projectName);
+
+    if (!colonizationData) {
+      await this.interaction.editReply({
+        content: `No colonization project found with the name **${projectName}**.`,
       });
       return;
     }
@@ -645,31 +617,33 @@ export class Colonization {
 
       // Check if user is participating (check both ID and nickname for legacy data)
       const participants = await getParticipantsByColonizationId(
-        colonizationData.id
+        colonizationData.id,
       );
-      if (
-        !participants.includes(userId) &&
-        !participants.includes(userNickname)
-      ) {
-        await this.interaction.editReply({
-          content: `You are not participating in the colonization project **${projectName}**.`,
-          components: [dismissButton],
-        });
-        return;
-      }
 
-      await removeParticipantFromProject(colonizationData.id, userId);
-      await this.interaction.editReply({
-        content: `You have successfully left the colonization project **${projectName}**.`,
-        components: [dismissButton],
-      });
+      if (
+        participants.includes(userId) ||
+        participants.includes(userNickname)
+      ) {
+        if (participants.includes(userId)) {
+          await removeParticipantFromProject(colonizationData.id, `${userId}`);
+        }
+        if (participants.includes(userNickname)) {
+          await removeParticipantFromProject(colonizationData.id, userNickname);
+        }
+        await this.interaction.editReply({
+          content: `You have successfully left the colonization project **${projectName}**.`,
+        });
+      }
     } catch (error) {
       console.error("Error leaving colonization project:", error);
       await this.interaction.editReply({
         content: `Failed to leave the colonization project: **${projectName}**`,
-        components: [dismissButton],
       });
     }
+
+    await this.interaction.editReply({
+      content: `You are not participating in the colonization project **${projectName}**.`,
+    });
   }
 
   async help() {
@@ -681,7 +655,7 @@ export class Colonization {
         "This comprehensive guide will help you track and manage Elite Dangerous colonization projects.\n\n" +
           "🔹 **Distance calculation** when reference system provided\n" +
           "🔹 **Authorization system** - only participants/creators can update progress\n" +
-          "🔹 **Interactive buttons** for easy navigation"
+          "🔹 **Interactive buttons** for easy navigation",
       );
 
     // Commands overview embed
@@ -721,7 +695,7 @@ export class Colonization {
             "• **Required:** `project_name`\n" +
             "• **Note:** You can only leave projects you're participating in\n" +
             '• **Example:** `/colonization_leave project_name:"my_station"`',
-        }
+        },
       );
 
     // More commands embed
@@ -754,7 +728,7 @@ export class Colonization {
             "• **Authorization:** Only the project creator can remove projects\n" +
             "• **Warning:** This action cannot be undone!\n" +
             '• **Example:** `/colonization_remove project_name:"my_station"`',
-        }
+        },
       );
 
     // Tips and examples embed
@@ -805,7 +779,7 @@ export class Colonization {
             "• **'No deadline'** = Projects with unlimited time\n" +
             "• **'EXPIRED'** = Projects past their deadline (shown in direct queries only)\n" +
             "• **List filtering** = Only active (non-expired) projects shown in lists",
-        }
+        },
       );
 
     // Starport types embed
@@ -842,12 +816,10 @@ export class Colonization {
     const options = this.chatInputInteraction.options;
     const rawProjectName = options.getString(
       AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-      true
+      true,
     ) as string;
     // Replace spaces with underscores to match stored project name format and ensure lowercase
     const projectName = rawProjectName.replace(/\s+/g, "_").toLowerCase();
-
-    const dismissButton = this.dismissButton.createDismissButton();
 
     await this.interaction.deferReply({
       flags: MessageFlags.Ephemeral,
@@ -859,7 +831,6 @@ export class Colonization {
     if (!colonizationData) {
       await this.interaction.editReply({
         content: `No colonization project found with the name **${projectName}**.`,
-        components: [dismissButton],
       });
       return;
     }
@@ -870,11 +841,10 @@ export class Colonization {
 
       // Check if user is a participant in this project or the creator
       const participantIds = await getParticipantsByColonizationId(
-        colonizationData.id
+        colonizationData.id,
       );
-      const participantNicknames = await this.getParticipantNicknames(
-        participantIds
-      );
+      const participantNicknames =
+        await this.getParticipantNicknames(participantIds);
 
       // Check both user ID (new format) and nickname (legacy format) for participation
       const isParticipant =
@@ -889,7 +859,6 @@ export class Colonization {
           }\nCurrent participants: ${
             participantNicknames.join("\n") || "None"
           }`,
-          components: [dismissButton],
         });
         return;
       }
@@ -904,17 +873,16 @@ export class Colonization {
       // Handle system name update (requires validation)
       const newSystemName = options.getString(
         AppSettings.INTERACTION_COLONIZATION_SYSTEM_NAME_ID,
-        false
+        false,
       );
       if (newSystemName && newSystemName.trim() !== "") {
         const systemInfo: SystemInfo | null = await EDSM.getSystemInfo(
-          newSystemName.trim()
+          newSystemName.trim(),
         );
 
         if (!systemInfo || !systemInfo.coords) {
           await this.interaction.editReply({
             content: `Could not find system info for **${newSystemName}**. Please check the system name and try again.`,
-            components: [dismissButton],
           });
           return;
         }
@@ -929,7 +897,7 @@ export class Colonization {
       // Handle starport type update
       const newStarPortType = options.getString(
         AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_ID,
-        false
+        false,
       );
       if (newStarPortType && newStarPortType.trim() !== "") {
         updates.starPortType = newStarPortType;
@@ -939,7 +907,7 @@ export class Colonization {
       // Handle Link update
       const newSrvSurveyLink = options.getString(
         AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_ID,
-        false
+        false,
       );
       if (newSrvSurveyLink !== null && newSrvSurveyLink.trim() !== "") {
         updates.srv_survey_link = newSrvSurveyLink.trim();
@@ -949,7 +917,7 @@ export class Colonization {
       // Handle time left update
       const newTimeLeft = options.getString(
         AppSettings.INTERACTION_COLONIZATION_TIMELEFT_ID,
-        false
+        false,
       );
       if (newTimeLeft && newTimeLeft.trim() !== "") {
         const parsedTimeLeft = this.parseTimeLeft(newTimeLeft.trim());
@@ -961,7 +929,7 @@ export class Colonization {
       // Handle architect update
       const newArchitect = options.getString(
         AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
-        false
+        false,
       );
       if (newArchitect && newArchitect.trim() !== "") {
         updates.architect = newArchitect.trim();
@@ -971,7 +939,7 @@ export class Colonization {
       // Handle primary port update
       const newIsPrimaryPort = options.getBoolean(
         AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
-        false
+        false,
       );
       if (newIsPrimaryPort !== null) {
         updates.isPrimaryPort = newIsPrimaryPort;
@@ -981,7 +949,7 @@ export class Colonization {
       // Handle progress update
       const newProgress = options.getNumber(
         AppSettings.INTERACTION_COLONIZATION_PROGRESS_ID,
-        false
+        false,
       );
       if (newProgress !== null) {
         updates.progress = newProgress;
@@ -998,7 +966,7 @@ export class Colonization {
       // Handle notes update
       const newNotes = options.getString(
         AppSettings.INTERACTION_COLONIZATION_NOTES_ID,
-        false
+        false,
       );
       if (newNotes !== null) {
         updates.notes = newNotes.trim() || null;
@@ -1009,7 +977,6 @@ export class Colonization {
       if (updatedFields.length === 0) {
         await this.interaction.editReply({
           content: `No valid updates provided for colonization project **${projectName}**. Please specify at least one field to update.`,
-          components: [dismissButton],
         });
         return;
       }
@@ -1022,27 +989,25 @@ export class Colonization {
         .setColor(0x00ff00)
         .setDescription(
           `Successfully updated the following fields:\n\n${updatedFields.join(
-            "\n"
-          )}`
+            "\n",
+          )}`,
         )
         .setTimestamp();
 
       await this.interaction.editReply({
         embeds: [embed],
-        components: [dismissButton],
       });
     } catch (error) {
       console.error("Error updating colonization project:", error);
       await this.interaction.editReply({
         content: `Failed to update colonization project: **${projectName}**`,
-        components: [dismissButton],
       });
     }
   }
 
   async updateProgressFromRavenColonial(
     url: string,
-    colonizationId: number
+    colonizationId: number,
   ): Promise<RavenColonialProgress | null> {
     // Build URL: https://ravencolonial.com/#build=220b4ba8-ad69-427e-99b8-39da23d270c3
     // System URL: https://ravencolonial.com/#sys=Parrot's%20Head%20Sector%20EL-Y%20d83
@@ -1059,9 +1024,8 @@ export class Colonization {
 
         try {
           // Await the remote fetch (or cached value) so that callers get the data
-          const progressData = await ravenColonial.checkProgressFromRevColonial(
-            buildId
-          );
+          const progressData =
+            await ravenColonial.checkProgressFromRevColonial(buildId);
 
           if (progressData) {
             // Persist the derived progress to our DB and wait for completion
@@ -1078,7 +1042,7 @@ export class Colonization {
         } catch (error) {
           console.error(
             `Error fetching progress from Raven Colonial for build ID ${buildId}:`,
-            error
+            error,
           );
         }
 
@@ -1135,7 +1099,7 @@ export class Colonization {
 
     const weeks = Math.floor(totalSeconds / (7 * 24 * 60 * 60));
     const days = Math.floor(
-      (totalSeconds % (7 * 24 * 60 * 60)) / (24 * 60 * 60)
+      (totalSeconds % (7 * 24 * 60 * 60)) / (24 * 60 * 60),
     );
     const hours = Math.floor((totalSeconds % (24 * 60 * 60)) / (60 * 60));
     const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
@@ -1153,13 +1117,13 @@ export class Colonization {
   getFields(
     options: string[],
     values: (string | number | boolean)[],
-    inline: boolean = false
+    inline: boolean = false,
   ): RestOrArray<APIEmbedField> {
     const fields: RestOrArray<APIEmbedField> = Array.from(
       Array(Math.max(options.length, values.length)),
       (_, i): APIEmbedField => {
         return { name: options[i], value: `${values[i]}`, inline: inline };
-      }
+      },
     );
 
     return fields;
@@ -1169,7 +1133,7 @@ export class Colonization {
     title: string,
     options: string[],
     values: (string | number | boolean)[],
-    inline: boolean = false
+    inline: boolean = false,
   ): EmbedBuilder {
     // Creating the embeded message
     const embeded_message = new EmbedBuilder()
@@ -1201,9 +1165,8 @@ export class Colonization {
   private async getUserNickname(userId?: string): Promise<string> {
     try {
       const targetUserId = userId || this.interaction.user.id;
-      const userInteracted = await this.interaction.guild?.members.fetch(
-        targetUserId
-      );
+      const userInteracted =
+        await this.interaction.guild?.members.fetch(targetUserId);
       return userInteracted?.nickname || this.interaction.user.username;
     } catch (error) {
       console.error("Error fetching user nickname:", error);
@@ -1217,7 +1180,7 @@ export class Colonization {
    * @returns Array of participant nicknames
    */
   private async getParticipantNicknames(
-    participantIds: string[]
+    participantIds: string[],
   ): Promise<string[]> {
     const nicknames: string[] = [];
     for (const participantId of participantIds) {
@@ -1227,9 +1190,8 @@ export class Colonization {
 
         if (isSnowflake) {
           // It's a proper Discord user ID, fetch the member
-          const userMember = await this.interaction.guild?.members.fetch(
-            participantId
-          );
+          const userMember =
+            await this.interaction.guild?.members.fetch(participantId);
           const nickname =
             userMember?.nickname || userMember?.user.username || participantId;
           nicknames.push(nickname);
@@ -1241,7 +1203,7 @@ export class Colonization {
       } catch (error) {
         console.warn(
           `Error fetching nickname for user ${participantId}:`,
-          error
+          error,
         );
         nicknames.push(participantId); // Fallback to the ID/nickname as-is
       }

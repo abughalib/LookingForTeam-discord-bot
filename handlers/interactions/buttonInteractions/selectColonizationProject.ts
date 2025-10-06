@@ -38,7 +38,9 @@ async function selectColonizationProject(interaction: ButtonInteraction) {
       "",
     );
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlags.Ephemeral,
+    });
 
     // Get the specific project by name
     const selectedProject = await getColonizationDataByProjectName(projectName);
