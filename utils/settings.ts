@@ -124,6 +124,8 @@ export class AppSettings {
     "Time left to complete the colonization (week, days, hours), i.e 3w, 2d, 5h, default 3weeks";
   static readonly INTERACTION_COLONIZATION_PROJECT_NAME_DESC =
     "Name of the colonization project (give it anyname you want, no spaces)";
+  static readonly INTERACTION_COLONIZATION_UPDATE_PROJECT_NAME_DESC =
+    "Name of the colonization project to update";
   static readonly INTERACTION_COLONIZATION_ARCHITECT_DESC =
     "Name of the System Architect (in-game name)";
   static readonly INTERACTION_COLONIZATION_IS_PRIMARY_PORT_DESC =
