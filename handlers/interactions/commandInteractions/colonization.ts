@@ -633,6 +633,7 @@ export class Colonization {
         await this.interaction.editReply({
           content: `You have successfully left the colonization project **${projectName}**.`,
         });
+        return;
       }
     } catch (error) {
       console.error("Error leaving colonization project:", error);
