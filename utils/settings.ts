@@ -330,13 +330,16 @@ export class AppSettings {
     ];
 
   static readonly INTERACTION_COLONIZATION_STARPORT_TYPE_CHOICES = [
-    { name: "Coriolis", value: "Coriolis" },
-    { name: "Ocellus", value: "Ocellus" },
-    { name: "Orbis", value: "Orbis" },
-    { name: "Outpost", value: "Outpost" },
-    { name: "Planetary Port", value: "Planetary Port" },
-    { name: "Asteroid Base", value: "Asteroid Base" },
-    { name: "Installation", value: "Installation" },
+    { name: "Starport (T3)", value: "t3_starport_t3" },
+    { name: "Starport (T2)", value: "t2_starport_t2" },
+    { name: "Outpost (T1)", value: "t1_outpost" },
+    { name: "Installation (T2)", value: "t2_installation" },
+    { name: "Installation (T1)", value: "t1_installation" },
+    { name: "Surface Port (T3)", value: "t3_surface_port" },
+    { name: "Surface Hub (T2)", value: "t2_hub" },
+    { name: "Surface Outpost (T1)", value: "t1_surface_outpost" },
+    { name: "Settlement (T2)", value: "t2_settlement" },
+    { name: "Settlement (T1)", value: "t1_settlement" },
   ];
 
   // Buttons customIDs
