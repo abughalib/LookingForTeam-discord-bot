@@ -1098,6 +1098,8 @@ export class Colonization {
     // Handle infinite time (0 means no deadline)
     if (totalSeconds === 0) return "No deadline";
 
+    if (totalSeconds == Infinity) return "∞";
+
     const weeks = Math.floor(totalSeconds / (7 * 24 * 60 * 60));
     const days = Math.floor(
       (totalSeconds % (7 * 24 * 60 * 60)) / (24 * 60 * 60),
