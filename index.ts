@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, IntentsBitField } from "discord.js";
+import { Client, GatewayIntentBits, IntentsBitField, Events } from "discord.js";
 import setCommands from "./handlers/commands";
 import handleInteractions from "./handlers/interactions";
 
@@ -10,12 +10,16 @@ const client = new Client({
   ],
 });
 
-client.on("clientReady", () => {
+client.once(Events.ClientReady, async (readyClient) => {
   console.log("The bot is ready!");
-  setCommands(client);
+  try {
+    await setCommands(readyClient);
+  } catch (error) {
+    console.error("Error while setting commands:", error);
+  }
 });
 
-client.on("interactionCreate", async (interaction) => {
+client.on(Events.InteractionCreate, async (interaction) => {
   await handleInteractions(interaction);
 });
 
