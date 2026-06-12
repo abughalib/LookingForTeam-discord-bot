@@ -4,6 +4,7 @@ import {
   getColonizationProgressCache,
 } from "./database";
 import { AppSettings } from "./settings";
+import { httpsRequest } from "./httpsRequest";
 
 export class RavenColonial {
   async checkProgressFromRevColonial(buildId: string) {
@@ -14,27 +15,32 @@ export class RavenColonial {
     }
 
     // Fetch from RavenColonial if not in cache
-
     const url = `${AppSettings.BOT_RAVENCOLONIAL_DETAIL_FETCH_URL}${buildId}`;
-    let response = await fetch(url, {
-      method: "GET",
-      headers: AppSettings.BOT_REAL_BROWSER_HEADERS,
-    });
 
-    console.log("Cache miss, fetching from API for buildId:", buildId);
+    try {
+      let response = await httpsRequest(url, {
+        method: "GET",
+        headers: AppSettings.BOT_REAL_BROWSER_HEADERS,
+      });
 
-    if (!response.ok) {
-      console.error(
-        `Error fetching RavenColonial data: ${response.statusText}`,
-      );
+      console.log("Cache miss, fetching from API for buildId:", buildId);
+
+      if (!response.ok) {
+        console.error(
+          `Error fetching RavenColonial data: ${response.status} ${response.statusText}`
+        );
+        return null;
+      }
+
+      let data: RavenColonialProgress = await response.json();
+
+      // Cache the fetched data
+      await cacheColonizationProgress(buildId, data);
+
+      return data;
+    } catch (error) {
+      console.error("RavenColonial fetch exception:", error);
       return null;
     }
-
-    let data: RavenColonialProgress = await response.json();
-
-    // Cache the fetched data
-    await cacheColonizationProgress(buildId, data);
-
-    return data;
   }
 }

@@ -1,4 +1,4 @@
-import { Client, ApplicationCommandOptionType } from "discord.js";
+import { Client, ApplicationCommandOptionType, ApplicationCommandDataResolvable } from "discord.js";
 import CommandLocalizations from "../utils/localization";
 import { AppSettings } from "../utils/settings";
 
@@ -11,7 +11,7 @@ import { AppSettings } from "../utils/settings";
  *   Sets the commands for the bot
  */
 
-function setCommands(client: Client) {
+async function setCommands(client: Client) {
   // If client application is null, return.
   // Log the error to the console with client
   if (client.application == null) {
@@ -32,9 +32,8 @@ function setCommands(client: Client) {
     return;
   }
 
-  // Create a new command
-  commands
-    .create({
+  const commandData: ApplicationCommandDataResolvable[] = [
+    {
       name: AppSettings.BOT_WING_COMMAND_NAME,
       description: CommandLocalizations.LOOKING_FOR_TEAM_DESCRIPTION["en-US"],
       description_localizations:
@@ -130,11 +129,8 @@ function setCommands(client: Client) {
           type: ApplicationCommandOptionType.String,
         },
       ],
-    })
-    .catch((error) => console.error("Error creating command: ", error));
-
-  commands
-    .create({
+    },
+    {
       name: AppSettings.BOT_SYSTEM_FACTION_INFO_COMMAND_NAME,
       description: CommandLocalizations.SYTEM_FACTION_INFO_DESCRIPTION["en-US"],
       description_localizations:
@@ -147,17 +143,8 @@ function setCommands(client: Client) {
           type: ApplicationCommandOptionType.String,
         },
       ],
-    })
-    .catch((error) =>
-      console.error(
-        "Error Creating command BOT_SYSTEM_FACTION_INFO_COMMAND_NAME: ",
-        error,
-      ),
-    );
-
-  // Colonization
-  commands
-    .create({
+    },
+    {
       name: AppSettings.BOT_COLONIZATION_ADD_COMMAND_NAME,
       description: CommandLocalizations.COLONIZATION_BOT_DESCRIPTION["en-US"],
       description_localizations:
@@ -221,191 +208,179 @@ function setCommands(client: Client) {
           type: ApplicationCommandOptionType.String,
         },
       ],
-    })
-    .catch((error) => {
-      console.error("Error creating command: ", error);
-    });
-
-  commands.create({
-    name: AppSettings.BOT_COLONIZATION_REMOVE_COMMAND_NAME,
-    description:
-      CommandLocalizations.COLONIZATION_REMOVE_BOT_DESCRIPTION["en-US"],
-    description_localizations:
-      CommandLocalizations.COLONIZATION_REMOVE_BOT_DESCRIPTION,
-    options: [
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
-        required: true,
-        type: ApplicationCommandOptionType.String,
-      },
-    ],
-  });
-
-  commands.create({
-    name: AppSettings.BOT_COLONIZATION_LEAVE_COMMAND_NAME,
-    description:
-      CommandLocalizations.COLONIZATION_LEAVE_BOT_DESCRIPTION["en-US"],
-    description_localizations:
-      CommandLocalizations.COLONIZATION_LEAVE_BOT_DESCRIPTION,
-    options: [
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
-        required: true,
-        type: ApplicationCommandOptionType.String,
-      },
-    ],
-  });
-
-  commands.create({
-    name: AppSettings.INTERACTION_COLONIZATION_LIST_COMMAND_NAME,
-    description:
-      CommandLocalizations.COLONIZATION_LIST_BOT_DESCRIPTION["en-US"],
-    description_localizations:
-      CommandLocalizations.COLONIZATION_LIST_BOT_DESCRIPTION,
-    options: [
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_SYSTEM_NAME_ID,
-        description: AppSettings.INTERACTION_SYSTEM_NAME_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.String,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.Boolean,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.String,
-        choices: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_CHOICES,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.String,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_ARCHITECT_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.String,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_REFERENCE_SYSTEM_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_REFERENCE_SYSTEM_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.String,
-      },
-    ],
-  });
-
-  commands.create({
-    name: AppSettings.BOT_COLONIZATION_PROGRESS_COMMAND_NAME,
-    description:
-      CommandLocalizations.COLONIZATION_PROGRESS_BOT_DESCRIPTION["en-US"],
-    description_localizations:
-      CommandLocalizations.COLONIZATION_PROGRESS_BOT_DESCRIPTION,
-    options: [
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
-        required: true,
-        type: ApplicationCommandOptionType.String,
-      },
-    ],
-  });
-
-  commands.create({
-    name: AppSettings.INTERACTION_COLONIZATION_PARTICIPATE_COMMAND_NAME,
-    description:
-      CommandLocalizations.COLONIZATION_PARTICIPATE_BOT_DESCRIPTION["en-US"],
-    description_localizations:
-      CommandLocalizations.COLONIZATION_PARTICIPATE_BOT_DESCRIPTION,
-    options: [
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
-        required: true,
-        type: ApplicationCommandOptionType.String,
-      },
-    ],
-  });
-
-  commands.create({
-    name: AppSettings.INTERACTION_COLONIZATION_UPDATE_COMMAND_NAME,
-    description:
-      CommandLocalizations.COLONIZATION_UPDATE_BOT_DESCRIPTION["en-US"],
-    description_localizations:
-      CommandLocalizations.COLONIZATION_UPDATE_BOT_DESCRIPTION,
-    options: [
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
-        description:
-          AppSettings.INTERACTION_COLONIZATION_UPDATE_PROJECT_NAME_DESC,
-        required: true,
-        type: ApplicationCommandOptionType.String,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_SYSTEM_NAME_ID,
-        description: AppSettings.INTERACTION_SYSTEM_NAME_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.String,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.String,
-        choices: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_CHOICES,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.String,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_TIMELEFT_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_TIMELEFT_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.String,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_ARCHITECT_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.String,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.Boolean,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_PROGRESS_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_PROGRESS_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.Number,
-      },
-      {
-        name: AppSettings.INTERACTION_COLONIZATION_NOTES_ID,
-        description: AppSettings.INTERACTION_COLONIZATION_NOTES_DESC,
-        required: false,
-        type: ApplicationCommandOptionType.String,
-      },
-    ],
-  });
-
-  // Create faction history command
-  commands
-    .create({
+    },
+    {
+      name: AppSettings.BOT_COLONIZATION_REMOVE_COMMAND_NAME,
+      description:
+        CommandLocalizations.COLONIZATION_REMOVE_BOT_DESCRIPTION["en-US"],
+      description_localizations:
+        CommandLocalizations.COLONIZATION_REMOVE_BOT_DESCRIPTION,
+      options: [
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
+          required: true,
+          type: ApplicationCommandOptionType.String,
+        },
+      ],
+    },
+    {
+      name: AppSettings.BOT_COLONIZATION_LEAVE_COMMAND_NAME,
+      description:
+        CommandLocalizations.COLONIZATION_LEAVE_BOT_DESCRIPTION["en-US"],
+      description_localizations:
+        CommandLocalizations.COLONIZATION_LEAVE_BOT_DESCRIPTION,
+      options: [
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
+          required: true,
+          type: ApplicationCommandOptionType.String,
+        },
+      ],
+    },
+    {
+      name: AppSettings.INTERACTION_COLONIZATION_LIST_COMMAND_NAME,
+      description:
+        CommandLocalizations.COLONIZATION_LIST_BOT_DESCRIPTION["en-US"],
+      description_localizations:
+        CommandLocalizations.COLONIZATION_LIST_BOT_DESCRIPTION,
+      options: [
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_SYSTEM_NAME_ID,
+          description: AppSettings.INTERACTION_SYSTEM_NAME_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.Boolean,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+          choices: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_CHOICES,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_ARCHITECT_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_REFERENCE_SYSTEM_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_REFERENCE_SYSTEM_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
+      ],
+    },
+    {
+      name: AppSettings.BOT_COLONIZATION_PROGRESS_COMMAND_NAME,
+      description:
+        CommandLocalizations.COLONIZATION_PROGRESS_BOT_DESCRIPTION["en-US"],
+      description_localizations:
+        CommandLocalizations.COLONIZATION_PROGRESS_BOT_DESCRIPTION,
+      options: [
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
+          required: true,
+          type: ApplicationCommandOptionType.String,
+        },
+      ],
+    },
+    {
+      name: AppSettings.INTERACTION_COLONIZATION_PARTICIPATE_COMMAND_NAME,
+      description:
+        CommandLocalizations.COLONIZATION_PARTICIPATE_BOT_DESCRIPTION["en-US"],
+      description_localizations:
+        CommandLocalizations.COLONIZATION_PARTICIPATE_BOT_DESCRIPTION,
+      options: [
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_DESC,
+          required: true,
+          type: ApplicationCommandOptionType.String,
+        },
+      ],
+    },
+    {
+      name: AppSettings.INTERACTION_COLONIZATION_UPDATE_COMMAND_NAME,
+      description:
+        CommandLocalizations.COLONIZATION_UPDATE_BOT_DESCRIPTION["en-US"],
+      description_localizations:
+        CommandLocalizations.COLONIZATION_UPDATE_BOT_DESCRIPTION,
+      options: [
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_PROJECT_NAME_ID,
+          description:
+            AppSettings.INTERACTION_COLONIZATION_UPDATE_PROJECT_NAME_DESC,
+          required: true,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_SYSTEM_NAME_ID,
+          description: AppSettings.INTERACTION_SYSTEM_NAME_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+          choices: AppSettings.INTERACTION_COLONIZATION_STARPORT_TYPE_CHOICES,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_SRV_SURVEY_LINK_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_TIMELEFT_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_TIMELEFT_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_ARCHITECT_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_ARCHITECT_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_IS_PRIMARY_PORT_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.Boolean,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_PROGRESS_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_PROGRESS_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.Number,
+        },
+        {
+          name: AppSettings.INTERACTION_COLONIZATION_NOTES_ID,
+          description: AppSettings.INTERACTION_COLONIZATION_NOTES_DESC,
+          required: false,
+          type: ApplicationCommandOptionType.String,
+        },
+      ],
+    },
+    {
       name: AppSettings.BOT_SYSTEM_FACTION_HISTORY_COMMAND_NAME,
       description: AppSettings.INTERACTION_FACTION_HISTROY_DESC,
       options: [
@@ -422,32 +397,21 @@ function setCommands(client: Client) {
           type: ApplicationCommandOptionType.Number,
         },
       ],
-    })
-    .catch((error) => {
-      console.error("Error creating command: ", error);
-    });
-
-  commands.create({
-    name: AppSettings.BOT_COLONIZATION_HELP_COMMAND_NAME,
-    description: AppSettings.INTERACTION_HELP_DESC,
-    description_localizations:
-      CommandLocalizations.LOOKING_FOR_TEAM_HELP_DESCRIPTION,
-  });
-
-  commands
-    .create({
+    },
+    {
+      name: AppSettings.BOT_COLONIZATION_HELP_COMMAND_NAME,
+      description: AppSettings.INTERACTION_HELP_DESC,
+      description_localizations:
+        CommandLocalizations.LOOKING_FOR_TEAM_HELP_DESCRIPTION,
+    },
+    {
       name: AppSettings.BOT_ELITE_SERVER_TICK_INFO,
       description:
         CommandLocalizations.ELITE_SERVER_TICK_INFO_DESCRIPTION["en-US"],
       description_localizations:
         CommandLocalizations.ELITE_SERVER_TICK_INFO_DESCRIPTION,
-    })
-    .catch((error) => {
-      console.error("Error creating command: ", error);
-    });
-
-  commands
-    .create({
+    },
+    {
       name: AppSettings.BOT_SYSTEM_TRAFFIC_COMMAND_NAME,
       description:
         CommandLocalizations.SYSTEM_TRAFFIC_INFO_DESCRIPTION["en-US"],
@@ -461,11 +425,8 @@ function setCommands(client: Client) {
           type: ApplicationCommandOptionType.String,
         },
       ],
-    })
-    .catch((error) => console.error("Error Get System Traffic Info: ", error));
-
-  commands
-    .create({
+    },
+    {
       name: AppSettings.BOT_SYSTEM_DEATH_COMMAND_NAME,
       description: CommandLocalizations.SYSTEM_DEATH_INFO_DESCRIPTION["en-US"],
       description_localizations:
@@ -478,26 +439,27 @@ function setCommands(client: Client) {
           type: ApplicationCommandOptionType.String,
         },
       ],
-    })
-    .catch((error) => console.error("Error Get System Death Info: ", error));
-
-  commands
-    .create({
+    },
+    {
       name: AppSettings.BOT_HELP_COMMAND_NAME,
       description: AppSettings.INTERACTION_HELP_DESC,
       description_localizations:
         CommandLocalizations.LOOKING_FOR_TEAM_HELP_DESCRIPTION,
-    })
-    .catch((error) => console.error("Error Get Help Info: ", error));
-
-  commands
-    .create({
+    },
+    {
       name: AppSettings.BOT_PING_COMMAND_NAME,
       description: AppSettings.INTERACTION_PING_DESC,
       description_localizations:
         CommandLocalizations.LOOKING_FOR_TEAM_PING_DESCRIPTION,
-    })
-    .catch((error) => console.error("Error Get Ping Info: ", error));
+    }
+  ];
+
+  try {
+    await commands.set(commandData);
+    console.log("Commands successfully registered.");
+  } catch (error) {
+    console.error("Error setting commands: ", error);
+  }
 }
 
 export default setCommands;

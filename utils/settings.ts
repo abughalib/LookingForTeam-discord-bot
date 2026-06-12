@@ -378,10 +378,16 @@ export class AppSettings {
     "https://ravencolonial100-awcbdvabgze4c5cq.canadacentral-01.azurewebsites.net/api/project/";
   static readonly REVENCOLONIAL_DEFAULT_URL = "https://ravencolonial.com/#sys=";
 
-  // Headers for API Request to Other Websites.
+  // Headers for GET API Requests (no Content-Type — mimics curl exactly, passes Cloudflare)
   static readonly BOT_HEADER = {
+    "User-Agent": "curl/8.14.1",
+    "Accept": "*/*",
+  };
+  // Headers for POST API Requests
+  static readonly BOT_POST_HEADER = {
     "Content-Type": "application/json",
-    "User-Agent": "Looking-For-Team-Bot/1.8 (Linux)",
+    "User-Agent": "curl/8.14.1",
+    "Accept": "*/*",
   };
   static readonly BOT_REAL_BROWSER_HEADERS = {
     "Content-Type": "application/json",

@@ -7,13 +7,14 @@ import {
   SystemTrafficInfo,
 } from "./models";
 import { getSystemInfoFromCache, cacheSystemInfo } from "./database";
+import { httpsRequest } from "./httpsRequest";
 
 /*
   EDSM API Queries here.
 */
 
 class EDSM {
-  constructor() {}
+  constructor() { }
 
   /*
     Args:
@@ -24,42 +25,82 @@ class EDSM {
       Fetches system Factions from EDSM
   */
   async fetchSystemFactionInfo(systemName: string, showHistory: number = 0) {
-    let resp = await fetch(AppSettings.BOT_SYSTEM_FACTION_FETCH_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        systemName: systemName,
-        showHistory: showHistory,
-      }),
-      headers: AppSettings.BOT_HEADER,
-    });
-
-    return resp.json();
+    try {
+      let resp = await httpsRequest(
+        `${AppSettings.BOT_SYSTEM_FACTION_FETCH_URL}?systemName=${encodeURIComponent(systemName)}&showHistory=${showHistory}`,
+        {
+          method: "GET",
+          headers: AppSettings.BOT_HEADER,
+        }
+      );
+      if (!resp.ok) {
+        const body = await resp.text().catch(() => "<unable to read body>");
+        console.error(
+          "EDSM faction fetch non-ok response:",
+          resp.status,
+          resp.statusText,
+          body,
+        );
+        return null;
+      }
+      return await resp.json();
+    } catch (error) {
+      console.error("EDSM Faction fetch error:", error);
+      return null;
+    }
   }
 
   // Elite Dangerous server status
   async eliteServerStatus(): Promise<ServerStatusModel | null> {
-    let resp = await fetch(AppSettings.BOT_ELITE_SERVER_FETCH_URL);
-
-    let resp_json = await resp.json();
-
-    let serverStatus: ServerStatusModel = resp_json;
-
-    return serverStatus;
+    try {
+      let resp = await httpsRequest(AppSettings.BOT_ELITE_SERVER_FETCH_URL, {
+        headers: AppSettings.BOT_HEADER,
+      });
+      if (!resp.ok) {
+        const body = await resp.text().catch(() => "<unable to read body>");
+        console.error(
+          "EDSM elite server fetch non-ok response:",
+          resp.status,
+          resp.statusText,
+          body,
+        );
+        return null;
+      }
+      let resp_json = await resp.json();
+      let serverStatus: ServerStatusModel = resp_json;
+      return serverStatus;
+    } catch (error) {
+      console.error("EDSM Server Status fetch error:", error);
+      return null;
+    }
   }
 
   // Elite Dangerous system Traffic info with Breakdown by ships
   async getSystemTrafficInfo(systemName: string): Promise<any | null> {
-    let resp = await fetch(AppSettings.BOT_SYSTEM_TRAFFIC_FETCH_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        systemName: systemName,
-      }),
-      headers: AppSettings.BOT_HEADER,
-    });
-
-    let resp_json = await resp.json();
-
-    return resp_json;
+    try {
+      let resp = await httpsRequest(
+        `${AppSettings.BOT_SYSTEM_TRAFFIC_FETCH_URL}?systemName=${encodeURIComponent(systemName)}`,
+        {
+          method: "GET",
+          headers: AppSettings.BOT_HEADER,
+        }
+      );
+      if (!resp.ok) {
+        const body = await resp.text().catch(() => "<unable to read body>");
+        console.error(
+          "EDSM traffic fetch non-ok response:",
+          systemName,
+          resp.status,
+          resp.statusText,
+          body,
+        );
+        return null;
+      }
+      return await resp.json();
+    } catch (error) {
+      console.error("EDSM Traffic fetch error:", error);
+      return null;
+    }
   }
 
   /*
@@ -69,19 +110,32 @@ class EDSM {
       systemDeath // [SystemDeath]
   */
   async getSystemDeath(systemName: string): Promise<SystemDeath | null> {
-    let resp = await fetch(AppSettings.BOT_SYSTEM_DEATHS_INFO_FETCH_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        systemName: systemName,
-      }),
-      headers: AppSettings.BOT_HEADER,
-    });
-
-    let resp_json = await resp.json();
-
-    let systemDeath: SystemDeath = resp_json;
-
-    return systemDeath;
+    try {
+      let resp = await httpsRequest(
+        `${AppSettings.BOT_SYSTEM_DEATHS_INFO_FETCH_URL}?systemName=${encodeURIComponent(systemName)}`,
+        {
+          method: "GET",
+          headers: AppSettings.BOT_HEADER,
+        }
+      );
+      if (!resp.ok) {
+        const body = await resp.text().catch(() => "<unable to read body>");
+        console.error(
+          "EDSM death fetch non-ok response:",
+          systemName,
+          resp.status,
+          resp.statusText,
+          body,
+        );
+        return null;
+      }
+      let resp_json = await resp.json();
+      let systemDeath: SystemDeath = resp_json;
+      return systemDeath;
+    } catch (error) {
+      console.error("EDSM Death fetch error:", error);
+      return null;
+    }
   }
 
   /*
@@ -127,9 +181,9 @@ class EDSM {
     }
 
     // If not in cache, fetch from API
-    const systemInfo = await fetch(
+    const systemInfo = await httpsRequest(
       AppSettings.BOT_SYSTEM_INFO_FETCH_URL +
-        `?systemName=${encodeURIComponent(systemName)}&showCoordinates=1`,
+      `?systemName=${encodeURIComponent(systemName)}&showCoordinates=1`,
       {
         method: "GET",
         headers: AppSettings.BOT_HEADER,
